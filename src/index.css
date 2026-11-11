@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+
+  --color-galaxy-900: #0E1A47;
+  --color-galaxy-700: #24307A;
+  --color-judul: #17204D;
+  --color-aksi: #3F51D9;
+  --color-aksen: #8FA2FF;
+  --color-lembut: #EAEEFF;
+  --color-latar: #F3F5FB;
+  --color-garis: #E3E7F1;
+  --color-teks: #1A2142;
+  --color-teks-lembut: #646E89;
+
+  --color-berjalan: #1E9E6A;
+  --color-segera: #E0A100;
+  --color-lewat: #E36A2E;
+  --color-selesai: #94A3B8;
+  --color-hapus: #D93645;
+}
+
+body {
+  margin: 0;
+  background: var(--color-latar);
+  color: var(--color-teks);
+}
