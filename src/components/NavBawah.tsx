@@ -1,5 +1,5 @@
 // Navigasi bawah: Beranda, Kontrak, tombol + (tambah kontrak), Pengingat, Profil.
-// Ukuran dan warna mengikuti docs/prototipe-referensi.html.
+// Gaya: datar dengan label, menu aktif navy, tombol + bulat bergradasi navy.
 
 import { Link, NavLink } from 'react-router-dom'
 import { useToast } from '../lib/toast'
@@ -7,7 +7,7 @@ import Ikon, { type NamaIkon } from './Ikon'
 
 // Class bersama untuk keempat menu (tanpa warna).
 const kelasMenu =
-  'flex min-h-11 flex-col items-center justify-center gap-1 border-none bg-transparent text-[11px] font-bold no-underline'
+  'flex min-h-11 flex-col items-center justify-center gap-1 border-none bg-transparent text-[11px] no-underline'
 
 type Props = {
   ke: string
@@ -15,13 +15,15 @@ type Props = {
   ikon: NamaIkon
 }
 
-/** Satu menu navigasi. Berwarna biru saat halamannya sedang dibuka. */
+/** Satu menu navigasi. Berwarna navy dan lebih tebal saat halamannya sedang dibuka. */
 function MenuNav({ ke, label, ikon }: Props) {
   return (
     <NavLink
       to={ke}
       end
-      className={({ isActive }) => `${kelasMenu} ${isActive ? 'text-aksi' : 'text-teks-lembut'}`}
+      className={({ isActive }) =>
+        `${kelasMenu} ${isActive ? 'font-semibold text-aksi hover:text-aksi' : 'font-medium text-teks-lembut hover:text-teks-lembut'}`
+      }
     >
       <Ikon nama={ikon} />
       {label}
@@ -35,9 +37,9 @@ function NavBawah() {
   return (
     <nav
       aria-label="Navigasi utama"
-      // Tinggi 86px dengan 20px ruang bawah untuk garis home HP.
+      // Tinggi 78px dengan 16px ruang bawah untuk garis home HP.
       // Kalau HP butuh ruang lebih besar (safe area), ruangnya ikut membesar.
-      className="grid flex-none grid-cols-5 items-center border-t border-garis bg-white pt-0 pb-[max(20px,env(safe-area-inset-bottom))] [min-height:calc(66px+max(20px,env(safe-area-inset-bottom)))]"
+      className="grid flex-none grid-cols-5 items-center border-t border-garis bg-white pb-[max(16px,env(safe-area-inset-bottom))] [min-height:calc(62px+max(16px,env(safe-area-inset-bottom)))]"
     >
       <MenuNav ke="/" label="Beranda" ikon="beranda" />
       <MenuNav ke="/kontrak" label="Kontrak" ikon="kontrak" />
@@ -45,7 +47,7 @@ function NavBawah() {
       <Link
         to="/tambah"
         aria-label="Tambah kontrak baru"
-        className="-mt-[30px] flex size-[58px] items-center justify-center justify-self-center rounded-[20px] border-4 border-latar bg-linear-135 from-aksi to-aksi-ungu text-white shadow-tombol-tambah hover:text-white"
+        className="-mt-7 flex size-[52px] items-center justify-center justify-self-center rounded-full bg-linear-135 from-galaxy-900 to-galaxy-700 text-white shadow-tombol-tambah ring-4 ring-latar hover:text-white"
       >
         <Ikon nama="tambah" ukuran={24} tebal={2.5} />
       </Link>
@@ -56,7 +58,7 @@ function NavBawah() {
       <button
         type="button"
         onClick={() => tampilkanToast('Halaman profil belum masuk desain MVP')}
-        className={`${kelasMenu} cursor-pointer text-teks-lembut`}
+        className={`${kelasMenu} cursor-pointer font-medium text-teks-lembut`}
       >
         <Ikon nama="profil" />
         Profil

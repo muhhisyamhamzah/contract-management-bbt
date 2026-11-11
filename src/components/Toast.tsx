@@ -29,13 +29,13 @@ function PenyediaToast({ children }: Props) {
       {/*
         Elemen ini selalu ada (hanya disembunyikan saat kosong), supaya pembaca layar
         tetap membacakan pesan baru yang muncul.
-        Posisi bawah 106px = tinggi navigasi bawah (86px) + jarak 20px, sama dengan referensi.
+        Posisi bawah 98px = tinggi navigasi bawah (78px) + jarak 20px.
       */}
       <div
         role="status"
         className={
           pesan
-            ? 'absolute right-5 bottom-[106px] left-5 z-40 rounded-2xl bg-judul px-4 py-3.5 text-center font-bold text-white shadow-toast'
+            ? 'absolute right-5 bottom-[98px] left-5 z-40 rounded-2xl bg-judul px-4 py-3.5 text-center font-bold text-white shadow-toast'
             : 'sr-only'
         }
       >

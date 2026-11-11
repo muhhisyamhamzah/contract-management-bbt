@@ -68,6 +68,18 @@ export function teksSisaHari(kontrak: Kontrak, hariIni: Date = new Date()): stri
   return `${sisaHari} hari lagi`
 }
 
+/** Menghitung berapa kontrak di setiap status, misalnya { berjalan: 2, segera: 3, ... }. */
+export function hitungJumlahPerStatus(
+  daftar: Kontrak[],
+  hariIni: Date = new Date(),
+): Record<StatusKontrak, number> {
+  const jumlah: Record<StatusKontrak, number> = { berjalan: 0, segera: 0, lewat: 0, selesai: 0 }
+  for (const kontrak of daftar) {
+    jumlah[hitungStatus(kontrak, hariIni)] += 1
+  }
+  return jumlah
+}
+
 type TampilanStatus = {
   /** Teks yang tampil di layar. */
   label: string
@@ -83,6 +95,10 @@ type TampilanStatus = {
   kelasCincin: string
   /** Warna garis masa kontrak di atas header gelap. */
   kelasBarHeader: string
+  /** Kotak ikon bergradasi warna logo + bayangan berwarna (gaya Beranda). */
+  kelasIkonGradasi: string
+  /** Hiasan lingkaran samar di pojok kotak ringkasan. */
+  kelasHiasan: string
 }
 
 /**
@@ -98,6 +114,8 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBar: 'bg-berjalan',
     kelasCincin: 'stroke-cincin-berjalan',
     kelasBarHeader: 'bg-cincin-berjalan',
+    kelasIkonGradasi: 'from-berjalan to-logo-hijau shadow-logo-hijau/35',
+    kelasHiasan: 'bg-logo-hijau/10',
   },
   segera: {
     label: 'Segera habis',
@@ -107,6 +125,8 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBar: 'bg-segera',
     kelasCincin: 'stroke-cincin-segera',
     kelasBarHeader: 'bg-cincin-segera',
+    kelasIkonGradasi: 'from-logo-emas to-logo-tanah shadow-logo-emas/40',
+    kelasHiasan: 'bg-logo-emas/12',
   },
   lewat: {
     label: 'Sudah lewat',
@@ -116,6 +136,8 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBar: 'bg-lewat',
     kelasCincin: 'stroke-cincin-lewat',
     kelasBarHeader: 'bg-cincin-lewat',
+    kelasIkonGradasi: 'from-logo-tanah to-hapus shadow-logo-tanah/40',
+    kelasHiasan: 'bg-logo-tanah/10',
   },
   selesai: {
     label: 'Selesai',
@@ -125,5 +147,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBar: 'bg-selesai',
     kelasCincin: 'stroke-selesai',
     kelasBarHeader: 'bg-selesai',
+    kelasIkonGradasi: 'from-selesai to-selesai-teks shadow-selesai/45',
+    kelasHiasan: 'bg-selesai/15',
   },
 }

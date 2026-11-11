@@ -1,20 +1,20 @@
 @import "tailwindcss";
 
 /*
-  Palet warna dan bayangan aplikasi. Semua nilai diambil dari docs/prototipe-referensi.html.
+  Palet warna dan bayangan aplikasi: navy dan emas, dengan warna logo BBT sebagai aksen.
+  Warna utama sengaja BUKAN hijau/teal supaya berbeda dari aplikasi Sismon.
   Di komponen, pakai class Tailwind dari token ini (misalnya bg-aksi, text-segera-teks).
   JANGAN menulis kode hex langsung di komponen.
 */
 @theme {
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 
-  /* Warna utama */
-  --color-galaxy-900: #0E1A47;
-  --color-galaxy-700: #24307A;
+  /* Warna utama: navy */
+  --color-galaxy-900: #13254F;    /* navy tua: awal gradasi header, tombol + */
+  --color-galaxy-700: #2B4C9B;    /* navy: akhir gradasi header */
   --color-judul: #17204D;
-  --color-aksi: #3F51D9;
-  --color-aksi-tua: #2C3BB0;      /* teks di kotak ungu muda, hover tautan */
-  --color-aksi-ungu: #7B6CF6;     /* ujung gradasi tombol + */
+  --color-aksi: #2B4C9B;          /* tombol utama, tautan, menu aktif */
+  --color-aksi-tua: #13254F;      /* teks di kotak biru muda, hover tautan */
   --color-aksen: #8FA2FF;
   --color-lembut: #EAEEFF;
   --color-latar: #F3F5FB;
@@ -56,13 +56,33 @@
   --color-hapus-latar: #FBE6E8;
   --color-hapus-teks: #9F2430;
 
+  /* Warna logo BBT. Dipakai kecil (ikon status, aksen), bukan sebagai warna utama. */
+  --color-logo-hijau: #1C8B4C;
+  --color-logo-emas: #F2B829;
+  --color-logo-tanah: #E07B2C;
+
+  /* Animasi ikon "meletup" saat muncul (dipakai dengan motion-safe:) */
+  --animate-meletup: meletup 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+
+  @keyframes meletup {
+    0% {
+      opacity: 0;
+      transform: translateY(8px) scale(0.6);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
   /* Bayangan */
+  --shadow-kotak: 0 1px 2px rgb(19 37 79 / 0.04), 0 8px 20px -12px rgb(19 37 79 / 0.22);
   --shadow-kartu: 0 18px 36px -18px rgb(14 26 71 / 0.35);
   --shadow-menu: 0 18px 36px -14px rgb(14 26 71 / 0.35);
   --shadow-menu-tebal: 0 18px 36px -14px rgb(14 26 71 / 0.45);
   --shadow-tab: 0 2px 8px -2px rgb(14 26 71 / 0.2);
   --shadow-toast: 0 16px 32px -12px rgb(14 26 71 / 0.5);
-  --shadow-tombol-tambah: 0 12px 24px -10px rgb(63 81 217 / 0.7);
+  --shadow-tombol-tambah: 0 12px 24px -10px rgb(43 76 155 / 0.6);
 }
 
 @layer base {

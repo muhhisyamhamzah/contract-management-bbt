@@ -19,7 +19,9 @@ Aplikasi HP untuk mencatat dan memantau kontrak di Badan Bank Tanah. Dikerjakan 
 
 ## Acuan desain
 
-- Tampilan dan interaksi mengikuti `docs/prototipe-referensi.html` semirip mungkin: tata letak, jarak, ukuran huruf, sudut membulat, warna, teks, dan interaksi.
+- **Gaya visual (warna, bentuk, ikon) mengikuti Beranda yang sudah jadi** (`src/pages/Beranda.tsx`): navy dan emas, header navy bergelombang, kotak putih bersudut 16px dengan `shadow-kotak`, ikon di kotak bergradasi warna logo, huruf semibold (bukan extrabold), kotak kalender untuk tanggal. Halaman lain (Kontrak, Pengingat, Detail, Tambah) disesuaikan dengan gaya ini.
+- **Isi, tata letak dasar, teks, dan interaksi** halaman lain tetap mengacu ke `docs/prototipe-referensi.html` (filter chip, pencarian, dropdown urutan, menu titik tiga, tab, form bertahap, toast, dll), tapi warnanya diganti ke palet navy dan emas.
+- Warna utama sengaja navy, BUKAN hijau atau teal, supaya berbeda dari aplikasi Sismon. Warna logo (hijau, emas, oranye tanah) hanya untuk aksen kecil seperti ikon status.
 - Cara membaca file itu: markup ada di dalam `<x-dc>`, logika dan data contoh di `class Component` di bagian bawah. `{{nama}}` adalah nilai dari `renderVals()`, `<sc-if>` adalah kondisi, `<sc-for>` adalah perulangan.
 - JANGAN tiru bingkai HP (bezel hitam, notch, garis home). Aplikasinya hanya isi layar, lebar maksimal 430px di tengah layar.
 - Logo di referensi memakai alamat `/_blob/...`; di aplikasi pakai `/logo-bbt.png`.
@@ -28,14 +30,15 @@ Aplikasi HP untuk mencatat dan memantau kontrak di Badan Bank Tanah. Dikerjakan 
 ## Tampilan
 
 - Mobile-first. Ukuran acuan 390 x 844 (layar HP), lebar maksimal 430px di tengah layar.
-- Jarak atas header (56px) dan bawah navigasi (20px) adalah ruang status bar dan garis home HP. Pakai `max(..., env(safe-area-inset-*))` supaya ikut membesar di HP yang butuh ruang lebih.
+- Jarak atas header (56px) dan bawah navigasi (16px) adalah ruang status bar dan garis home HP. Pakai `max(..., env(safe-area-inset-*))` supaya ikut membesar di HP yang butuh ruang lebih.
 - Font: Plus Jakarta Sans (sudah dimuat di `index.html`). Ukuran huruf dasar 14px.
 - Ukuran huruf ditulis dalam piksel, misalnya `text-[12px]`, `text-[16px]`, sesuai angka di referensi. JANGAN pakai `text-xs`, `text-sm`, `text-lg`, dan sejenisnya, karena class itu ikut mengubah jarak baris. Jarak baris dasar sengaja `normal` (diatur di `src/index.css`), sama dengan referensi.
 - Judul `h1` sampai `h3` sudah tebal (700) dari `src/index.css`. Tambahkan `font-extrabold` kalau referensi memakai 800.
-- Palet warna dan bayangan didaftarkan di `src/index.css` lewat `@theme`. Pakai class Tailwind dari token itu, JANGAN menulis kode hex di komponen. Warna yang dipakai referensi tapi belum ada di `@theme` ditambahkan sebagai token baru dengan nama yang jelas, bukan ditulis langsung.
-  - `galaxy-900`, `galaxy-700`: gradasi header dan kartu utama
+- Palet warna dan bayangan didaftarkan di `src/index.css` lewat `@theme`. Pakai class Tailwind dari token itu, JANGAN menulis kode hex di komponen. Warna baru ditambahkan sebagai token dengan nama yang jelas, bukan ditulis langsung.
+  - `galaxy-900` (navy tua), `galaxy-700` (navy): gradasi header, tombol +, kotak ikon navy
   - `judul`: judul dan teks tebal
-  - `aksi`: tombol utama; `aksi-tua`: teks di kotak ungu muda; `aksi-ungu`: ujung gradasi tombol +
+  - `aksi`: tombol utama, tautan, menu aktif (navy); `aksi-tua`: navy tua untuk teks di kotak biru muda
+  - `logo-hijau`, `logo-emas`, `logo-tanah`: warna logo BBT, HANYA untuk aksen kecil (gradasi ikon status, pita kalender, lingkaran profil)
   - `aksen`, `lembut`: sorotan ringan, menu aktif
   - `latar`: latar halaman; `latar-tab`: latar tab
   - `garis`: border; `garis-input`: border isian form; `garis-lembut`: pembatas baris dan latar progress bar
@@ -45,9 +48,11 @@ Aplikasi HP untuk mencatat dan memantau kontrak di Badan Bank Tanah. Dikerjakan 
   - `cincin-berjalan`, `cincin-segera`, `cincin-lewat`: cincin hitung mundur dan garis masa di header Detail
   - `lewat-kartu`, `lewat-garis-kartu`: kartu "Sudah lewat" di Pengingat
   - `hapus`, `hapus-latar`, `hapus-teks`: HANYA untuk aksi menghapus dan pesan kesalahan
-  - Bayangan: `shadow-kartu`, `shadow-menu`, `shadow-menu-tebal`, `shadow-tab`, `shadow-toast`, `shadow-tombol-tambah`
-- Label, ikon, dan class warna tiap status diambil dari `TAMPILAN_STATUS` di `src/lib/status.ts`, jangan ditulis ulang di komponen.
-- Logo Badan Bank Tanah berwarna hijau dan kuning. Selalu taruh di atas panel putih, jangan langsung di atas latar biru gelap.
+  - Bayangan: `shadow-kotak` (kotak dan kartu putih gaya baru), `shadow-kartu`, `shadow-menu`, `shadow-menu-tebal`, `shadow-tab`, `shadow-toast`, `shadow-tombol-tambah`
+  - Animasi: `animate-meletup` untuk ikon yang muncul. Selalu pakai `motion-safe:` dan beri `motion-reduce:transition-none` pada efek gerak, supaya pengguna yang mematikan animasi tidak terganggu.
+- Label, ikon, dan class warna tiap status (termasuk `kelasIkonGradasi` dan `kelasHiasan`) diambil dari `TAMPILAN_STATUS` di `src/lib/status.ts`, jangan ditulis ulang di komponen.
+- Ikon: pakai ikon garis di `src/components/Ikon.tsx`. Ikon 3D atau gambar ikon dari luar sudah dicoba dan DITOLAK, jangan dipakai.
+- Logo Badan Bank Tanah (`/logo-bbt.png`, hijau dan kuning) HANYA tampil di layar pembuka (`src/components/LayarPembuka.tsx`) dengan latar putih, saat aplikasi pertama dibuka. Di dalam aplikasi (Beranda dan halaman lain) tidak ada logo.
 
 ## Status kontrak
 
@@ -66,7 +71,7 @@ Navigasi bawah berisi 5 item: Beranda, Kontrak, tombol + (tambah kontrak), Pengi
 
 Tombol Kembali di Detail dan Batal di form mengikuti riwayat browser. Kalau halaman dibuka langsung lewat alamat (riwayat kosong), cadangannya ke `/kontrak` (Detail) dan `/` (form). Pakai `useKembali` di `src/lib/navigasi.ts`.
 
-1. **Beranda**: sapaan, kartu "X kontrak butuh tindakan", 4 kotak status yang bisa diklik (membuka daftar dengan filter itu), deretan "Segera habis" yang bisa digeser ke samping, dan total nilai kontrak berjalan.
+1. **Beranda** (SUDAH JADI, jadi acuan gaya): header navy bergelombang (judul aplikasi, sapaan, tanggal, lonceng dengan jumlah, lingkaran profil yang memunculkan toast), kotak pencarian yang membuka daftar Kontrak, "Ringkasan kontrak" 6 kotak (4 status yang membuka daftar dengan filter itu, Tambah, Pengingat), daftar "Segera habis" ke bawah dengan kotak kalender, dan total nilai kontrak yang belum selesai.
 2. **Kontrak**: pencarian (judul, nomor, mitra), chip filter status, dropdown urutan (paling cepat habis, nilai terbesar, nama A-Z), daftar kartu kontrak. Ada tampilan kosong kalau tidak ada hasil.
 3. **Pengingat**: dua kelompok, "Sudah lewat" dan "Habis dalam 30 hari".
 4. **Detail kontrak**: header dengan lingkaran hitung mundur sisa hari, garis masa kontrak (mulai sampai berakhir), tab Ringkasan / Dokumen / Riwayat, tombol bawah "Tandai selesai" dan "Perpanjang", menu titik tiga (edit, unduh dokumen, hapus dengan konfirmasi).
@@ -78,7 +83,7 @@ Tombol Kembali di Detail dan Batal di form mengikuti riwayat browser. Kalau hala
 ```
 src/
   pages/        Beranda, Kontrak, Pengingat, DetailKontrak, FormKontrak
-  components/   NavBawah, TataLetakHP, TataLetakUtama, Ikon, KartuKontrak, BadgeStatus, CincinHari, Toast, dll
+  components/   NavBawah, TataLetakHP, TataLetakUtama, LayarPembuka, Ikon, KotakRingkasan, KotakKalender, BarisSegeraHabis, KartuKontrak, BadgeStatus, CincinHari, MenuDropdown, Toast, dll
   data/         kontrakContoh.ts
   lib/          status.ts (hitung status, label, warna), format.ts (rupiah, tanggal), navigasi.ts (tombol kembali)
   types/        kontrak.ts

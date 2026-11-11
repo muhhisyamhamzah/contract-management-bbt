@@ -6,6 +6,7 @@
 // Toast juga dipasang di sini supaya muncul di dalam kolom HP.
 
 import { Outlet } from 'react-router-dom'
+import LayarPembuka from './LayarPembuka'
 import PenyediaToast from './Toast'
 
 function TataLetakHP() {
@@ -14,6 +15,8 @@ function TataLetakHP() {
       <PenyediaToast>
         <Outlet />
       </PenyediaToast>
+      {/* Logo BBT saat aplikasi pertama dibuka, menutupi seluruh kolom HP */}
+      <LayarPembuka />
     </div>
   )
 }
