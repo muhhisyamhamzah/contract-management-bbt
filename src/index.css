@@ -1,28 +1,84 @@
 @import "tailwindcss";
 
+/*
+  Palet warna dan bayangan aplikasi. Semua nilai diambil dari docs/prototipe-referensi.html.
+  Di komponen, pakai class Tailwind dari token ini (misalnya bg-aksi, text-segera-teks).
+  JANGAN menulis kode hex langsung di komponen.
+*/
 @theme {
   --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
 
+  /* Warna utama */
   --color-galaxy-900: #0E1A47;
   --color-galaxy-700: #24307A;
   --color-judul: #17204D;
   --color-aksi: #3F51D9;
+  --color-aksi-tua: #2C3BB0;      /* teks di kotak ungu muda, hover tautan */
+  --color-aksi-ungu: #7B6CF6;     /* ujung gradasi tombol + */
   --color-aksen: #8FA2FF;
   --color-lembut: #EAEEFF;
   --color-latar: #F3F5FB;
+  --color-latar-tab: #E6EAF5;     /* latar tab Ringkasan / Dokumen / Riwayat */
   --color-garis: #E3E7F1;
+  --color-garis-input: #DCE1EE;   /* border kotak isian form */
+  --color-garis-lembut: #EEF1F5;  /* pembatas baris, latar progress bar */
   --color-teks: #1A2142;
   --color-teks-lembut: #646E89;
+  --color-teks-header: #C9D1FF;   /* teks redup di atas header biru */
 
+  /* Warna pekat tiap status (titik, progress bar, garis termin) */
   --color-berjalan: #1E9E6A;
   --color-segera: #E0A100;
   --color-lewat: #E36A2E;
   --color-selesai: #94A3B8;
+
+  /* Badge dan ikon status: latar muda + teks gelap */
+  --color-berjalan-latar: #E3F5EC;
+  --color-berjalan-teks: #11734B;
+  --color-segera-latar: #FBF0D3;
+  --color-segera-teks: #7A5700;
+  --color-lewat-latar: #FCE6DA;
+  --color-lewat-teks: #9E4113;
+  --color-selesai-latar: #EEF1F5;
+  --color-selesai-teks: #4B5568;
+
+  /* Kartu "Sudah lewat" di halaman Pengingat */
+  --color-lewat-kartu: #FFF7F2;
+  --color-lewat-garis-kartu: #F3C9B2;
+
+  /* Cincin hitung mundur dan garis masa kontrak di header Detail (di atas latar gelap) */
+  --color-cincin-berjalan: #7EE0B0;
+  --color-cincin-segera: #FAC775;
+  --color-cincin-lewat: #F5B08A;
+
+  /* HANYA untuk aksi menghapus dan pesan kesalahan */
   --color-hapus: #D93645;
+  --color-hapus-latar: #FBE6E8;
+  --color-hapus-teks: #9F2430;
+
+  /* Bayangan */
+  --shadow-kartu: 0 18px 36px -18px rgb(14 26 71 / 0.35);
+  --shadow-menu: 0 18px 36px -14px rgb(14 26 71 / 0.35);
+  --shadow-menu-tebal: 0 18px 36px -14px rgb(14 26 71 / 0.45);
+  --shadow-tab: 0 2px 8px -2px rgb(14 26 71 / 0.2);
+  --shadow-toast: 0 16px 32px -12px rgb(14 26 71 / 0.5);
+  --shadow-tombol-tambah: 0 12px 24px -10px rgb(63 81 217 / 0.7);
 }
 
-body {
-  margin: 0;
-  background: var(--color-latar);
-  color: var(--color-teks);
+@layer base {
+  body {
+    margin: 0;
+    background: var(--color-latar);
+    color: var(--color-teks);
+    font-family: var(--font-sans);
+    font-size: 14px;
+  }
+
+  a {
+    color: var(--color-aksi);
+  }
+
+  a:hover {
+    color: var(--color-aksi-tua);
+  }
 }

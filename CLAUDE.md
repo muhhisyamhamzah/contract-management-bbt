@@ -17,19 +17,34 @@ Aplikasi HP untuk mencatat dan memantau kontrak di Badan Bank Tanah. Dikerjakan 
 - Rencana: dijadikan PWA nanti. Belum dikerjakan.
 - Jangan menambah library baru tanpa bertanya dulu.
 
+## Acuan desain
+
+- Tampilan dan interaksi mengikuti `docs/prototipe-referensi.html` semirip mungkin: tata letak, jarak, ukuran huruf, sudut membulat, warna, teks, dan interaksi.
+- Cara membaca file itu: markup ada di dalam `<x-dc>`, logika dan data contoh di `class Component` di bagian bawah. `{{nama}}` adalah nilai dari `renderVals()`, `<sc-if>` adalah kondisi, `<sc-for>` adalah perulangan.
+- JANGAN tiru bingkai HP (bezel hitam, notch, garis home). Aplikasinya hanya isi layar, lebar maksimal 430px di tengah layar.
+- Logo di referensi memakai alamat `/_blob/...`; di aplikasi pakai `/logo-bbt.png`.
+- Yang sengaja berbeda dari referensi: status, sisa hari, dan progres DIHITUNG dari tanggal (bukan angka tetap); tanggal data contoh relatif terhadap hari ini; perpindahan layar memakai `react-router-dom`.
+
 ## Tampilan
 
-- Mobile-first. Ukuran acuan 390 x 844 (layar HP). Tetap rapi di layar lebih lebar dengan membatasi lebar konten di tengah.
-- Font: Plus Jakarta Sans (sudah dimuat di `index.html`).
-- Palet warna sudah didaftarkan di `src/index.css` lewat `@theme`. Pakai class Tailwind dari token itu, JANGAN menulis kode hex di komponen:
+- Mobile-first. Ukuran acuan 390 x 844 (layar HP), lebar maksimal 430px di tengah layar.
+- Jarak atas header (56px) dan bawah navigasi (20px) adalah ruang status bar dan garis home HP. Pakai `max(..., env(safe-area-inset-*))` supaya ikut membesar di HP yang butuh ruang lebih.
+- Font: Plus Jakarta Sans (sudah dimuat di `index.html`). Ukuran huruf dasar 14px.
+- Palet warna dan bayangan didaftarkan di `src/index.css` lewat `@theme`. Pakai class Tailwind dari token itu, JANGAN menulis kode hex di komponen. Warna yang dipakai referensi tapi belum ada di `@theme` ditambahkan sebagai token baru dengan nama yang jelas, bukan ditulis langsung.
   - `galaxy-900`, `galaxy-700`: gradasi header dan kartu utama
   - `judul`: judul dan teks tebal
-  - `aksi`: tombol utama
+  - `aksi`: tombol utama; `aksi-tua`: teks di kotak ungu muda; `aksi-ungu`: ujung gradasi tombol +
   - `aksen`, `lembut`: sorotan ringan, menu aktif
-  - `latar`: latar halaman; `garis`: border
-  - `teks`, `teks-lembut`: teks biasa dan teks keterangan
-  - `berjalan`, `segera`, `lewat`, `selesai`: warna status
-  - `hapus`: HANYA untuk aksi menghapus
+  - `latar`: latar halaman; `latar-tab`: latar tab
+  - `garis`: border; `garis-input`: border isian form; `garis-lembut`: pembatas baris dan latar progress bar
+  - `teks`, `teks-lembut`: teks biasa dan teks keterangan; `teks-header`: teks redup di header biru
+  - `berjalan`, `segera`, `lewat`, `selesai`: warna pekat status (progress bar, titik)
+  - `<status>-latar` dan `<status>-teks` (misalnya `segera-latar`, `segera-teks`): badge dan ikon status. Jangan pakai opacity seperti `bg-segera/15`.
+  - `cincin-berjalan`, `cincin-segera`, `cincin-lewat`: cincin hitung mundur dan garis masa di header Detail
+  - `lewat-kartu`, `lewat-garis-kartu`: kartu "Sudah lewat" di Pengingat
+  - `hapus`, `hapus-latar`, `hapus-teks`: HANYA untuk aksi menghapus dan pesan kesalahan
+  - Bayangan: `shadow-kartu`, `shadow-menu`, `shadow-menu-tebal`, `shadow-tab`, `shadow-toast`, `shadow-tombol-tambah`
+- Label, ikon, dan class warna tiap status diambil dari `TAMPILAN_STATUS` di `src/lib/status.ts`, jangan ditulis ulang di komponen.
 - Logo Badan Bank Tanah berwarna hijau dan kuning. Selalu taruh di atas panel putih, jangan langsung di atas latar biru gelap.
 
 ## Status kontrak
@@ -45,23 +60,25 @@ Batas 30 hari harus berupa satu konstanta di `src/lib/status.ts`, bukan angka ya
 
 ## Halaman
 
-Navigasi bawah berisi 5 item: Beranda, Kontrak, tombol + (tambah kontrak), Pengingat, Profil.
+Navigasi bawah berisi 5 item: Beranda, Kontrak, tombol + (tambah kontrak), Pengingat, Profil. Navigasi bawah hanya tampil di Beranda, Kontrak, dan Pengingat. Profil belum masuk MVP: tombolnya hanya memunculkan toast "Halaman profil belum masuk desain MVP", tidak ada halaman Profil.
+
+Tombol Kembali di Detail dan Batal di form mengikuti riwayat browser. Kalau halaman dibuka langsung lewat alamat (riwayat kosong), cadangannya ke `/kontrak` (Detail) dan `/` (form). Pakai `useKembali` di `src/lib/navigasi.ts`.
 
 1. **Beranda**: sapaan, kartu "X kontrak butuh tindakan", 4 kotak status yang bisa diklik (membuka daftar dengan filter itu), deretan "Segera habis" yang bisa digeser ke samping, dan total nilai kontrak berjalan.
 2. **Kontrak**: pencarian (judul, nomor, mitra), chip filter status, dropdown urutan (paling cepat habis, nilai terbesar, nama A-Z), daftar kartu kontrak. Ada tampilan kosong kalau tidak ada hasil.
 3. **Pengingat**: dua kelompok, "Sudah lewat" dan "Habis dalam 30 hari".
 4. **Detail kontrak**: header dengan lingkaran hitung mundur sisa hari, garis masa kontrak (mulai sampai berakhir), tab Ringkasan / Dokumen / Riwayat, tombol bawah "Tandai selesai" dan "Perpanjang", menu titik tiga (edit, unduh dokumen, hapus dengan konfirmasi).
 5. **Tambah kontrak**: form 3 langkah (info kontrak; nilai dan waktu; dokumen dan pengingat), tombol Kembali dan Lanjut, validasi di tiap langkah, ringkasan sebelum simpan.
-6. **Profil**: belum masuk MVP. Cukup halaman sederhana.
+6. **Profil**: belum masuk MVP. Tidak ada halaman, hanya toast dari tombol Profil di navigasi bawah.
 
 ## Struktur folder
 
 ```
 src/
-  pages/        Beranda, Kontrak, Pengingat, DetailKontrak, FormKontrak, Profil
-  components/   NavBawah, KartuKontrak, BadgeStatus, CincinHari, Toast, dll
+  pages/        Beranda, Kontrak, Pengingat, DetailKontrak, FormKontrak
+  components/   NavBawah, TataLetakHP, TataLetakUtama, Ikon, KartuKontrak, BadgeStatus, CincinHari, Toast, dll
   data/         kontrakContoh.ts
-  lib/          status.ts (hitung status, label, warna), format.ts (rupiah, tanggal)
+  lib/          status.ts (hitung status, label, warna), format.ts (rupiah, tanggal), navigasi.ts (tombol kembali)
   types/        kontrak.ts
 ```
 

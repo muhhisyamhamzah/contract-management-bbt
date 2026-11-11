@@ -52,6 +52,16 @@ export function formatTanggalSingkat(teks: string): string {
   })
 }
 
+/** Contoh: "Selasa, 10 November 2026". Untuk tanggal hari ini di header Beranda. */
+export function formatTanggalHariIni(tanggal: Date = new Date()): string {
+  return tanggal.toLocaleDateString('id-ID', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
+}
+
 /** Mengubah objek Date menjadi teks "YYYY-MM-DD" (kebalikan dari keTanggal). */
 export function keTeksTanggal(tanggal: Date): string {
   const tahun = tanggal.getFullYear()

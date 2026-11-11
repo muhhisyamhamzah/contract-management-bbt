@@ -1,5 +1,7 @@
-// Logika status kontrak: menghitung status dari tanggal, label, dan warnanya.
+// Logika status kontrak: menghitung status, sisa hari, dan progres dari tanggal,
+// serta label, ikon, dan warna tiap status.
 
+import type { NamaIkon } from '../components/Ikon'
 import type { Kontrak, StatusKontrak } from '../types/kontrak'
 import { keTanggal } from './format'
 
@@ -8,15 +10,23 @@ export const BATAS_HARI_SEGERA = 30
 
 const MILIDETIK_PER_HARI = 24 * 60 * 60 * 1000
 
+/** Tanggal hari ini jam 00:00, supaya perhitungan hari tidak terpengaruh jam. */
+function awalHari(tanggal: Date): Date {
+  return new Date(tanggal.getFullYear(), tanggal.getMonth(), tanggal.getDate())
+}
+
+/** Selisih hari dari tanggal a ke tanggal b (b - a). */
+function selisihHari(a: Date, b: Date): number {
+  // Math.round menghindari selisih satu jam saat pergantian zona waktu musim panas.
+  return Math.round((awalHari(b).getTime() - awalHari(a).getTime()) / MILIDETIK_PER_HARI)
+}
+
 /**
  * Menghitung sisa hari sampai tanggal berakhir.
  * Hasil 0 berarti berakhir hari ini, angka negatif berarti sudah lewat.
  */
 export function hitungSisaHari(tanggalBerakhir: string, hariIni: Date = new Date()): number {
-  const awalHariIni = new Date(hariIni.getFullYear(), hariIni.getMonth(), hariIni.getDate())
-  const selisih = keTanggal(tanggalBerakhir).getTime() - awalHariIni.getTime()
-  // Math.round menghindari selisih satu jam saat pergantian zona waktu musim panas.
-  return Math.round(selisih / MILIDETIK_PER_HARI)
+  return selisihHari(hariIni, keTanggal(tanggalBerakhir))
 }
 
 /** Menentukan status kontrak. Urutan pengecekan penting: "selesai" didahulukan. */
@@ -29,24 +39,91 @@ export function hitungStatus(kontrak: Kontrak, hariIni: Date = new Date()): Stat
   return 'berjalan'
 }
 
-/** Teks yang tampil di layar untuk setiap status. */
-export const LABEL_STATUS: Record<StatusKontrak, string> = {
-  berjalan: 'Berjalan',
-  segera: 'Segera habis',
-  lewat: 'Sudah lewat',
-  selesai: 'Selesai',
+/**
+ * Persen masa kontrak yang sudah dilalui (0 sampai 100), untuk progress bar.
+ * Kontrak yang sudah lewat atau selesai selalu 100.
+ */
+export function hitungProgres(kontrak: Kontrak, hariIni: Date = new Date()): number {
+  const status = hitungStatus(kontrak, hariIni)
+  if (status === 'lewat' || status === 'selesai') return 100
+
+  const mulai = keTanggal(kontrak.tanggalMulai)
+  const berakhir = keTanggal(kontrak.tanggalBerakhir)
+  const totalHari = selisihHari(mulai, berakhir)
+  if (totalHari <= 0) return 100
+
+  const sudahDilalui = selisihHari(mulai, hariIni)
+  const persen = Math.round((sudahDilalui / totalHari) * 100)
+  return Math.min(100, Math.max(0, persen))
+}
+
+/** Teks sisa waktu, misalnya "18 hari lagi", "Lewat 8 hari", atau "Selesai". */
+export function teksSisaHari(kontrak: Kontrak, hariIni: Date = new Date()): string {
+  const status = hitungStatus(kontrak, hariIni)
+  if (status === 'selesai') return 'Selesai'
+
+  const sisaHari = hitungSisaHari(kontrak.tanggalBerakhir, hariIni)
+  if (status === 'lewat') return `Lewat ${Math.abs(sisaHari)} hari`
+  if (sisaHari === 0) return 'Habis hari ini'
+  return `${sisaHari} hari lagi`
+}
+
+type TampilanStatus = {
+  /** Teks yang tampil di layar. */
+  label: string
+  /** Ikon status (kotak ikon di Beranda dan kartu kontrak). */
+  ikon: NamaIkon
+  /** Latar muda + teks gelap. Untuk badge, kotak ikon, dan kotak peringatan. */
+  kelasBadge: string
+  /** Warna teks saja, misalnya untuk chip filter yang tidak aktif. */
+  kelasTeks: string
+  /** Warna pekat untuk progress bar dan titik. */
+  kelasBar: string
+  /** Warna garis cincin (SVG) di atas header gelap. */
+  kelasCincin: string
+  /** Warna garis masa kontrak di atas header gelap. */
+  kelasBarHeader: string
 }
 
 /**
- * Class Tailwind untuk badge status: latar muda (opacity 15%) dan teks pekat.
- * Ditulis lengkap (bukan disusun dari potongan teks) supaya Tailwind bisa menemukannya.
+ * Label, ikon, dan class warna untuk setiap status.
+ * Class ditulis lengkap (bukan disusun dari potongan teks) supaya Tailwind bisa menemukannya.
  */
-export const WARNA_STATUS: Record<StatusKontrak, string> = {
-  berjalan: 'bg-berjalan/15 text-berjalan',
-  segera: 'bg-segera/15 text-segera',
-  lewat: 'bg-lewat/15 text-lewat',
-  selesai: 'bg-selesai/15 text-selesai',
+export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
+  berjalan: {
+    label: 'Berjalan',
+    ikon: 'play',
+    kelasBadge: 'bg-berjalan-latar text-berjalan-teks',
+    kelasTeks: 'text-berjalan-teks',
+    kelasBar: 'bg-berjalan',
+    kelasCincin: 'stroke-cincin-berjalan',
+    kelasBarHeader: 'bg-cincin-berjalan',
+  },
+  segera: {
+    label: 'Segera habis',
+    ikon: 'jam',
+    kelasBadge: 'bg-segera-latar text-segera-teks',
+    kelasTeks: 'text-segera-teks',
+    kelasBar: 'bg-segera',
+    kelasCincin: 'stroke-cincin-segera',
+    kelasBarHeader: 'bg-cincin-segera',
+  },
+  lewat: {
+    label: 'Sudah lewat',
+    ikon: 'peringatan',
+    kelasBadge: 'bg-lewat-latar text-lewat-teks',
+    kelasTeks: 'text-lewat-teks',
+    kelasBar: 'bg-lewat',
+    kelasCincin: 'stroke-cincin-lewat',
+    kelasBarHeader: 'bg-cincin-lewat',
+  },
+  selesai: {
+    label: 'Selesai',
+    ikon: 'centangLingkaran',
+    kelasBadge: 'bg-selesai-latar text-selesai-teks',
+    kelasTeks: 'text-selesai-teks',
+    kelasBar: 'bg-selesai',
+    kelasCincin: 'stroke-selesai',
+    kelasBarHeader: 'bg-selesai',
+  },
 }
-
-/** Urutan status saat ditampilkan (misalnya 4 kotak di Beranda dan chip filter). */
-export const URUTAN_STATUS: StatusKontrak[] = ['berjalan', 'segera', 'lewat', 'selesai']

@@ -1,5 +1,5 @@
-// Kerangka untuk halaman yang punya navigasi bawah (Beranda, Kontrak, Pengingat, Profil).
-// Halaman Detail dan Form tidak memakai ini, karena nanti punya tombol bawah sendiri.
+// Kerangka untuk halaman yang punya navigasi bawah: Beranda, Kontrak, dan Pengingat.
+// Halaman Detail dan Tambah kontrak tidak memakai ini, karena punya tombol bawah sendiri.
 
 import { Outlet } from 'react-router-dom'
 import NavBawah from './NavBawah'
@@ -7,10 +7,9 @@ import NavBawah from './NavBawah'
 function TataLetakUtama() {
   return (
     <>
-      {/* pb-24 memberi ruang supaya isi halaman tidak tertutup navigasi bawah. */}
-      <main className="mx-auto min-h-dvh max-w-md pb-24">
+      <div className="flex min-h-0 flex-1 flex-col">
         <Outlet />
-      </main>
+      </div>
       <NavBawah />
     </>
   )

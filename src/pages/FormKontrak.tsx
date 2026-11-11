@@ -1,16 +1,24 @@
-// Halaman tambah kontrak. Form 3 langkah dikerjakan nanti.
+// Halaman tambah kontrak. Form 3 langkah dikerjakan di tahap 7.
 
-import { Link } from 'react-router-dom'
 import JudulHalaman from '../components/JudulHalaman'
+import { useKembali } from '../lib/navigasi'
 
 function FormKontrak() {
+  // Kalau halaman dibuka langsung lewat alamat, tombol Batal menuju Beranda.
+  const batal = useKembali('/')
+
   return (
-    <main className="mx-auto min-h-dvh max-w-md">
-      <Link to="/" className="inline-flex min-h-11 items-center px-4 text-sm font-semibold text-aksi">
-        ← Batal
-      </Link>
-      <JudulHalaman judul="Tambah Kontrak" />
-    </main>
+    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
+      <JudulHalaman judul="Kontrak baru">
+        <button
+          type="button"
+          onClick={batal}
+          className="mt-2 h-11 self-start rounded-[14px] bg-latar px-4 font-bold text-judul"
+        >
+          Batal
+        </button>
+      </JudulHalaman>
+    </div>
   )
 }
 

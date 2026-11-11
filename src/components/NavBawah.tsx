@@ -1,36 +1,26 @@
 // Navigasi bawah: Beranda, Kontrak, tombol + (tambah kontrak), Pengingat, Profil.
+// Ukuran dan warna mengikuti docs/prototipe-referensi.html.
 
 import { Link, NavLink } from 'react-router-dom'
 import Ikon, { type NamaIkon } from './Ikon'
 
-type ItemNav = {
+// Class bersama untuk keempat menu (tanpa warna).
+const kelasMenu =
+  'flex min-h-11 flex-col items-center justify-center gap-1 border-none bg-transparent text-[11px] font-bold no-underline'
+
+type Props = {
   ke: string
   label: string
   ikon: NamaIkon
 }
 
-const itemKiri: ItemNav[] = [
-  { ke: '/', label: 'Beranda', ikon: 'beranda' },
-  { ke: '/kontrak', label: 'Kontrak', ikon: 'kontrak' },
-]
-
-const itemKanan: ItemNav[] = [
-  { ke: '/pengingat', label: 'Pengingat', ikon: 'pengingat' },
-  { ke: '/profil', label: 'Profil', ikon: 'profil' },
-]
-
-/** Satu tombol menu. Warna berubah saat halamannya sedang dibuka. */
-function TautanNav({ ke, label, ikon }: ItemNav) {
+/** Satu menu navigasi. Berwarna biru saat halamannya sedang dibuka. */
+function MenuNav({ ke, label, ikon }: Props) {
   return (
     <NavLink
       to={ke}
-      // "end" supaya Beranda (/) tidak ikut aktif saat membuka halaman lain.
-      end={ke === '/'}
-      className={({ isActive }) =>
-        `flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 rounded-xl text-[11px] font-semibold ${
-          isActive ? 'text-aksi' : 'text-teks-lembut'
-        }`
-      }
+      end
+      className={({ isActive }) => `${kelasMenu} ${isActive ? 'text-aksi' : 'text-teks-lembut'}`}
     >
       <Ikon nama={ikon} />
       {label}
@@ -42,27 +32,28 @@ function NavBawah() {
   return (
     <nav
       aria-label="Navigasi utama"
-      className="fixed inset-x-0 bottom-0 z-10 border-t border-garis bg-white pb-[env(safe-area-inset-bottom)]"
+      // Tinggi 86px dengan 20px ruang bawah untuk garis home HP.
+      // Kalau HP butuh ruang lebih besar (safe area), ruangnya ikut membesar.
+      className="grid flex-none grid-cols-5 items-center border-t border-garis bg-white pt-0 pb-[max(20px,env(safe-area-inset-bottom))] [min-height:calc(66px+max(20px,env(safe-area-inset-bottom)))]"
     >
-      <div className="mx-auto flex max-w-md items-center gap-1 px-2 py-1.5">
-        {itemKiri.map((item) => (
-          <TautanNav key={item.ke} {...item} />
-        ))}
+      <MenuNav ke="/" label="Beranda" ikon="beranda" />
+      <MenuNav ke="/kontrak" label="Kontrak" ikon="kontrak" />
 
-        <div className="flex flex-1 justify-center">
-          <Link
-            to="/tambah"
-            aria-label="Tambah kontrak"
-            className="-mt-6 flex size-14 items-center justify-center rounded-full bg-aksi text-white shadow-lg ring-4 ring-latar"
-          >
-            <Ikon nama="tambah" className="size-7" />
-          </Link>
-        </div>
+      <Link
+        to="/tambah"
+        aria-label="Tambah kontrak baru"
+        className="-mt-[30px] flex size-[58px] items-center justify-center justify-self-center rounded-[20px] border-4 border-latar bg-linear-135 from-aksi to-aksi-ungu text-white shadow-tombol-tambah hover:text-white"
+      >
+        <Ikon nama="tambah" ukuran={24} tebal={2.5} />
+      </Link>
 
-        {itemKanan.map((item) => (
-          <TautanNav key={item.ke} {...item} />
-        ))}
-      </div>
+      <MenuNav ke="/pengingat" label="Pengingat" ikon="pengingat" />
+
+      {/* Profil belum masuk MVP: tombol ini hanya memunculkan toast (dipasang di tahap 2). */}
+      <button type="button" className={`${kelasMenu} cursor-pointer text-teks-lembut`}>
+        <Ikon nama="profil" />
+        Profil
+      </button>
     </nav>
   )
 }
