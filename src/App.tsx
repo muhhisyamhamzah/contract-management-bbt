@@ -8,7 +8,6 @@ import Kontrak from './pages/Kontrak'
 import Pengingat from './pages/Pengingat'
 import DetailKontrak from './pages/DetailKontrak'
 import FormKontrak from './pages/FormKontrak'
-import ContohKomponen from './pages/ContohKomponen'
 
 function App() {
   return (
@@ -25,9 +24,6 @@ function App() {
         {/* Halaman tanpa navigasi bawah (punya tombol bawah sendiri) */}
         <Route path="/kontrak/:id" element={<DetailKontrak />} />
         <Route path="/tambah" element={<FormKontrak />} />
-
-        {/* SEMENTARA: halaman cek komponen, hanya saat npm run dev. Hapus setelah tahap 7. */}
-        {import.meta.env.DEV && <Route path="/contoh-komponen" element={<ContohKomponen />} />}
       </Route>
 
       {/* Alamat yang tidak dikenal (termasuk /profil) dikembalikan ke Beranda */}

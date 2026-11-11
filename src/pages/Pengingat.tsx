@@ -4,7 +4,7 @@
 import type { ReactNode } from 'react'
 import HeaderGelombang from '../components/HeaderGelombang'
 import Ikon from '../components/Ikon'
-import KartuPengingat from '../components/KartuPengingat'
+import KelompokPengingat from '../components/KelompokPengingat'
 import { kontrakContoh } from '../data/kontrakContoh'
 import { BATAS_HARI_SEGERA, hitungSisaHari, hitungStatus } from '../lib/status'
 import type { Kontrak, StatusKontrak } from '../types/kontrak'
@@ -14,35 +14,6 @@ function ambilUrut(daftar: Kontrak[], status: StatusKontrak): Kontrak[] {
   return daftar
     .filter((kontrak) => hitungStatus(kontrak) === status)
     .sort((a, b) => hitungSisaHari(a.tanggalBerakhir) - hitungSisaHari(b.tanggalBerakhir))
-}
-
-type PropsKelompok = {
-  judul: string
-  /** Warna judul kelompok, misalnya text-lewat-teks. */
-  kelasJudul: string
-  daftar: Kontrak[]
-  pesanKosong: string
-}
-
-/** Satu kelompok pengingat: judul berwarna, jumlah, lalu daftar kartu. */
-function KelompokPengingat({ judul, kelasJudul, daftar, pesanKosong }: PropsKelompok) {
-  return (
-    <section className="flex flex-col gap-2.5">
-      <h2 className={`m-0 flex items-center gap-2 text-[12px] font-extrabold tracking-[0.06em] uppercase ${kelasJudul}`}>
-        {judul}
-        <span className="rounded-full bg-white px-2 py-0.5 text-[11px] tracking-normal shadow-kotak">
-          {daftar.length}
-        </span>
-      </h2>
-      {daftar.length > 0 ? (
-        daftar.map((kontrak) => <KartuPengingat key={kontrak.id} kontrak={kontrak} />)
-      ) : (
-        <p className="m-0 rounded-2xl bg-white p-4 text-center text-[13px] text-teks-lembut shadow-kotak">
-          {pesanKosong}
-        </p>
-      )}
-    </section>
-  )
 }
 
 function Pengingat() {

@@ -83,9 +83,9 @@ Tombol Kembali di Detail dan Batal di form mengikuti riwayat browser. Kalau hala
 ```
 src/
   pages/        Beranda, Kontrak, Pengingat, DetailKontrak, FormKontrak
-  components/   NavBawah, TataLetakHP, TataLetakUtama, LayarPembuka, Ikon, KotakRingkasan, KotakKalender, BarisSegeraHabis, KartuKontrak, BadgeStatus, CincinHari, MenuDropdown, Toast, dll
-  data/         kontrakContoh.ts
-  lib/          status.ts (hitung status, label, warna), format.ts (rupiah, tanggal), navigasi.ts (tombol kembali)
+  components/   Satu komponen satu file: NavBawah, MenuNav, TataLetakHP, TataLetakUtama, LayarPembuka, HeaderGelombang, Ikon, Kotak*/Kartu*/Baris* (tampilan daftar), BadgeStatus, CincinHari, MenuDropdown, DialogKonfirmasi, Toast, Langkah* (form), dll
+  data/         kontrakContoh.ts, rincianContoh.ts (termin, dokumen, riwayat)
+  lib/          status.ts (status, label, warna), format.ts (rupiah, tanggal), daftarKontrak.ts (saring, urut), formKontrak.ts (validasi form), navigasi.ts, toast.ts
   types/        kontrak.ts
 ```
 
