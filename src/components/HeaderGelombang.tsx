@@ -30,8 +30,8 @@ function HeaderGelombang({ children, kelasBawah = 'pb-16' }: Props) {
         <div className="absolute inset-y-0 right-0 w-2/3 bg-[radial-gradient(rgb(255_255_255/0.09)_1px,transparent_1.5px)] bg-size-[14px_14px] [mask-image:linear-gradient(to_left,black,transparent)]" />
       </div>
 
-      {/* Isi header di atas lapisan hiasan */}
-      <div className="relative">{children}</div>
+      {/* Isi header di atas lapisan hiasan dan gelombang (supaya menu dropdown tidak tertutup) */}
+      <div className="relative z-10">{children}</div>
 
       {/* Gelombang di bawah header, warnanya sama dengan latar halaman */}
       <svg

@@ -66,7 +66,7 @@ function CincinHari({ kontrak }: Props) {
         className="absolute inset-0 flex flex-col items-center justify-center leading-[1.1]"
       >
         <span className="text-[24px] font-extrabold">{angka}</span>
-        <span className="text-[11px] text-teks-header">{keterangan}</span>
+        <span className="text-[11px] text-white/75">{keterangan}</span>
       </span>
     </div>
   )

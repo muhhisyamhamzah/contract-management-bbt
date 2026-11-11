@@ -52,6 +52,13 @@ export function formatTanggalSingkat(teks: string): string {
   })
 }
 
+/** Menggeser tanggal "YYYY-MM-DD" sebanyak sekian hari (negatif = mundur). Hasil juga "YYYY-MM-DD". */
+export function geserTanggal(teks: string, jumlahHari: number): string {
+  const tanggal = keTanggal(teks)
+  tanggal.setDate(tanggal.getDate() + jumlahHari)
+  return keTeksTanggal(tanggal)
+}
+
 /** Contoh: "Selasa, 10 November 2026". Untuk tanggal hari ini di header Beranda. */
 export function formatTanggalHariIni(tanggal: Date = new Date()): string {
   return tanggal.toLocaleDateString('id-ID', {

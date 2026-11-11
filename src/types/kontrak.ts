@@ -32,3 +32,39 @@ export type Kontrak = {
   ditandaiSelesai: boolean
   pengingatHari: PengingatHari
 }
+
+// ---------------------------------------------------------------------------
+// Rincian yang tampil di halaman Detail kontrak. Sementara diisi data contoh
+// (src/data/rincianContoh.ts); nanti datang dari backend.
+// ---------------------------------------------------------------------------
+
+/** Satu termin (tahap) pembayaran. */
+export type Termin = {
+  /** Nomor urut termin, mulai dari 1. */
+  ke: number
+  /** Persen dari nilai kontrak. */
+  persen: number
+  lunas: boolean
+}
+
+/** Satu file dokumen kontrak. */
+export type Dokumen = {
+  nama: string
+  /** Ukuran yang sudah diformat, misalnya "2,4 MB". */
+  ukuran: string
+  /** Tanggal unggah, format YYYY-MM-DD. */
+  tanggal: string
+}
+
+/** Jenis kejadian di riwayat; menentukan warna titiknya. */
+export type JenisRiwayat = 'dicatat' | 'lunas' | 'selesai'
+
+/** Satu kejadian di tab Riwayat. */
+export type KejadianRiwayat = {
+  judul: string
+  /** Nama orang yang melakukan. */
+  oleh: string
+  /** Format YYYY-MM-DD */
+  tanggal: string
+  jenis: JenisRiwayat
+}
