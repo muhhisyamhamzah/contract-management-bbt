@@ -2,6 +2,7 @@
 // Ukuran dan warna mengikuti docs/prototipe-referensi.html.
 
 import { Link, NavLink } from 'react-router-dom'
+import { useToast } from '../lib/toast'
 import Ikon, { type NamaIkon } from './Ikon'
 
 // Class bersama untuk keempat menu (tanpa warna).
@@ -29,6 +30,8 @@ function MenuNav({ ke, label, ikon }: Props) {
 }
 
 function NavBawah() {
+  const tampilkanToast = useToast()
+
   return (
     <nav
       aria-label="Navigasi utama"
@@ -49,8 +52,12 @@ function NavBawah() {
 
       <MenuNav ke="/pengingat" label="Pengingat" ikon="pengingat" />
 
-      {/* Profil belum masuk MVP: tombol ini hanya memunculkan toast (dipasang di tahap 2). */}
-      <button type="button" className={`${kelasMenu} cursor-pointer text-teks-lembut`}>
+      {/* Profil belum masuk MVP: tidak ada halaman, tombol ini hanya memunculkan toast. */}
+      <button
+        type="button"
+        onClick={() => tampilkanToast('Halaman profil belum masuk desain MVP')}
+        className={`${kelasMenu} cursor-pointer text-teks-lembut`}
+      >
         <Ikon nama="profil" />
         Profil
       </button>

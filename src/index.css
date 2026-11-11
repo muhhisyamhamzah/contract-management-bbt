@@ -72,6 +72,15 @@
     color: var(--color-teks);
     font-family: var(--font-sans);
     font-size: 14px;
+    /* Referensi memakai jarak baris bawaan browser, bukan 1.5 bawaan Tailwind. */
+    line-height: normal;
+  }
+
+  /* Tailwind menghapus huruf tebal bawaan judul; referensi mengandalkannya. */
+  h1,
+  h2,
+  h3 {
+    font-weight: 700;
   }
 
   a {

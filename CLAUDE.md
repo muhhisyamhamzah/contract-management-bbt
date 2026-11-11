@@ -30,6 +30,8 @@ Aplikasi HP untuk mencatat dan memantau kontrak di Badan Bank Tanah. Dikerjakan 
 - Mobile-first. Ukuran acuan 390 x 844 (layar HP), lebar maksimal 430px di tengah layar.
 - Jarak atas header (56px) dan bawah navigasi (20px) adalah ruang status bar dan garis home HP. Pakai `max(..., env(safe-area-inset-*))` supaya ikut membesar di HP yang butuh ruang lebih.
 - Font: Plus Jakarta Sans (sudah dimuat di `index.html`). Ukuran huruf dasar 14px.
+- Ukuran huruf ditulis dalam piksel, misalnya `text-[12px]`, `text-[16px]`, sesuai angka di referensi. JANGAN pakai `text-xs`, `text-sm`, `text-lg`, dan sejenisnya, karena class itu ikut mengubah jarak baris. Jarak baris dasar sengaja `normal` (diatur di `src/index.css`), sama dengan referensi.
+- Judul `h1` sampai `h3` sudah tebal (700) dari `src/index.css`. Tambahkan `font-extrabold` kalau referensi memakai 800.
 - Palet warna dan bayangan didaftarkan di `src/index.css` lewat `@theme`. Pakai class Tailwind dari token itu, JANGAN menulis kode hex di komponen. Warna yang dipakai referensi tapi belum ada di `@theme` ditambahkan sebagai token baru dengan nama yang jelas, bukan ditulis langsung.
   - `galaxy-900`, `galaxy-700`: gradasi header dan kartu utama
   - `judul`: judul dan teks tebal
