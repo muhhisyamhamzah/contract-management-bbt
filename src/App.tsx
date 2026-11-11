@@ -6,6 +6,7 @@ import TataLetakUtama from './components/TataLetakUtama'
 import Beranda from './pages/Beranda'
 import Kontrak from './pages/Kontrak'
 import Pengingat from './pages/Pengingat'
+import Profil from './pages/Profil'
 import DetailKontrak from './pages/DetailKontrak'
 import FormKontrak from './pages/FormKontrak'
 
@@ -19,6 +20,7 @@ function App() {
           {/* Filter status bisa dikirim lewat alamat, misalnya /kontrak?status=segera */}
           <Route path="/kontrak" element={<Kontrak />} />
           <Route path="/pengingat" element={<Pengingat />} />
+          <Route path="/profil" element={<Profil />} />
         </Route>
 
         {/* Halaman tanpa navigasi bawah (punya tombol bawah sendiri) */}
@@ -26,7 +28,7 @@ function App() {
         <Route path="/tambah" element={<FormKontrak />} />
       </Route>
 
-      {/* Alamat yang tidak dikenal (termasuk /profil) dikembalikan ke Beranda */}
+      {/* Alamat yang tidak dikenal dikembalikan ke Beranda */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

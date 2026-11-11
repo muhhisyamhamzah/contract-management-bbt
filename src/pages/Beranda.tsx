@@ -1,6 +1,6 @@
 // Halaman Beranda: ringkasan kondisi semua kontrak.
 // Isi dari atas ke bawah: header navy bergelombang (judul aplikasi, sapaan, tanggal, lonceng,
-// profil), kotak pencarian, 6 kotak "Ringkasan kontrak", daftar "Segera habis", dan total nilai.
+// tautan profil), kotak pencarian, 6 kotak "Ringkasan kontrak", daftar "Segera habis", dan total nilai.
 
 import { Link } from 'react-router-dom'
 import BarisSegeraHabis from '../components/BarisSegeraHabis'
@@ -16,7 +16,6 @@ import {
   hitungStatus,
   TAMPILAN_STATUS,
 } from '../lib/status'
-import { useToast } from '../lib/toast'
 import type { StatusKontrak } from '../types/kontrak'
 
 /** Urutan 4 kotak status di Ringkasan kontrak. */
@@ -26,8 +25,6 @@ const URUTAN_KOTAK_STATUS: StatusKontrak[] = ['segera', 'lewat', 'berjalan', 'se
 const GRADASI_NAVY = 'from-galaxy-700 to-galaxy-900 shadow-galaxy-700/40'
 
 function Beranda() {
-  const tampilkanToast = useToast()
-
   const daftar = kontrakContoh
   const jumlah = hitungJumlahPerStatus(daftar)
   const butuhTindakan = jumlah.segera + jumlah.lewat
@@ -70,15 +67,13 @@ function Beranda() {
               )}
             </Link>
 
-            {/* Profil belum masuk MVP: sama seperti tombol Profil di navigasi bawah. */}
-            <button
-              type="button"
+            <Link
+              to="/profil"
               aria-label="Profil"
-              onClick={() => tampilkanToast('Halaman profil belum masuk desain MVP')}
-              className="flex size-12 cursor-pointer items-center justify-center rounded-full border-none bg-logo-emas text-[18px] font-bold text-galaxy-900"
+              className="flex size-12 items-center justify-center rounded-full bg-logo-emas text-[18px] font-bold text-galaxy-900 no-underline hover:text-galaxy-900"
             >
               A
-            </button>
+            </Link>
           </div>
         </div>
       </HeaderGelombang>

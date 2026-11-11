@@ -67,7 +67,7 @@ Batas 30 hari harus berupa satu konstanta di `src/lib/status.ts`, bukan angka ya
 
 ## Halaman
 
-Navigasi bawah berisi 5 item: Beranda, Kontrak, tombol + (tambah kontrak), Pengingat, Profil. Navigasi bawah hanya tampil di Beranda, Kontrak, dan Pengingat. Profil belum masuk MVP: tombolnya hanya memunculkan toast "Halaman profil belum masuk desain MVP", tidak ada halaman Profil.
+Navigasi bawah berisi 5 item: Beranda, Kontrak, tombol + (tambah kontrak), Pengingat, Profil. Navigasi bawah tampil di Beranda, Kontrak, Pengingat, dan Profil.
 
 Tombol Kembali di Detail dan Batal di form mengikuti riwayat browser. Kalau halaman dibuka langsung lewat alamat (riwayat kosong), cadangannya ke `/kontrak` (Detail) dan `/` (form). Pakai `useKembali` di `src/lib/navigasi.ts`.
 
@@ -76,13 +76,13 @@ Tombol Kembali di Detail dan Batal di form mengikuti riwayat browser. Kalau hala
 3. **Pengingat**: dua kelompok, "Sudah lewat" dan "Habis dalam 30 hari".
 4. **Detail kontrak**: header dengan lingkaran hitung mundur sisa hari, garis masa kontrak (mulai sampai berakhir), tab Ringkasan / Dokumen / Riwayat, tombol bawah "Tandai selesai" dan "Perpanjang", menu titik tiga (edit, unduh dokumen, hapus dengan konfirmasi).
 5. **Tambah kontrak**: form 3 langkah (info kontrak; nilai dan waktu; dokumen dan pengingat), tombol Kembali dan Lanjut, validasi di tiap langkah, ringkasan sebelum simpan.
-6. **Profil**: belum masuk MVP. Tidak ada halaman, hanya toast dari tombol Profil di navigasi bawah.
+6. **Profil** (`/profil`, juga dibuka dari lingkaran inisial di Beranda): identitas admin, ringkasan kerja (tercatat, butuh tindakan, selesai), info akun, pengaturan pengingat, bantuan, tentang aplikasi, dan Keluar dengan konfirmasi. Belum ada login: data akun memakai teks pengganti seperti "[Nama admin]", dan tombol yang belum berfungsi memunculkan toast bertanda "(contoh)". Jangan menambah menu General Affair di sini.
 
 ## Struktur folder
 
 ```
 src/
-  pages/        Beranda, Kontrak, Pengingat, DetailKontrak, FormKontrak
+  pages/        Beranda, Kontrak, Pengingat, DetailKontrak, FormKontrak, Profil
   components/   Satu komponen satu file: NavBawah, MenuNav, TataLetakHP, TataLetakUtama, LayarPembuka, HeaderGelombang, Ikon, Kotak*/Kartu*/Baris* (tampilan daftar), BadgeStatus, CincinHari, MenuDropdown, DialogKonfirmasi, Toast, Langkah* (form), dll
   data/         kontrakContoh.ts, rincianContoh.ts (termin, dokumen, riwayat)
   lib/          status.ts (status, label, warna), format.ts (rupiah, tanggal), daftarKontrak.ts (saring, urut), formKontrak.ts (validasi form), navigasi.ts, toast.ts

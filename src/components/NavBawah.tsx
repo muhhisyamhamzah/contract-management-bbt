@@ -2,13 +2,10 @@
 // Gaya: datar dengan label, menu aktif navy, tombol + bulat bergradasi navy.
 
 import { Link } from 'react-router-dom'
-import { useToast } from '../lib/toast'
 import Ikon from './Ikon'
 import MenuNav from './MenuNav'
 
 function NavBawah() {
-  const tampilkanToast = useToast()
-
   return (
     <nav
       aria-label="Navigasi utama"
@@ -29,12 +26,7 @@ function NavBawah() {
 
       <MenuNav ke="/pengingat" label="Pengingat" ikon="pengingat" />
 
-      {/* Profil belum masuk MVP: tidak ada halaman, tombol ini hanya memunculkan toast. */}
-      <MenuNav
-        label="Profil"
-        ikon="profil"
-        onKlik={() => tampilkanToast('Halaman profil belum masuk desain MVP')}
-      />
+      <MenuNav ke="/profil" label="Profil" ikon="profil" />
     </nav>
   )
 }

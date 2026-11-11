@@ -69,6 +69,29 @@ const daftarIkon = {
   ),
   centang: <path d="M5 12l5 5 9-10" />,
   sampah: <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />,
+
+  // Halaman Profil
+  email: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7l9 6 9-6" />
+    </>
+  ),
+  kartuId: (
+    <>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <circle cx="9" cy="11" r="2" />
+      <path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M14 10h4M14 14h3" />
+    </>
+  ),
+  gedung: <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M8 8h3M8 12h3M8 16h3M3 21h18" />,
+  bantuan: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5" />
+    </>
+  ),
+  keluar: <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4" />,
 } satisfies Record<string, ReactNode>
 
 export type NamaIkon = keyof typeof daftarIkon
