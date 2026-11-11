@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom'
 import { formatTanggalSingkat } from '../lib/format'
 import { teksSisaHari } from '../lib/status'
 import type { Kontrak } from '../types/kontrak'
+import BadgeStatus from './BadgeStatus'
 import Ikon from './Ikon'
 import KotakKalender from './KotakKalender'
 
@@ -23,9 +24,7 @@ function BarisSegeraHabis({ kontrak }: Props) {
       <span className="flex min-w-0 flex-1 flex-col gap-1">
         <span className="flex items-start justify-between gap-2">
           <span className="text-[14px] font-semibold text-judul">{kontrak.judul}</span>
-          <span className="flex-none rounded-full bg-segera-latar px-2 py-0.5 text-[11px] font-semibold text-segera-teks">
-            {teksSisaHari(kontrak)}
-          </span>
+          <BadgeStatus status="segera">{teksSisaHari(kontrak)}</BadgeStatus>
         </span>
         <span className="flex items-center gap-1.5 text-[12px] text-teks-lembut">
           <Ikon nama="jam" ukuran={13} /> Berakhir {formatTanggalSingkat(kontrak.tanggalBerakhir)}

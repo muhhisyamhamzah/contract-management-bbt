@@ -1,5 +1,5 @@
 // Label kecil berbentuk pil dengan warna sesuai status kontrak.
-// Contoh: badge "Segera habis" di Detail, atau "18 hari lagi" di kartu kontrak.
+// Contoh: "18 hari lagi" di kartu kontrak, atau "Segera habis" di Detail.
 
 import type { ReactNode } from 'react'
 import { TAMPILAN_STATUS } from '../lib/status'
@@ -17,7 +17,7 @@ function BadgeStatus({ status, children, className = '' }: Props) {
 
   return (
     <span
-      className={`rounded-full px-2.5 py-1 text-[12px] font-bold ${tampilan.kelasBadge} ${className}`}
+      className={`flex-none rounded-full px-2 py-0.5 text-[11px] font-semibold ${tampilan.kelasBadge} ${className}`}
     >
       {children ?? tampilan.label}
     </span>

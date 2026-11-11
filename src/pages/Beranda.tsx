@@ -4,6 +4,7 @@
 
 import { Link } from 'react-router-dom'
 import BarisSegeraHabis from '../components/BarisSegeraHabis'
+import HeaderGelombang from '../components/HeaderGelombang'
 import Ikon from '../components/Ikon'
 import KotakRingkasan from '../components/KotakRingkasan'
 import { kontrakContoh } from '../data/kontrakContoh'
@@ -43,8 +44,8 @@ function Beranda() {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      {/* Header navy dengan bawah bergelombang. Logo BBT hanya tampil di layar pembuka. */}
-      <div className="relative flex-none bg-linear-135 from-galaxy-900 to-galaxy-700 px-5 pt-[max(56px,env(safe-area-inset-top))] pb-16 text-white">
+      {/* Header navy bergelombang. Logo BBT hanya tampil di layar pembuka. */}
+      <HeaderGelombang>
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-col gap-1">
             <h1 className="m-0 text-[22px] font-bold">Contract Management</h1>
@@ -80,21 +81,12 @@ function Beranda() {
             </button>
           </div>
         </div>
+      </HeaderGelombang>
 
-        {/* Gelombang di bawah header */}
-        <svg
-          viewBox="0 0 390 36"
-          preserveAspectRatio="none"
-          aria-hidden="true"
-          className="absolute -bottom-px left-0 block h-9 w-full"
-        >
-          <path d="M0 36 L0 22 C 90 6, 200 40, 300 18 C 340 9, 370 6, 390 4 L390 36 Z" className="fill-latar" />
-        </svg>
-      </div>
-
-      {/* Kotak pencarian, menumpuk di gelombang header. Membuka daftar kontrak. */}
+      {/* Kotak pencarian, menumpuk di gelombang header. Membuka daftar kontrak dengan kursor siap mengetik. */}
       <Link
         to="/kontrak"
+        state={{ fokusCari: true }}
         className="relative z-10 mx-5 -mt-9 flex h-[52px] flex-none items-center gap-3 rounded-[14px] bg-white px-4 text-[14px] text-teks-lembut shadow-kotak hover:text-teks-lembut"
       >
         <Ikon nama="cari" ukuran={20} className="text-aksi" />
