@@ -1,66 +1,68 @@
 // Halaman Pengingat: kontrak yang perlu diputuskan (diperpanjang atau ditutup),
-// dibagi dua kelompok: "Sudah lewat" dan "Habis dalam 30 hari".
+// dibagi dua kelompok: "Sudah lewat, perlu keputusan" lalu "Habis dalam 3 bulan".
 
 import type { ReactNode } from 'react'
 import HeaderGelombang from '../components/HeaderGelombang'
-import Ikon from '../components/Ikon'
+import KeadaanKosong from '../components/KeadaanKosong'
 import KelompokPengingat from '../components/KelompokPengingat'
-import { kontrakContoh } from '../data/kontrakContoh'
-import { BATAS_HARI_SEGERA, hitungSisaHari, hitungStatus } from '../lib/status'
-import type { Kontrak, StatusKontrak } from '../types/kontrak'
-
-/** Kontrak dengan status tertentu, diurutkan dari sisa hari paling kecil (paling mendesak). */
-function ambilUrut(daftar: Kontrak[], status: StatusKontrak): Kontrak[] {
-  return daftar
-    .filter((kontrak) => hitungStatus(kontrak) === status)
-    .sort((a, b) => hitungSisaHari(a.tanggalBerakhir) - hitungSisaHari(b.tanggalBerakhir))
-}
+import { useData } from '../lib/data'
+import { urutkanPalingCepatHabis } from '../lib/daftarKontrak'
+import { BATAS_HARI_SEGERA, hitungStatus, TAHAP_PENGINGAT_BULAN } from '../lib/status'
+import { KELAS_KOTAK, KELAS_WADAH } from '../lib/tataLetak'
 
 function Pengingat() {
-  const sudahLewat = ambilUrut(kontrakContoh, 'lewat')
-  const segeraHabis = ambilUrut(kontrakContoh, 'segera')
+  const { kontrak } = useData()
+  const sudahLewat = urutkanPalingCepatHabis(kontrak.filter((k) => hitungStatus(k) === 'lewat'))
+  const segeraHabis = urutkanPalingCepatHabis(kontrak.filter((k) => hitungStatus(k) === 'segera'))
+  const bulan = Math.round(BATAS_HARI_SEGERA / 30)
 
   let isi: ReactNode
   if (sudahLewat.length === 0 && segeraHabis.length === 0) {
     isi = (
-      <div className="flex flex-col items-center gap-2 px-4 py-12 text-center text-teks-lembut">
-        <span className="mb-1 flex size-14 items-center justify-center rounded-full bg-white text-berjalan shadow-kotak">
-          <Ikon nama="centangLingkaran" ukuran={26} />
-        </span>
-        <span className="font-semibold text-judul">Semua kontrak aman</span>
-        <span>Tidak ada kontrak yang lewat atau habis dalam {BATAS_HARI_SEGERA} hari.</span>
+      <div className={KELAS_KOTAK}>
+        <KeadaanKosong
+          ikon="centangLingkaran"
+          kelasIkon="text-berjalan-teks"
+          judul="Semua kontrak aman"
+          pesan={`Tidak ada kontrak yang sudah lewat atau habis dalam ${bulan} bulan.`}
+        />
       </div>
     )
   } else {
     isi = (
       <>
         <KelompokPengingat
-          judul="Sudah lewat"
+          id="judul-lewat"
+          judul="Sudah lewat, perlu keputusan"
           kelasJudul="text-lewat-teks"
+          kelasTitik="bg-lewat"
+          kelasKotak="border-lewat-garis-kartu"
           daftar={sudahLewat}
           pesanKosong="Tidak ada kontrak yang sudah lewat."
         />
         <KelompokPengingat
-          judul={`Habis dalam ${BATAS_HARI_SEGERA} hari`}
+          id="judul-segera"
+          judul={`Habis dalam ${bulan} bulan`}
           kelasJudul="text-segera-teks"
+          kelasTitik="bg-segera"
+          kelasKotak=""
           daftar={segeraHabis}
-          pesanKosong={`Tidak ada kontrak yang habis dalam ${BATAS_HARI_SEGERA} hari.`}
+          pesanKosong={`Tidak ada kontrak yang habis dalam ${bulan} bulan.`}
         />
       </>
     )
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <HeaderGelombang kelasBawah="pb-12">
-        <h1 className="m-0 text-[22px] font-bold">Pengingat</h1>
-        <span className="text-[13px] text-white/80">
-          Kontrak yang perlu diputuskan: diperpanjang atau ditutup.
-        </span>
-      </HeaderGelombang>
-
-      <div className="flex flex-col gap-6 px-5 pt-3 pb-6">{isi}</div>
-    </div>
+    <>
+      <HeaderGelombang
+        judul="Pengingat"
+        keterangan={`Dikirim otomatis ${TAHAP_PENGINGAT_BULAN.join(', ').replace(/, (\d)$/, ', dan $1')} bulan sebelum kontrak habis, ke seluruh tim pengadaan dan kepala divisi umum.`}
+      />
+      <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-12 flex flex-col gap-8 pb-4`}>
+        {isi}
+      </main>
+    </>
   )
 }
 

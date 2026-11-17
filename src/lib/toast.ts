@@ -1,4 +1,4 @@
-// Jalur untuk memunculkan toast (pesan singkat di bawah layar) dari halaman mana pun.
+// Jalur untuk memunculkan toast (pesan singkat di bawah tengah layar) dari halaman mana pun.
 // Tampilannya ada di src/components/Toast.tsx.
 //
 // Cara pakai di komponen:
@@ -8,7 +8,7 @@
 import { createContext, useContext } from 'react'
 
 /** Lama toast tampil sebelum hilang sendiri, dalam milidetik. */
-export const DURASI_TOAST = 2200
+export const DURASI_TOAST = 2800
 
 export const KonteksToast = createContext<((pesan: string) => void) | null>(null)
 

@@ -1,186 +1,153 @@
-// Halaman Beranda: ringkasan kondisi semua kontrak.
-// Isi dari atas ke bawah: header navy bergelombang (judul aplikasi, sapaan, tanggal, lonceng,
-// tautan profil), kotak pencarian, 6 kotak "Ringkasan kontrak", daftar "Segera habis", dan total nilai.
+// Halaman Beranda: kontrak yang perlu perhatian dan ringkasan jumlah per status.
+// Isi dari atas ke bawah: header (tanggal, sapaan, tombol Tambah kontrak), ringkasan tiga kartu,
+// daftar "Perlu perhatian" (sudah lewat + habis dalam 90 hari), dan critical point terdekat.
 
 import { Link } from 'react-router-dom'
-import BarisSegeraHabis from '../components/BarisSegeraHabis'
+import BarisKontrak from '../components/BarisKontrak'
 import HeaderGelombang from '../components/HeaderGelombang'
 import Ikon from '../components/Ikon'
-import KotakRingkasan from '../components/KotakRingkasan'
-import { kontrakContoh } from '../data/kontrakContoh'
+import KartuBagian from '../components/KartuBagian'
+import KeadaanKosong from '../components/KeadaanKosong'
+import KotakKalender from '../components/KotakKalender'
+import RingkasanStatus from '../components/RingkasanStatus'
+import { useData, usePengguna } from '../lib/data'
+import { urutkanPalingCepatHabis } from '../lib/daftarKontrak'
 import { formatRupiahSingkat, formatTanggalHariIni } from '../lib/format'
 import {
   BATAS_HARI_SEGERA,
   hitungJumlahPerStatus,
   hitungSisaHari,
   hitungStatus,
+  LABEL_CRITICAL_POINT,
+  perluPerhatian,
   TAMPILAN_STATUS,
 } from '../lib/status'
-import type { StatusKontrak } from '../types/kontrak'
+import { KELAS_KOTAK, KELAS_TAUTAN_AKSI, KELAS_TOMBOL_EMAS, KELAS_WADAH } from '../lib/tataLetak'
 
-/** Urutan 4 kotak status di Ringkasan kontrak. */
-const URUTAN_KOTAK_STATUS: StatusKontrak[] = ['segera', 'lewat', 'berjalan', 'selesai']
-
-/** Gaya kotak ikon navy untuk kotak Tambah dan Pengingat. */
-const GRADASI_NAVY = 'from-galaxy-700 to-galaxy-900 shadow-galaxy-700/40'
+/** Critical point yang tanggal pentingnya jatuh dalam sekian hari ke depan ikut tampil di Beranda. */
+const HARI_CRITICAL_TERDEKAT = BATAS_HARI_SEGERA
 
 function Beranda() {
-  const daftar = kontrakContoh
-  const jumlah = hitungJumlahPerStatus(daftar)
-  const butuhTindakan = jumlah.segera + jumlah.lewat
+  const pengguna = usePengguna()
+  const { kontrak } = useData()
 
-  // Daftar "Segera habis": yang paling cepat habis di atas.
-  const segeraHabis = daftar
-    .filter((kontrak) => hitungStatus(kontrak) === 'segera')
-    .sort((a, b) => hitungSisaHari(a.tanggalBerakhir) - hitungSisaHari(b.tanggalBerakhir))
+  const jumlah = hitungJumlahPerStatus(kontrak)
+  const perhatian = urutkanPalingCepatHabis(kontrak.filter((k) => perluPerhatian(k)))
+  const nilaiPerhatian = perhatian.reduce((total, k) => total + k.nilai, 0)
 
-  // "Kontrak berjalan" di sini = semua kontrak yang belum ditandai selesai
-  // (termasuk yang segera habis dan sudah lewat), sama dengan perhitungan referensi.
-  const belumSelesai = daftar.filter((kontrak) => !kontrak.ditandaiSelesai)
-  const totalNilai = belumSelesai.reduce((total, kontrak) => total + kontrak.nilai, 0)
+  // Critical point aktif yang punya tanggal penting dalam 90 hari ke depan (atau sudah lewat).
+  const criticalTerdekat = kontrak
+    .filter((k) => hitungStatus(k) !== 'selesai')
+    .flatMap((k) =>
+      k.criticalPoint
+        .filter((b) => b.status === 'aktif' && b.tanggalPenting)
+        .map((b) => ({ kontrak: k, butir: b, sisa: hitungSisaHari(b.tanggalPenting) })),
+    )
+    .filter((c) => c.sisa <= HARI_CRITICAL_TERDEKAT)
+    .sort((a, b) => a.sisa - b.sisa)
+
+  const namaDepan = pengguna.nama.split(' ')[0]
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      {/* Header navy bergelombang. Logo BBT hanya tampil di layar pembuka. */}
-      <HeaderGelombang>
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex flex-col gap-1">
-            <h1 className="m-0 text-[22px] font-bold">Contract Management</h1>
-            <span className="text-[15px] font-semibold">Halo, [Nama admin] 👋</span>
-            <span className="text-[13px] text-white/80">{formatTanggalHariIni()}</span>
-          </div>
+    <>
+      <HeaderGelombang
+        atas={<span className="text-[14px] text-teks-header">{formatTanggalHariIni()}</span>}
+        judul={<>Halo, {namaDepan} 👋</>}
+        keterangan={
+          perhatian.length > 0 ? (
+            <>
+              Ada{' '}
+              <Link to="/pengingat" className="font-bold text-tombol-emas hover:text-white">
+                {perhatian.length} kontrak
+              </Link>{' '}
+              yang perlu Anda perhatikan, senilai {formatRupiahSingkat(nilaiPerhatian)}.
+            </>
+          ) : (
+            'Semua kontrak aman. Tidak ada yang lewat atau habis dalam 3 bulan.'
+          )
+        }
+        aksi={
+          <Link to="/tambah" className={KELAS_TOMBOL_EMAS}>
+            <Ikon nama="tambah" ukuran={18} tebal={2.5} />
+            Tambah kontrak
+          </Link>
+        }
+      />
 
-          <div className="flex items-center gap-2">
-            <Link
-              to="/pengingat"
-              aria-label={`Buka pengingat, ${butuhTindakan} kontrak butuh tindakan`}
-              className="relative flex size-11 items-center justify-center text-white hover:text-white"
-            >
-              <Ikon nama="pengingat" ukuran={26} />
-              {butuhTindakan > 0 && (
-                <span
-                  aria-hidden="true"
-                  className="absolute top-0.5 right-0.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full bg-hapus px-1 text-[10px] font-bold text-white"
-                >
-                  {butuhTindakan}
-                </span>
-              )}
-            </Link>
+      <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-14 flex flex-col gap-8 pb-4`}>
+        <RingkasanStatus
+          perluPerhatian={jumlah.segera + jumlah.lewat}
+          berjalan={jumlah.berjalan}
+          selesai={jumlah.selesai}
+        />
 
-            <Link
-              to="/profil"
-              aria-label="Profil"
-              className="flex size-12 items-center justify-center rounded-full bg-logo-emas text-[18px] font-bold text-galaxy-900 no-underline hover:text-galaxy-900"
-            >
-              A
-            </Link>
-          </div>
-        </div>
-      </HeaderGelombang>
-
-      {/* Kotak pencarian, menumpuk di gelombang header. Membuka daftar kontrak dengan kursor siap mengetik. */}
-      <Link
-        to="/kontrak"
-        state={{ fokusCari: true }}
-        className="relative z-10 mx-5 -mt-9 flex h-[52px] flex-none items-center gap-3 rounded-[14px] bg-white px-4 text-[14px] text-teks-lembut shadow-kotak hover:text-teks-lembut"
-      >
-        <Ikon nama="cari" ukuran={20} className="text-aksi" />
-        Cari judul, nomor, atau mitra...
-      </Link>
-
-      <div className="flex flex-col gap-6 px-5 pt-6 pb-6">
-        {/* Ringkasan kontrak: 4 status + Tambah + Pengingat */}
-        <section className="flex flex-col gap-3">
+        <section aria-labelledby="judul-perhatian" className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="m-0 text-[17px] text-judul">Ringkasan kontrak</h2>
-            <Link to="/kontrak" className="py-2 text-[13px] font-semibold text-aksi">
-              Lihat semua
+            <h2 id="judul-perhatian" className="m-0 text-[20px] text-judul">
+              Perlu perhatian
+            </h2>
+            <Link to="/pengingat" className={KELAS_TAUTAN_AKSI}>
+              Lihat pengingat
+              <Ikon nama="kanan" ukuran={14} tebal={2.5} />
             </Link>
           </div>
-          <div className="grid grid-cols-3 gap-2.5">
-            {URUTAN_KOTAK_STATUS.map((status, i) => {
-              const tampilan = TAMPILAN_STATUS[status]
-              return (
-                <KotakRingkasan
-                  key={status}
-                  judul={tampilan.label}
-                  keterangan={`${jumlah[status]} kontrak`}
-                  ikon={tampilan.ikon}
-                  ke={`/kontrak?status=${status}`}
-                  kelasIkonGradasi={tampilan.kelasIkonGradasi}
-                  kelasHiasan={tampilan.kelasHiasan}
-                  urutan={i}
-                />
-              )
-            })}
-            <KotakRingkasan
-              judul="Tambah"
-              keterangan="Kontrak baru"
-              ikon="tambah"
-              ke="/tambah"
-              kelasIkonGradasi={GRADASI_NAVY}
-              kelasHiasan="bg-galaxy-700/10"
-              urutan={4}
-            />
-            <KotakRingkasan
-              judul="Pengingat"
-              keterangan={`${butuhTindakan} kontrak`}
-              ikon="pengingat"
-              ke="/pengingat"
-              kelasIkonGradasi={GRADASI_NAVY}
-              kelasHiasan="bg-logo-emas/15"
-              urutan={5}
-            />
-          </div>
-        </section>
-
-        {/* Segera habis: daftar bertanggal */}
-        <section className="flex flex-col gap-3">
-          <div className="flex items-center justify-between">
-            <h2 className="m-0 text-[17px] text-judul">Segera habis</h2>
-            <Link to="/kontrak?status=segera" className="py-2 text-[13px] font-semibold text-aksi">
-              Lihat semua
-            </Link>
-          </div>
-          <div className="flex flex-col rounded-2xl bg-white px-4 shadow-kotak">
-            {segeraHabis.length > 0 ? (
-              <>
-                {segeraHabis.map((kontrak) => (
-                  <BarisSegeraHabis key={kontrak.id} kontrak={kontrak} />
+          <div className={`${KELAS_KOTAK} px-4 md:px-7`}>
+            {perhatian.length > 0 ? (
+              <ul className="m-0 list-none p-0">
+                {perhatian.map((k) => (
+                  <BarisKontrak key={k.id} kontrak={k} />
                 ))}
-                <Link
-                  to="/kontrak?status=segera"
-                  className="py-3 text-center text-[13px] font-semibold text-aksi"
-                >
-                  Lihat semua kontrak
-                </Link>
-              </>
+              </ul>
             ) : (
-              <p className="m-0 py-5 text-center text-[13px] text-teks-lembut">
-                Tidak ada kontrak yang habis dalam {BATAS_HARI_SEGERA} hari.
-              </p>
+              <KeadaanKosong
+                ikon="centangLingkaran"
+                kelasIkon="text-berjalan-teks"
+                judul="Semua kontrak aman"
+                pesan={`Tidak ada kontrak yang sudah lewat atau habis dalam ${BATAS_HARI_SEGERA} hari.`}
+              />
             )}
           </div>
         </section>
 
-        {/* Total nilai kontrak yang belum selesai */}
-        <section className="flex items-center gap-3 rounded-2xl bg-white p-4 shadow-kotak">
-          <span
-            aria-hidden="true"
-            className={`flex size-10 flex-none items-center justify-center rounded-[14px] bg-linear-135 text-white shadow-md inset-shadow-[0_1px_0_rgb(255_255_255/0.45)] ${GRADASI_NAVY}`}
+        {criticalTerdekat.length > 0 && (
+          <KartuBagian
+            id="critical-terdekat"
+            judul="Critical point terdekat"
+            ikon="peringatan"
+            keterangan="Klausul berisiko dengan tanggal penting"
           >
-            <Ikon nama="dokumen" ukuran={20} />
-          </span>
-          <span className="flex flex-1 flex-col">
-            <span className="text-[12px] text-teks-lembut">Total nilai kontrak berjalan</span>
-            <span className="text-[18px] font-bold text-judul">{formatRupiahSingkat(totalNilai)}</span>
-          </span>
-          <span className="rounded-full bg-latar px-2.5 py-1 text-[12px] font-semibold text-judul">
-            {belumSelesai.length} kontrak
-          </span>
-        </section>
-      </div>
-    </div>
+            <ul className="m-0 grid list-none gap-3 p-0 md:grid-cols-2">
+              {criticalTerdekat.map(({ kontrak: k, butir, sisa }) => {
+                const lewat = sisa < 0
+                return (
+                  <li key={butir.id}>
+                    <Link
+                      to={`/kontrak/${k.id}#critical-point`}
+                      className="flex h-full gap-3.5 rounded-xl border border-garis bg-latar p-4 text-teks no-underline transition-[background-color,border-color,color] duration-150 hover:border-garis-input hover:text-teks motion-reduce:transition-none"
+                    >
+                      <KotakKalender
+                        tanggal={butir.tanggalPenting}
+                        kelasPita={lewat ? TAMPILAN_STATUS.lewat.kelasPita : TAMPILAN_STATUS.segera.kelasPita}
+                      />
+                      <span className="flex min-w-0 flex-col gap-1">
+                        <span className="text-[13px] font-semibold text-judul">
+                          {LABEL_CRITICAL_POINT[butir.jenis]}
+                          {butir.pasal && <span className="font-normal text-teks-lembut"> · {butir.pasal}</span>}
+                        </span>
+                        <span className="text-[13px] leading-snug text-teks">{butir.ringkasan}</span>
+                        <span className={`text-[12px] font-semibold ${lewat ? 'text-lewat-teks' : 'text-segera-teks'}`}>
+                          {k.nama} · {lewat ? `lewat ${Math.abs(sisa)} hari` : sisa === 0 ? 'hari ini' : `${sisa} hari lagi`}
+                        </span>
+                      </span>
+                    </Link>
+                  </li>
+                )
+              })}
+            </ul>
+          </KartuBagian>
+        )}
+      </main>
+    </>
   )
 }
 

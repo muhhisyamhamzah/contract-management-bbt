@@ -1,16 +1,17 @@
-// Halaman daftar Kontrak: pencarian, chip filter status, dropdown urutan, dan daftar kartu.
+// Halaman daftar Kontrak: pencarian, filter status, pilihan urutan, dan daftar kontrak.
 //
 // Filter, kata kunci, dan urutan disimpan di alamat, misalnya /kontrak?status=lewat&q=hukum&urut=nilai.
-// Jadi kotak status di Beranda bisa langsung membuka daftar terfilter, dan tombol Back
+// Jadi kartu ringkasan di Beranda bisa langsung membuka daftar terfilter, dan tombol Back
 // mengembalikan filter sebelumnya.
 
-import { useLocation, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
+import BarisKontrak from '../components/BarisKontrak'
 import ChipFilter from '../components/ChipFilter'
 import HeaderGelombang from '../components/HeaderGelombang'
 import Ikon from '../components/Ikon'
-import KartuKontrak from '../components/KartuKontrak'
+import KeadaanKosong from '../components/KeadaanKosong'
 import MenuDropdown from '../components/MenuDropdown'
-import { kontrakContoh } from '../data/kontrakContoh'
+import { useData } from '../lib/data'
 import {
   bacaFilter,
   bacaUrutan,
@@ -21,21 +22,18 @@ import {
   type Urutan,
 } from '../lib/daftarKontrak'
 import { hitungJumlahPerStatus, TAMPILAN_STATUS } from '../lib/status'
+import { KELAS_KOTAK, KELAS_TOMBOL_EMAS, KELAS_TOMBOL_KEDUA, KELAS_WADAH } from '../lib/tataLetak'
 
 function Kontrak() {
+  const { kontrak } = useData()
   const [parameter, setParameter] = useSearchParams()
-  const location = useLocation()
 
   const filter = bacaFilter(parameter.get('status'))
   const kataKunci = parameter.get('q') ?? ''
   const urutan = bacaUrutan(parameter.get('urut'))
 
-  // Kalau dibuka dari kotak pencarian di Beranda, kursor langsung di kotak pencarian.
-  const fokusCari = Boolean((location.state as { fokusCari?: boolean } | null)?.fokusCari)
-
-  const daftar = kontrakContoh
-  const jumlah = hitungJumlahPerStatus(daftar)
-  const hasil = saringDanUrutkan(daftar, filter, kataKunci, urutan)
+  const jumlah = hitungJumlahPerStatus(kontrak)
+  const hasil = saringDanUrutkan(kontrak, filter, kataKunci, urutan)
 
   /** Mengubah satu parameter di alamat. Nilai kosong atau bawaan dihapus supaya alamat tetap rapi. */
   function ubahParameter(nama: string, nilai: string, bawaan: string) {
@@ -55,100 +53,121 @@ function Kontrak() {
     return f === 'semua' ? 'Semua' : TAMPILAN_STATUS[f].label
   }
 
+  const adaFilter = filter !== 'semua' || kataKunci !== ''
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">
-      <HeaderGelombang>
-        <h1 className="m-0 text-[22px] font-bold">Kontrak</h1>
-        <span className="text-[13px] text-white/80">{daftar.length} kontrak tercatat</span>
-      </HeaderGelombang>
+    <>
+      <HeaderGelombang
+        judul="Kontrak"
+        keterangan={`${kontrak.length} kontrak tercatat`}
+        aksi={
+          <Link to="/tambah" className={KELAS_TOMBOL_EMAS}>
+            <Ikon nama="tambah" ukuran={18} tebal={2.5} />
+            Tambah kontrak
+          </Link>
+        }
+      />
 
-      {/* Kotak pencarian, menumpuk di gelombang header */}
-      <label className="relative z-20 mx-5 -mt-9 flex h-[52px] flex-none items-center gap-3 rounded-[14px] bg-white px-4 shadow-kotak">
-        <Ikon nama="cari" ukuran={20} className="flex-none text-aksi" />
-        <input
-          type="search"
-          value={kataKunci}
-          onChange={(event) => ubahParameter('q', event.target.value, '')}
-          placeholder="Cari judul, nomor, atau mitra"
-          aria-label="Cari kontrak"
-          autoFocus={fokusCari}
-          className="min-w-0 flex-1 border-none bg-transparent text-[14px] text-teks outline-none placeholder:text-teks-lembut [&::-webkit-search-cancel-button]:hidden"
-        />
-        {kataKunci && (
-          <button
-            type="button"
-            aria-label="Hapus kata kunci"
-            onClick={() => ubahParameter('q', '', '')}
-            className="-mr-2 flex size-11 flex-none cursor-pointer items-center justify-center rounded-xl border-none bg-transparent text-teks-lembut"
-          >
-            <Ikon nama="tutup" ukuran={18} />
-          </button>
-        )}
-      </label>
-
-      {/* Chip filter dan urutan: menempel di atas saat daftar di-scroll */}
-      <div className="sticky top-0 z-10 flex flex-none flex-col gap-3 bg-latar pt-4 pb-3">
-        <div className="flex gap-2 overflow-x-auto px-5 pb-0.5">
-          {URUTAN_FILTER.map((f) => (
-            <ChipFilter
-              key={f}
-              label={labelFilter(f)}
-              jumlah={f === 'semua' ? daftar.length : jumlah[f]}
-              aktif={filter === f}
-              kelasTeks={f === 'semua' ? 'text-judul' : TAMPILAN_STATUS[f].kelasTeks}
-              onPilih={() => ubahParameter('status', f, 'semua')}
+      <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-14 flex flex-col gap-5 pb-4`}>
+        {/* Pencarian, filter, dan urutan */}
+        <div className={`${KELAS_KOTAK} flex flex-col gap-2 p-3 md:p-4`}>
+          <label className="flex h-12 items-center gap-3 rounded-xl border border-garis-input bg-white px-4 focus-within:border-aksi focus-within:outline-2 focus-within:outline-aksi">
+            <Ikon nama="cari" ukuran={20} className="flex-none text-aksi" />
+            <span className="sr-only">Cari kontrak</span>
+            <input
+              type="search"
+              value={kataKunci}
+              onChange={(event) => ubahParameter('q', event.target.value, '')}
+              placeholder="Cari nama kontrak, penyedia, atau nomor PKS"
+              // Garis fokus digambar oleh label pembungkus (focus-within), supaya seluruh kotak tersorot.
+              className="min-w-0 flex-1 border-none bg-transparent text-[15px] text-teks outline-none focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
             />
-          ))}
-        </div>
-
-        <div className="flex items-center justify-between px-5">
-          <span aria-live="polite" className="text-[13px] text-teks-lembut">
-            {hasil.length} kontrak
-          </span>
-          <MenuDropdown
-            isiTombol={
-              <>
-                <Ikon nama="urutkan" ukuran={14} tebal={2.5} />
-                {LABEL_URUTAN[urutan]}
-              </>
-            }
-            kelasTombol="flex h-9 cursor-pointer items-center gap-1.5 rounded-xl border border-garis bg-white px-3 text-[13px] font-semibold text-judul"
-            judul="Urutkan berdasarkan"
-            item={(Object.keys(LABEL_URUTAN) as Urutan[]).map((u) => ({
-              label: LABEL_URUTAN[u],
-              terpilih: urutan === u,
-              onPilih: () => ubahParameter('urut', u, 'berakhir'),
-            }))}
-          />
-        </div>
-      </div>
-
-      {/* Daftar kartu */}
-      <div className="flex flex-col gap-3 px-5 pb-6">
-        {hasil.map((kontrak) => (
-          <KartuKontrak key={kontrak.id} kontrak={kontrak} />
-        ))}
-
-        {hasil.length === 0 && (
-          <div className="flex flex-col items-center gap-2 px-4 py-12 text-center text-teks-lembut">
-            <span className="mb-1 flex size-14 items-center justify-center rounded-full bg-white text-aksi shadow-kotak">
-              <Ikon nama="cari" ukuran={24} />
-            </span>
-            <span className="font-semibold text-judul">Tidak ada kontrak yang cocok</span>
-            <span>Coba kata kunci atau filter lain.</span>
-            {(filter !== 'semua' || kataKunci) && (
+            {kataKunci && (
               <button
                 type="button"
-                onClick={() => setParameter({}, { replace: true })}
-                className="mt-2 h-11 cursor-pointer rounded-xl border border-garis bg-white px-4 font-semibold text-aksi"
+                aria-label="Hapus kata kunci"
+                onClick={() => ubahParameter('q', '', '')}
+                className="-mr-2 flex size-11 flex-none cursor-pointer items-center justify-center rounded-xl border-none bg-transparent text-teks-lembut hover:text-judul"
               >
-                Hapus filter
+                <Ikon nama="tutup" ukuran={18} />
               </button>
             )}
+          </label>
+
+          <div className="flex flex-col gap-1 md:flex-row md:items-center md:justify-between">
+            <div role="group" aria-label="Filter status" className="flex flex-wrap gap-x-2">
+              {URUTAN_FILTER.map((f) => (
+                <ChipFilter
+                  key={f}
+                  label={labelFilter(f)}
+                  jumlah={f === 'semua' ? kontrak.length : jumlah[f]}
+                  aktif={filter === f}
+                  onPilih={() => ubahParameter('status', f, 'semua')}
+                />
+              ))}
+            </div>
+
+            <MenuDropdown
+              isiTombol={
+                <>
+                  <Ikon nama="urutkan" ukuran={15} tebal={2.5} />
+                  <span>
+                    <span className="text-teks-lembut">Urutkan: </span>
+                    {LABEL_URUTAN[urutan]}
+                  </span>
+                </>
+              }
+              kelasTombol="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border-none bg-transparent px-2 text-[13px] font-semibold text-judul hover:bg-latar"
+              judul="Urutkan berdasarkan"
+              item={(Object.keys(LABEL_URUTAN) as Urutan[]).map((u) => ({
+                label: LABEL_URUTAN[u],
+                terpilih: urutan === u,
+                onPilih: () => ubahParameter('urut', u, 'berakhir'),
+              }))}
+            />
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+
+        <p aria-live="polite" className="m-0 -mb-2 px-1 text-[13px] text-teks-lembut">
+          Menampilkan {hasil.length} dari {kontrak.length} kontrak
+          {kataKunci && <> untuk “{kataKunci}”</>}
+        </p>
+
+        <div className={`${KELAS_KOTAK} px-4 md:px-7`}>
+          {hasil.length > 0 ? (
+            <ul className="m-0 list-none p-0">
+              {hasil.map((k) => (
+                <BarisKontrak key={k.id} kontrak={k} denganNomor />
+              ))}
+            </ul>
+          ) : kontrak.length === 0 ? (
+            <KeadaanKosong
+              ikon="kontrak"
+              judul="Belum ada kontrak"
+              pesan="Kontrak yang dicatat akan muncul di sini, lengkap dengan pengingat sebelum habis."
+              aksi={
+                <Link to="/tambah" className={KELAS_TOMBOL_KEDUA}>
+                  <Ikon nama="tambah" ukuran={16} tebal={2.5} /> Tambah kontrak pertama
+                </Link>
+              }
+            />
+          ) : (
+            <KeadaanKosong
+              ikon="cari"
+              judul="Tidak ada kontrak yang cocok"
+              pesan="Coba kata kunci lain, misalnya sebagian nama penyedia atau nomor PKS."
+              aksi={
+                adaFilter && (
+                  <button type="button" onClick={() => setParameter({}, { replace: true })} className={KELAS_TOMBOL_KEDUA}>
+                    Hapus pencarian dan filter
+                  </button>
+                )
+              }
+            />
+          )}
+        </div>
+      </main>
+    </>
   )
 }
 

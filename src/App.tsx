@@ -1,31 +1,33 @@
-// Daftar alamat (route) aplikasi dan halaman yang ditampilkan di setiap alamat.
+// Daftar alamat (route) website dan halaman yang ditampilkan di setiap alamat.
 
 import { Navigate, Route, Routes } from 'react-router-dom'
-import TataLetakHP from './components/TataLetakHP'
-import TataLetakUtama from './components/TataLetakUtama'
+import RuteAdmin from './components/RuteAdmin'
+import TataLetakWebsite from './components/TataLetakWebsite'
+import Admin from './pages/Admin'
 import Beranda from './pages/Beranda'
-import Kontrak from './pages/Kontrak'
-import Pengingat from './pages/Pengingat'
-import Profil from './pages/Profil'
 import DetailKontrak from './pages/DetailKontrak'
 import FormKontrak from './pages/FormKontrak'
+import Kontrak from './pages/Kontrak'
+import Masuk from './pages/Masuk'
+import Pengingat from './pages/Pengingat'
 
 function App() {
   return (
     <Routes>
-      <Route element={<TataLetakHP />}>
-        {/* Halaman dengan navigasi bawah */}
-        <Route element={<TataLetakUtama />}>
-          <Route path="/" element={<Beranda />} />
-          {/* Filter status bisa dikirim lewat alamat, misalnya /kontrak?status=segera */}
-          <Route path="/kontrak" element={<Kontrak />} />
-          <Route path="/pengingat" element={<Pengingat />} />
-          <Route path="/profil" element={<Profil />} />
-        </Route>
+      <Route path="/masuk" element={<Masuk />} />
 
-        {/* Halaman tanpa navigasi bawah (punya tombol bawah sendiri) */}
+      {/* Halaman yang hanya bisa dibuka setelah masuk */}
+      <Route element={<TataLetakWebsite />}>
+        <Route path="/" element={<Beranda />} />
+        {/* Filter status bisa dikirim lewat alamat, misalnya /kontrak?status=segera */}
+        <Route path="/kontrak" element={<Kontrak />} />
         <Route path="/kontrak/:id" element={<DetailKontrak />} />
+        <Route path="/kontrak/:id/ubah" element={<FormKontrak />} />
         <Route path="/tambah" element={<FormKontrak />} />
+        <Route path="/pengingat" element={<Pengingat />} />
+        <Route element={<RuteAdmin />}>
+          <Route path="/admin" element={<Admin />} />
+        </Route>
       </Route>
 
       {/* Alamat yang tidak dikenal dikembalikan ke Beranda */}

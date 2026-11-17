@@ -20,11 +20,16 @@
   --color-latar: #F3F5FB;
   --color-latar-tab: #E6EAF5;     /* latar tab Ringkasan / Dokumen / Riwayat */
   --color-garis: #E3E7F1;
-  --color-garis-input: #DCE1EE;   /* border kotak isian form */
+  --color-garis-input: #8590AB;   /* border kotak isian form: 3,19:1 di putih (WCAG 1.4.11, lihat docs/ui-audit.md) */
   --color-garis-lembut: #EEF1F5;  /* pembatas baris, latar progress bar */
   --color-teks: #1A2142;
   --color-teks-lembut: #646E89;
   --color-teks-header: #C9D1FF;   /* teks redup di atas header biru */
+
+  /* Tombol utama di atas header navy (desain v4). Nilainya sama dengan logo-emas,
+     tapi dipisah supaya warna logo tetap hanya untuk aksen kecil. Teks di atasnya galaxy-900 (8,3:1). */
+  --color-tombol-emas: #F2B829;
+  --color-tombol-emas-tua: #E0A100;
 
   /* Warna pekat tiap status (titik, progress bar, garis termin) */
   --color-berjalan: #1E9E6A;
@@ -42,14 +47,8 @@
   --color-selesai-latar: #EEF1F5;
   --color-selesai-teks: #4B5568;
 
-  /* Kartu "Sudah lewat" di halaman Pengingat */
-  --color-lewat-kartu: #FFF7F2;
+  /* Garis kotak kelompok "Sudah lewat" di halaman Pengingat */
   --color-lewat-garis-kartu: #F3C9B2;
-
-  /* Cincin hitung mundur dan garis masa kontrak di header Detail (di atas latar gelap) */
-  --color-cincin-berjalan: #7EE0B0;
-  --color-cincin-segera: #FAC775;
-  --color-cincin-lewat: #F5B08A;
 
   /* HANYA untuk aksi menghapus dan pesan kesalahan */
   --color-hapus: #D93645;
@@ -77,12 +76,11 @@
 
   /* Bayangan */
   --shadow-kotak: 0 1px 2px rgb(19 37 79 / 0.04), 0 8px 20px -12px rgb(19 37 79 / 0.22);
-  --shadow-kartu: 0 18px 36px -18px rgb(14 26 71 / 0.35);
   --shadow-menu: 0 18px 36px -14px rgb(14 26 71 / 0.35);
   --shadow-menu-tebal: 0 18px 36px -14px rgb(14 26 71 / 0.45);
-  --shadow-tab: 0 2px 8px -2px rgb(14 26 71 / 0.2);
   --shadow-toast: 0 16px 32px -12px rgb(14 26 71 / 0.5);
   --shadow-tombol-tambah: 0 12px 24px -10px rgb(43 76 155 / 0.6);
+  --shadow-tombol-emas: 0 10px 22px -10px rgb(242 184 41 / 0.7);
 }
 
 @layer base {
@@ -109,5 +107,31 @@
 
   a:hover {
     color: var(--color-aksi-tua);
+  }
+
+  /* Tailwind membuat placeholder 50% dari warna teks (sekitar 3,2:1). Placeholder di sini
+     membawa contoh format, jadi dibuat 5:1. */
+  ::placeholder {
+    color: var(--color-teks-lembut);
+    opacity: 1;
+  }
+
+  /* Fokus keyboard: satu gaya untuk semua elemen, terlihat di semua browser.
+     Tidak muncul saat diklik atau disentuh (hanya :focus-visible). */
+  :focus-visible {
+    outline: 2px solid var(--color-aksi);
+    outline-offset: 2px;
+  }
+
+  /* Di atas latar navy (header), garis fokus putih supaya kontras. */
+  .permukaan-gelap :focus-visible {
+    outline-color: #fff;
+  }
+
+  /* Kotak isian yang punya garis sendiri: garis fokus menempel di tepi kotak. */
+  input:focus-visible,
+  select:focus-visible,
+  textarea:focus-visible {
+    outline-offset: 0;
   }
 }

@@ -1,12 +1,11 @@
-// Kumpulan ikon garis (SVG). Bentuknya disalin dari docs/prototipe-referensi.html,
-// supaya tidak perlu library ikon tambahan.
+// Kumpulan ikon garis (SVG), supaya tidak perlu library ikon tambahan.
+// Ikon 3D atau gambar ikon dari luar sudah DITOLAK, jangan dipakai.
 // Ikon selalu dekoratif (aria-hidden). Teks atau aria-label diberikan oleh pemakainya.
 
 import type { ReactNode } from 'react'
 
 const daftarIkon = {
-  // Navigasi bawah
-  beranda: <path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z" />,
+  // Navigasi
   kontrak: (
     <>
       <path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z" />
@@ -20,12 +19,6 @@ const daftarIkon = {
       <path d="M10 21h4" />
     </>
   ),
-  profil: (
-    <>
-      <circle cx="12" cy="8" r="4" />
-      <path d="M4 21c0-4 4-6 8-6s8 2 8 6" />
-    </>
-  ),
 
   // Ikon status kontrak
   play: <path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zM10 8.5l5 3.5-5 3.5z" />,
@@ -37,6 +30,7 @@ const daftarIkon = {
   // Arah dan aksi
   kanan: <path d="M9 5l7 7-7 7" />,
   kiri: <path d="M15 5l-7 7 7 7" />,
+  bawah: <path d="M6 9l6 6 6-6" />,
   tutup: <path d="M6 6l12 12M18 6L6 18" />,
   titikTiga: (
     <>
@@ -60,35 +54,49 @@ const daftarIkon = {
   ),
   unduh: <path d="M12 4v12M7 11l5 5 5-5M5 20h14" />,
   unggah: <path d="M12 16V4M7 9l5-5 5 5M4 20h16" />,
-  kamera: (
-    <>
-      <rect x="3" y="7" width="18" height="13" rx="2" />
-      <circle cx="12" cy="13.5" r="3.5" />
-      <path d="M8 7l2-3h4l2 3" />
-    </>
-  ),
   centang: <path d="M5 12l5 5 9-10" />,
   sampah: <path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13" />,
 
-  // Halaman Profil
+  // Form, akun, dan admin
+  pensil: <path d="M4 20h4L19 9l-4-4L4 16zM13.5 6.5l4 4" />,
+  kalender: (
+    <>
+      <rect x="3" y="5" width="18" height="16" rx="2" />
+      <path d="M3 10h18M8 3v4M16 3v4" />
+    </>
+  ),
+  salin: (
+    <>
+      <rect x="9" y="9" width="11" height="11" rx="2" />
+      <path d="M5 15V5a1 1 0 0 1 1-1h10" />
+    </>
+  ),
+  mata: (
+    <>
+      <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" />
+      <circle cx="12" cy="12" r="3" />
+    </>
+  ),
+  mataTutup: <path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6A17 17 0 0 0 2 12s3.5 7 10 7a9.7 9.7 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2" />,
+  kunci: (
+    <>
+      <rect x="4" y="10" width="16" height="11" rx="2" />
+      <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    </>
+  ),
+  pengguna: (
+    <>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M3 20c0-3.3 2.7-5.5 6-5.5s6 2.2 6 5.5M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c1.8.7 3 2.6 3 5.4" />
+    </>
+  ),
+  perisai: <path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6zM9 12l2 2 4-4" />,
+  riwayat: <path d="M3 12a9 9 0 1 0 3-6.7L3 8M3 3v5h5M12 7v5l3 2" />,
+  catatan: <path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3" />,
   email: (
     <>
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="M3 7l9 6 9-6" />
-    </>
-  ),
-  kartuId: (
-    <>
-      <rect x="3" y="5" width="18" height="14" rx="2" />
-      <circle cx="9" cy="11" r="2" />
-      <path d="M6 16c.5-1.5 1.7-2 3-2s2.5.5 3 2M14 10h4M14 14h3" />
-    </>
-  ),
-  gedung: <path d="M4 21V5a1 1 0 0 1 1-1h9a1 1 0 0 1 1 1v16M15 9h4a1 1 0 0 1 1 1v11M8 8h3M8 12h3M8 16h3M3 21h18" />,
-  bantuan: (
-    <>
-      <circle cx="12" cy="12" r="9" />
-      <path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6M12 17v.5" />
     </>
   ),
   keluar: <path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3M10 17l5-5-5-5M15 12H4" />,

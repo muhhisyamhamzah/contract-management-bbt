@@ -1,70 +1,112 @@
-// Semua definisi tipe untuk kontrak disimpan di sini.
-// Field masih sementara (menunggu wawancara dengan kepala divisi),
-// jadi kalau ada perubahan cukup ubah file ini.
-
-/** Jenis kontrak. Sementara: PKS, SPK, dan Lainnya. */
-export type JenisKontrak = 'PKS' | 'SPK' | 'Lainnya'
-
-/** Pilihan berapa hari sebelum berakhir pengingat dikirim. */
-export type PengingatHari = 30 | 60 | 90
+// Semua definisi tipe aplikasi disimpan di sini, supaya mudah diubah saat
+// kolom final dari atasan berubah (lihat CLAUDE.md bagian "Data kontrak").
 
 /**
- * Status kontrak. Tidak diisi manual, tapi dihitung dari tanggal berakhir
+ * Status kontrak. Tidak diisi manual, tapi dihitung dari tanggal akhir
  * (lihat src/lib/status.ts). Status baru, misalnya untuk alur persetujuan
  * nanti, cukup ditambahkan di sini.
  */
 export type StatusKontrak = 'berjalan' | 'segera' | 'lewat' | 'selesai'
 
-export type Kontrak = {
+/** Jenis klausul berisiko di PKS. */
+export type JenisCriticalPoint = 'pengakhiran' | 'denda' | 'lainnya'
+
+/** Satu klausul berisiko di PKS, misalnya pasal pengakhiran kontrak atau denda. */
+export type CriticalPoint = {
   id: string
-  nomor: string
-  judul: string
-  jenis: JenisKontrak
-  mitra: string
-  unitPemilik: string
-  /** Nilai kontrak dalam rupiah, angka bulat tanpa titik. */
-  nilai: number
-  /** Format YYYY-MM-DD */
-  tanggalMulai: string
-  /** Format YYYY-MM-DD */
-  tanggalBerakhir: string
-  /** true kalau admin sudah menandai kontrak ini selesai. */
-  ditandaiSelesai: boolean
-  pengingatHari: PengingatHari
+  jenis: JenisCriticalPoint
+  /** Rujukan pasal, misalnya "Pasal 12". */
+  pasal: string
+  /** Ringkasan singkat yang ditulis pengguna. */
+  ringkasan: string
+  /** Tanggal penting (opsional), format YYYY-MM-DD. Kalau diisi, ikut diingatkan. */
+  tanggalPenting: string
+  status: 'aktif' | 'selesai'
+  /** Keterangan penanganan, diisi saat ditandai selesai. */
+  penanganan: string
 }
 
-// ---------------------------------------------------------------------------
-// Rincian yang tampil di halaman Detail kontrak. Sementara diisi data contoh
-// (src/data/rincianContoh.ts); nanti datang dari backend.
-// ---------------------------------------------------------------------------
+export type JenisDokumen = 'PKS utama' | 'Adendum' | 'BAST' | 'Lainnya'
 
-/** Satu termin (tahap) pembayaran. */
-export type Termin = {
-  /** Nomor urut termin, mulai dari 1. */
-  ke: number
-  /** Persen dari nilai kontrak. */
-  persen: number
-  lunas: boolean
-}
-
-/** Satu file dokumen kontrak. */
+/** Satu file PDF kontrak. */
 export type Dokumen = {
+  id: string
   nama: string
-  /** Ukuran yang sudah diformat, misalnya "2,4 MB". */
-  ukuran: string
+  jenis: JenisDokumen
+  /** Ukuran file dalam byte. */
+  ukuran: number
   /** Tanggal unggah, format YYYY-MM-DD. */
   tanggal: string
 }
 
-/** Jenis kejadian di riwayat; menentukan warna titiknya. */
-export type JenisRiwayat = 'dicatat' | 'lunas' | 'selesai'
+export type Kontrak = {
+  id: string
+  /** Nama kontrak. */
+  nama: string
+  /** Pihak penyedia (dulu disebut "mitra"). */
+  penyedia: string
+  /** Nomor PKS, unik. */
+  nomorPks: string
+  /** Format YYYY-MM-DD */
+  tanggalPks: string
+  /** Awal kontrak, format YYYY-MM-DD */
+  tanggalMulai: string
+  /** Akhir kontrak, format YYYY-MM-DD */
+  tanggalBerakhir: string
+  /** Nilai kontrak dalam rupiah, angka bulat. */
+  nilai: number
+  criticalPoint: CriticalPoint[]
+  /** [TERBUKA] Isinya progres pekerjaan atau status pembayaran. */
+  monitoring: string
+  catatan: string
+  /** [TERBUKA] Bedanya dengan catatan belum jelas. */
+  keterangan: string
+  dokumen: Dokumen[]
+  /** true kalau sudah ditandai selesai oleh pengguna. */
+  ditandaiSelesai: boolean
+  /** Keterangan saat ditandai selesai. */
+  keteranganSelesai: string
+}
 
-/** Satu kejadian di tab Riwayat. */
-export type KejadianRiwayat = {
-  judul: string
+// ---------------------------------------------------------------------------
+// Akun, riwayat perubahan, dan notifikasi
+// ---------------------------------------------------------------------------
+
+export type Peran = 'pengguna' | 'admin'
+
+export type Akun = {
+  id: string
+  nama: string
+  email: string
+  /** Jabatan yang tampil di daftar akun, misalnya "Tim Pengadaan". */
+  jabatan: string
+  peran: Peran
+  aktif: boolean
+  /** HANYA untuk data contoh selama belum ada backend. Backend menyimpan hash. */
+  sandi: string
+}
+
+/** Satu baris riwayat perubahan: siapa, kapan, apa yang berubah. */
+export type CatatanRiwayat = {
+  id: string
+  /** Waktu kejadian, format ISO. */
+  waktu: string
   /** Nama orang yang melakukan. */
   oleh: string
-  /** Format YYYY-MM-DD */
+  aksi: 'tambah' | 'ubah' | 'hapus' | 'selesai' | 'unggah' | 'akun'
+  /** Kalimat singkat, misalnya "Menambah kontrak Jasa penilaian aset". */
+  rincian: string
+  /** Kontrak yang terkait (kosong untuk perubahan akun atau kontrak yang sudah dihapus). */
+  kontrakId?: string
+}
+
+/** Notifikasi di panel lonceng. Dihitung dari jadwal pengingat. */
+export type Notifikasi = {
+  id: string
+  judul: string
+  isi: string
+  /** Tanggal pengingat, format YYYY-MM-DD. */
   tanggal: string
-  jenis: JenisRiwayat
+  kontrakId: string
+  jenis: 'pengingat' | 'lewat' | 'critical'
 }

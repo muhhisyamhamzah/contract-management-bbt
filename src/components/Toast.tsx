@@ -1,5 +1,5 @@
-// Penyedia toast: menyimpan pesan yang sedang tampil dan menggambarnya di bawah layar.
-// Dipasang sekali di TataLetakHP. Halaman memunculkan toast lewat useToast() (src/lib/toast.ts).
+// Penyedia toast: menyimpan pesan yang sedang tampil dan menggambarnya di bawah tengah layar.
+// Dipasang sekali di main.tsx. Halaman memunculkan toast lewat useToast() (src/lib/toast.ts).
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { DURASI_TOAST, KonteksToast } from '../lib/toast'
@@ -29,13 +29,12 @@ function PenyediaToast({ children }: Props) {
       {/*
         Elemen ini selalu ada (hanya disembunyikan saat kosong), supaya pembaca layar
         tetap membacakan pesan baru yang muncul.
-        Posisi bawah 98px = tinggi navigasi bawah (78px) + jarak 20px.
       */}
       <div
         role="status"
         className={
           pesan
-            ? 'absolute right-5 bottom-[98px] left-5 z-40 rounded-2xl bg-judul px-4 py-3.5 text-center font-bold text-white shadow-toast'
+            ? 'fixed bottom-[max(24px,env(safe-area-inset-bottom))] left-1/2 z-50 w-max max-w-[calc(100vw-32px)] -translate-x-1/2 rounded-2xl bg-judul px-5 py-3.5 text-center font-semibold text-white shadow-toast'
             : 'sr-only'
         }
       >

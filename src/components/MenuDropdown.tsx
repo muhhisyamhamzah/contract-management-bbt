@@ -1,15 +1,18 @@
-// Tombol yang membuka menu kecil di bawahnya. Dipakai untuk:
-// - dropdown urutan di halaman Kontrak ("Paling cepat habis", dll)
-// - menu titik tiga di Detail kontrak (Edit, Unduh, Hapus)
+// Tombol yang membuka panel pilihan kecil di bawahnya. Dipakai untuk:
+// - pilihan urutan di halaman Kontrak ("Paling cepat habis", dll)
+// - menu titik tiga di Detail kontrak dan daftar akun
 //
-// Menu tertutup saat: salah satu pilihan diklik, klik di luar menu, atau tombol Escape.
+// Polanya "disclosure" (tombol + daftar tombol biasa), bukan role="menu", supaya tombol Tab
+// dan pembaca layar bekerja seperti biasa (lihat docs/ui-audit.md temuan 8).
+// Panel tertutup saat pilihan diklik, klik di luar, Escape, atau fokus keluar.
 
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
+import { usePopover } from '../lib/popover'
 
 export type ItemMenu = {
   label: string
   onPilih: () => void
-  /** Pilihan yang sedang aktif: diberi latar ungu muda dan tanda centang. */
+  /** Pilihan yang sedang aktif: diberi latar biru muda dan tanda centang. */
   terpilih?: boolean
   /** Aksi berbahaya (misalnya Hapus): teks merah tebal. */
   bahaya?: boolean
@@ -25,49 +28,17 @@ type Props = {
   /** Judul kecil di atas pilihan, misalnya "Urutkan berdasarkan". */
   judul?: string
   item: ItemMenu[]
-  /** Lebar menu dalam piksel. */
+  /** Lebar panel dalam piksel. */
   lebar?: number
-  /** Bayangan lebih pekat, untuk menu di atas header gelap. */
-  bayanganTebal?: boolean
 }
 
-function MenuDropdown({
-  isiTombol,
-  kelasTombol,
-  labelTombol,
-  judul,
-  item,
-  lebar = 230,
-  bayanganTebal = false,
-}: Props) {
-  const [terbuka, setTerbuka] = useState(false)
-  const wadah = useRef<HTMLDivElement>(null)
-  const tombol = useRef<HTMLButtonElement>(null)
-
-  // Saat menu terbuka: tutup kalau klik di luar atau menekan Escape.
-  useEffect(() => {
-    if (!terbuka) return
-
-    function saatKlik(event: PointerEvent) {
-      if (!wadah.current?.contains(event.target as Node)) setTerbuka(false)
-    }
-    function saatTombolKeyboard(event: KeyboardEvent) {
-      if (event.key === 'Escape') {
-        setTerbuka(false)
-        tombol.current?.focus()
-      }
-    }
-
-    document.addEventListener('pointerdown', saatKlik)
-    document.addEventListener('keydown', saatTombolKeyboard)
-    return () => {
-      document.removeEventListener('pointerdown', saatKlik)
-      document.removeEventListener('keydown', saatTombolKeyboard)
-    }
-  }, [terbuka])
+function MenuDropdown({ isiTombol, kelasTombol, labelTombol, judul, item, lebar = 230 }: Props) {
+  const { terbuka, setTerbuka, wadah, tombol } = usePopover()
+  const id = useId()
 
   function pilih(itemMenu: ItemMenu) {
     setTerbuka(false)
+    tombol.current?.focus()
     itemMenu.onPilih()
   }
 
@@ -77,8 +48,8 @@ function MenuDropdown({
         ref={tombol}
         type="button"
         aria-label={labelTombol}
-        aria-haspopup="menu"
         aria-expanded={terbuka}
+        aria-controls={id}
         onClick={() => setTerbuka(!terbuka)}
         className={kelasTombol}
       >
@@ -87,30 +58,22 @@ function MenuDropdown({
 
       {terbuka && (
         <div
-          role="menu"
+          id={id}
           style={{ width: lebar }}
-          // Menu muncul 6px di bawah tombol, rata kanan dengan tombol.
-          className={`absolute top-[calc(100%+6px)] right-0 z-20 flex flex-col rounded-2xl border border-garis bg-white p-1.5 ${
-            bayanganTebal ? 'shadow-menu-tebal' : 'shadow-menu'
-          }`}
+          // Panel muncul 6px di bawah tombol, rata kanan dengan tombol.
+          className="absolute top-[calc(100%+6px)] right-0 z-30 flex flex-col rounded-2xl border border-garis bg-white p-1.5 text-teks shadow-menu"
         >
-          {judul && (
-            <span className="px-3 pt-2 pb-1 text-[12px] font-semibold text-teks-lembut">
-              {judul}
-            </span>
-          )}
+          {judul && <span className="px-3 pt-2 pb-1 text-[12px] font-semibold text-teks-lembut">{judul}</span>}
 
           {item.map((itemMenu) => (
             <button
               key={itemMenu.label}
               type="button"
-              // Pilihan yang bisa "terpilih" (misalnya urutan) diumumkan sebagai pilihan bercentang.
-              role={itemMenu.terpilih === undefined ? 'menuitem' : 'menuitemradio'}
-              aria-checked={itemMenu.terpilih}
+              aria-pressed={itemMenu.terpilih}
               onClick={() => pilih(itemMenu)}
-              className={`flex h-11 cursor-pointer items-center justify-between rounded-xl border-none px-3 text-left ${
+              className={`flex h-11 cursor-pointer items-center justify-between rounded-xl border-none px-3 text-left hover:bg-latar ${
                 itemMenu.terpilih
-                  ? 'bg-lembut font-bold text-judul'
+                  ? 'bg-lembut font-bold text-judul hover:bg-lembut'
                   : itemMenu.bahaya
                     ? 'bg-white font-bold text-hapus-teks'
                     : 'bg-white text-teks'
