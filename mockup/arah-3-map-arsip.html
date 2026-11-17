@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup Arah 3: Map Arsip (Beranda)</title>
+<!-- Arah ini TIDAK mengganti font: tetap Plus Jakarta Sans. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap">
+<style>
+  :root {
+    --navy: #13254F; --navy-2: #2B4C9B; --emas: #F2B829; --emas-teks: #7A5700;
+    --latar: #E9ECF3; --kertas: #FFFFFF; --garis: #DCE0EA; --garis-lembut: #EDEFF4;
+    --teks: #1A2142; --lembut: #5A6380; --teks-header: #C9D1FF;
+    --lewat: #E36A2E; --lewat-teks: #9E4113; --berjalan: #1E9E6A; --selesai: #94A3B8;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--latar); color: var(--teks); font: 14px/1.45 "Plus Jakarta Sans", system-ui, sans-serif; }
+  .wadah { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  .angka { font-variant-numeric: tabular-nums; }
+
+  /* Bilah navy tipis. Logo duduk di tab putih yang menggantung dari tepi atas, seperti label map arsip. */
+  .bilah { background: var(--navy); color: #fff; }
+  .bilah .wadah { display: flex; align-items: center; gap: 28px; height: 64px; }
+  .tab-logo { align-self: flex-start; background: #fff; padding: 14px 18px 12px; border-radius: 0 0 10px 10px; margin-bottom: -22px; position: relative; z-index: 2; border-bottom: 3px solid var(--emas); }
+  .tab-logo img { height: 46px; display: block; }
+  .app { font-weight: 700; font-size: 15px; color: #fff; }
+  .bilah nav { display: flex; gap: 4px; }
+  .bilah nav a { color: var(--teks-header); text-decoration: none; font-weight: 500; padding: 0 12px; height: 44px; display: inline-flex; align-items: center; gap: 6px; border-radius: 6px; }
+  .bilah nav a[aria-current] { color: var(--navy); background: #fff; font-weight: 700; }
+  .jumlah { background: var(--emas); color: var(--navy); font-size: 12px; font-weight: 700; border-radius: 4px; padding: 0 6px; }
+  .kanan { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+  .ikon-btn { width: 44px; height: 44px; display: grid; place-items: center; color: #fff; }
+  .avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--emas); color: var(--navy); display: grid; place-items: center; font-weight: 700; font-size: 13px; }
+
+  /* Pembuka */
+  .pembuka { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; padding: 48px 0 20px; }
+  .tanggal { margin: 0 0 4px; color: var(--lembut); }
+  h1 { margin: 0; font-size: 30px; font-weight: 800; color: var(--navy); letter-spacing: -0.02em; line-height: 1.15; }
+  .tombol { display: inline-flex; align-items: center; gap: 8px; height: 46px; padding: 0 18px; border-radius: 8px; background: var(--navy); color: #fff; font-weight: 700; text-decoration: none; white-space: nowrap; }
+
+  /* Rekap: satu batang proporsi + angka yang bisa diklik sebagai filter */
+  .rekap { background: var(--kertas); border-radius: 10px; padding: 18px 20px; display: grid; gap: 12px; margin-bottom: 28px; }
+  .batang { display: flex; height: 10px; border-radius: 5px; overflow: hidden; gap: 2px; }
+  .rekap ul { display: flex; gap: 8px 28px; margin: 0; padding: 0; list-style: none; flex-wrap: wrap; }
+  .rekap a { color: var(--teks); text-decoration: none; display: inline-flex; align-items: center; gap: 8px; min-height: 32px; }
+  .rekap a b { font-size: 18px; }
+  .rekap i { width: 10px; height: 10px; border-radius: 2px; display: inline-block; }
+
+  /* Map: kelompok per bulan berakhir, judulnya berbentuk tab map */
+  .map { margin-bottom: 26px; }
+  .map-tab { display: inline-flex; align-items: baseline; gap: 10px; background: var(--kertas); padding: 10px 18px 8px; border-radius: 10px 10px 0 0; }
+  .map-tab h2 { margin: 0; font-size: 16px; color: var(--navy); }
+  .map-tab span { color: var(--lembut); font-size: 13px; }
+  .lembar { background: var(--kertas); border-radius: 0 10px 10px 10px; padding: 4px 20px; }
+  .baris { display: grid; grid-template-columns: 52px 1fr 170px 150px 110px; gap: 18px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--garis-lembut); }
+  .baris:last-child { border-bottom: 0; }
+  .baris b { display: block; font-size: 15px; color: var(--teks); }
+  .peny { color: var(--lembut); }
+  .pks { color: var(--teks); }
+  .nilai { text-align: right; font-weight: 600; }
+  .sisa { text-align: right; line-height: 1.1; }
+  .sisa strong { display: block; font-size: 22px; font-weight: 800; }
+  .sisa small { color: var(--lembut); font-size: 12px; }
+  .sisa.lewat strong { color: var(--lewat-teks); } .sisa.segera strong { color: var(--emas-teks); }
+
+  .kal { width: 52px; border: 1px solid var(--garis); border-radius: 8px; overflow: hidden; text-align: center; }
+  .kal i { display: block; font-style: normal; font-size: 11px; font-weight: 700; color: var(--navy); line-height: 17px; }
+  .kal b { font-size: 20px; line-height: 1; padding: 5px 0 6px; color: var(--navy); }
+  .p-lewat { background: var(--lewat); } .p-segera { background: var(--emas); }
+  footer { color: var(--lembut); font-size: 13px; padding: 12px 0 32px; }
+
+  @media (max-width: 900px) {
+    .bilah .wadah { height: auto; flex-wrap: wrap; gap: 0 12px; }
+    .tab-logo { padding: 10px 12px 8px; margin-bottom: 0; }
+    .tab-logo img { height: 34px; }
+    .app { display: none; }
+    .kanan { align-self: center; }
+    .bilah nav { order: 3; width: 100%; justify-content: space-between; padding: 8px 0; }
+    .bilah nav a { padding: 0 10px; }
+    .pembuka { flex-direction: column; align-items: flex-start; padding-top: 24px; }
+    h1 { font-size: 24px; }
+    .lembar { padding: 4px 14px; border-radius: 0 10px 10px 10px; }
+    .baris { grid-template-columns: 52px 1fr auto; gap: 4px 14px; }
+    .baris .kal { grid-row: span 2; }
+    .baris .pks { display: none; }
+    .baris .nilai { grid-column: 2; grid-row: 2; text-align: left; font-weight: 500; color: var(--lembut); }
+    .baris .sisa { grid-column: 3; grid-row: 1 / span 2; }
+    .sisa strong { font-size: 18px; }
+  }
+</style>
+</head>
+<body>
+<header class="bilah">
+  <div class="wadah">
+    <a class="tab-logo" href="#"><img src="/logo-bbt.png" alt="Badan Bank Tanah"></a>
+    <span class="app">Contract Management</span>
+    <nav aria-label="Navigasi utama"><a href="#" aria-current="page">Beranda</a><a href="#">Kontrak</a><a href="#">Pengingat <span class="jumlah">6</span></a><a href="#">Admin</a></nav>
+    <div class="kanan">
+      <span class="ikon-btn" aria-label="Notifikasi"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21h4"/></svg></span>
+      <span class="avatar">DC</span>
+    </div>
+  </div>
+</header>
+
+<main class="wadah">
+  <section class="pembuka">
+    <div>
+      <p class="tanggal">Selasa, 17 November 2026</p>
+      <h1>6 kontrak perlu perhatian, senilai Rp 5,7 miliar</h1>
+    </div>
+    <a class="tombol" href="#"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>Tambah kontrak</a>
+  </section>
+
+  <section class="rekap angka" aria-label="Jumlah kontrak per status">
+    <div class="batang" aria-hidden="true"><span style="flex:2;background:var(--lewat)"></span><span style="flex:4;background:var(--emas)"></span><span style="flex:2;background:var(--berjalan)"></span><span style="flex:1;background:var(--selesai)"></span></div>
+    <ul>
+      <li><a href="#"><i style="background:var(--lewat)"></i><b>2</b> Sudah lewat</a></li>
+      <li><a href="#"><i style="background:var(--emas)"></i><b>4</b> Segera habis</a></li>
+      <li><a href="#"><i style="background:var(--berjalan)"></i><b>2</b> Berjalan</a></li>
+      <li><a href="#"><i style="background:var(--selesai)"></i><b>1</b> Selesai</a></li>
+    </ul>
+  </section>
+
+  <section class="map angka">
+    <div class="map-tab"><h2>November 2026</h2><span>2 sudah lewat</span></div>
+    <div class="lembar">
+      <div class="baris"><div class="kal"><i class="p-lewat">Nov</i><b>7</b></div><div><b>Survei dan pengukuran bidang tanah</b><span class="peny">PT Contoh Geospasial</span></div><span class="pks">019/BBT/PKS/2025</span><span class="nilai">Rp 2.100.000.000</span><span class="sisa lewat"><strong>10 hari</strong><small>sudah lewat</small></span></div>
+      <div class="baris"><div class="kal"><i class="p-lewat">Nov</i><b>9</b></div><div><b>Jasa penilaian aset</b><span class="peny">KJPP Contoh</span></div><span class="pks">008/BBT/PKS/2026</span><span class="nilai">Rp 285.000.000</span><span class="sisa lewat"><strong>8 hari</strong><small>sudah lewat</small></span></div>
+    </div>
+  </section>
+
+  <section class="map angka">
+    <div class="map-tab"><h2>Desember 2026</h2><span>3 kontrak berakhir</span></div>
+    <div class="lembar">
+      <div class="baris"><div class="kal"><i class="p-segera">Des</i><b>5</b></div><div><b>Kerja sama pemanfaatan lahan</b><span class="peny">PT Contoh Agro Lestari</span></div><span class="pks">015/BBT/PKS/2026</span><span class="nilai">Rp 1.200.000.000</span><span class="sisa segera"><strong>18 hari</strong><small>lagi</small></span></div>
+      <div class="baris"><div class="kal"><i class="p-segera">Des</i><b>10</b></div><div><b>Jasa konsultan hukum</b><span class="peny">Kantor Hukum Contoh dan Rekan</span></div><span class="pks">027/BBT/PKS/2026</span><span class="nilai">Rp 640.000.000</span><span class="sisa segera"><strong>23 hari</strong><small>lagi</small></span></div>
+      <div class="baris"><div class="kal"><i class="p-segera">Des</i><b>14</b></div><div><b>Pengembangan sistem informasi</b><span class="peny">PT Contoh Solusi Digital</span></div><span class="pks">031/BBT/PKS/2026</span><span class="nilai">Rp 980.000.000</span><span class="sisa segera"><strong>27 hari</strong><small>lagi</small></span></div>
+    </div>
+  </section>
+
+  <section class="map angka">
+    <div class="map-tab"><h2>Januari 2027</h2><span>1 kontrak berakhir</span></div>
+    <div class="lembar">
+      <div class="baris"><div class="kal"><i class="p-segera">Jan</i><b>21</b></div><div><b>Pemeliharaan gedung kantor</b><span class="peny">PT Contoh Graha Prima</span></div><span class="pks">036/BBT/PKS/2026</span><span class="nilai">Rp 450.000.000</span><span class="sisa segera"><strong>65 hari</strong><small>lagi</small></span></div>
+    </div>
+  </section>
+</main>
+<footer><div class="wadah">Contract Management, Badan Bank Tanah. Purwarupa dengan data contoh.</div></footer>
+</body>
+</html>

@@ -1,0 +1,99 @@
+/* Gaya tabel bersama untuk mockup tabel-referensi.html dan kombinasi.html. Hanya mockup. */
+
+  :root { --navy:#13254F; --aksi:#2B4C9B; --biru:#8FA8E8; --emas:#F2B829; --tanah:#E07B2C; --hijau:#1E9E6A; --abu:#8291A8;
+    --latar:#FAFAFC; --garis:#E4E7EF; --garis-l:#EEF0F4; --teks:#1A2142; --lembut:#59627D; --sorot:#EEF1F8;
+    --lewat-t:#9E4113; --lewat-l:#FCE6DA; --segera-t:#7A5700; --segera-l:#FBF0D3; --jalan-t:#11734B; --jalan-l:#E3F5EC; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--latar); color:var(--teks); font:14px/1.45 "Public Sans",system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  .wadah { max-width:1120px; margin:0 auto; padding:40px 24px 80px; }
+  h1 { font-size:40px; font-weight:800; letter-spacing:-.035em; margin:0; color:var(--navy); }
+  .serif { font-family:"Source Serif 4",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
+  .pengantar { color:var(--lembut); font-size:16px; margin:8px 0 0; max-width:720px; }
+  .varian { margin-top:72px; }
+  .kepala-varian { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+  .no { display:inline-grid; place-items:center; width:34px; height:34px; border-radius:99px; background:var(--navy); color:#fff; font-weight:800; }
+  .kepala-varian h2 { margin:0; font-size:26px; font-weight:800; letter-spacing:-.03em; color:var(--navy); }
+  .catatan { color:var(--lembut); margin:0 0 18px; max-width:820px; }
+  .catatan b { color:var(--teks); }
+  .t-l { color:var(--lewat-t); } .t-s { color:var(--segera-t); } .t-j { color:var(--jalan-t); }
+
+  /* Mozaik kecil untuk latar beberapa varian */
+  .mozaik { position:absolute; inset:0 0 auto 0; height:220px; display:grid; grid-template-columns:repeat(24,1fr); gap:6px; padding:6px; overflow:hidden;
+    -webkit-mask-image:linear-gradient(#000 20%,transparent 95%); mask-image:linear-gradient(#000 20%,transparent 95%); pointer-events:none; }
+  .mozaik i { aspect-ratio:1; border-radius:9px; }
+
+  /* ---------- 1. Tabel kaca di atas mozaik ---------- */
+  .v1 { position:relative; border-radius:32px; overflow:hidden; padding:72px 28px 28px; background:#fff; border:1px solid var(--garis); }
+  .kaca { position:relative; background:rgb(255 255 255 / .72); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border:1px solid rgb(255 255 255 / .9);
+    border-radius:24px; box-shadow:0 20px 40px -24px rgb(19 37 79 / .35); padding:6px 8px; }
+  table { width:100%; border-collapse:collapse; }
+  .v1 th { text-align:left; font-size:12px; font-weight:600; color:var(--lembut); padding:14px 16px; }
+  .v1 td { padding:14px 16px; border-top:1px solid rgb(19 37 79 / .07); vertical-align:middle; }
+  .v1 tbody tr:hover td { background:rgb(238 241 248 / .7); }
+  .nama b { display:block; font-weight:650; font-weight:600; } .nama span { color:var(--lembut); font-size:13px; }
+  .titik { display:inline-flex; align-items:center; gap:8px; font-weight:600; white-space:nowrap; }
+  .titik::before { content:""; width:8px; height:8px; border-radius:99px; background:currentColor; }
+  .kanan { text-align:right; } th.kanan { text-align:right; }
+  .tgl b { display:block; } .tgl span { font-size:12px; color:var(--lembut); }
+  .judul-tabel { display:flex; justify-content:space-between; align-items:center; padding:12px 16px 4px; }
+  .judul-tabel h3 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.02em; color:var(--navy); }
+  .pil-gelap { background:var(--navy); color:#fff; border-radius:99px; padding:10px 18px; font-weight:600; font-size:13px; }
+
+  /* ---------- 2. Ringkas ala aplikasi kerja (kelompok + baris tipis) ---------- */
+  .v2 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:8px 0 12px; }
+  .v2 .kelompok { display:flex; align-items:center; gap:10px; padding:16px 24px 8px; font-weight:700; color:var(--navy); }
+  .v2 .kelompok small { color:var(--lembut); font-weight:500; }
+  .ubin { width:12px; height:12px; border-radius:4px; display:inline-block; flex:none; }
+  .v2 .row { display:grid; grid-template-columns:20px minmax(0,1.6fr) 1fr 150px 120px 110px; gap:16px; align-items:center; padding:0 24px; min-height:48px; border-top:1px solid var(--garis-l); }
+  .v2 .row:hover { background:var(--latar); }
+  .v2 .row .n { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .v2 .row .p, .v2 .row .k { color:var(--lembut); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .v2 .hdr { min-height:36px; font-size:12px; color:var(--lembut); border-top:0; }
+
+  /* ---------- 3. Garis 90 hari di dalam tabel ---------- */
+  .v3 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:6px 24px 14px; }
+  .v3 th { text-align:left; font-size:12px; font-weight:600; color:var(--lembut); padding:16px 0 10px; }
+  .v3 td { padding:16px 12px 16px 0; border-top:1px solid var(--garis-l); vertical-align:middle; }
+  .trek { position:relative; height:34px; min-width:300px; }
+  .trek .rel { position:absolute; left:0; right:0; top:20px; height:4px; border-radius:99px; background:linear-gradient(90deg, var(--lewat-l) 0 25%, var(--segera-l) 25% 100%); }
+  .trek .kini { position:absolute; left:25%; top:12px; width:2px; height:20px; background:var(--navy); border-radius:2px; }
+  .trek .tanda { position:absolute; top:13px; width:18px; height:18px; border-radius:6px; transform:translateX(-50%); border:3px solid #fff; box-shadow:0 2px 6px rgb(19 37 79 / .25); }
+  .trek .lbl { position:absolute; top:-2px; font-size:11px; font-weight:700; transform:translateX(-50%); white-space:nowrap; }
+  .skala { display:flex; justify-content:space-between; font-size:11px; color:var(--lembut); min-width:300px; }
+
+  /* ---------- 4. Angka serif besar (gaya editorial referensi) ---------- */
+  .v4 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:4px 28px; }
+  .v4 .row { display:grid; grid-template-columns:130px minmax(0,1fr) 170px 120px 40px; gap:20px; align-items:center; padding:18px 0; border-top:1px solid var(--garis-l); }
+  .v4 .row:first-child { border-top:0; }
+  .v4 .besar { font-family:"Source Serif 4",Georgia,serif; font-style:italic; font-size:52px; line-height:.9; letter-spacing:-.02em; }
+  .v4 .besar small { display:block; font-family:"Public Sans",sans-serif; font-style:normal; font-size:12px; font-weight:600; letter-spacing:0; margin-top:6px; }
+  .v4 .n { font-size:17px; font-weight:700; letter-spacing:-.01em; color:var(--navy); }
+  .panah { width:40px; height:40px; border-radius:99px; border:1px solid var(--garis); display:grid; place-items:center; color:var(--navy); }
+
+  /* ---------- 5. Baris pil mengambang di atas mozaik ---------- */
+  .v5 { position:relative; border-radius:32px; overflow:hidden; padding:64px 28px 28px; background:linear-gradient(#fff, var(--latar)); border:1px solid var(--garis); }
+  .v5 .daftar { position:relative; display:flex; flex-direction:column; gap:10px; }
+  .v5 .pil { display:grid; grid-template-columns:56px minmax(0,1fr) 160px 120px 130px 48px; gap:16px; align-items:center; background:#fff; border:1px solid var(--garis);
+    border-radius:99px; padding:8px 8px 8px 8px; box-shadow:0 12px 28px -20px rgb(19 37 79 / .45); }
+  .v5 .bulat { width:56px; height:56px; border-radius:99px; display:grid; place-items:center; text-align:center; line-height:1; font-weight:800; color:var(--navy); }
+  .v5 .bulat small { display:block; font-size:10px; font-weight:700; }
+  .v5 .aksi { width:48px; height:48px; border-radius:99px; background:var(--navy); color:#fff; display:grid; place-items:center; }
+
+  /* ---------- 6. Ubin status mozaik sebagai tanggal ---------- */
+  .v6 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:12px 24px; }
+  .v6 .row + .row { border-top:1px solid var(--garis-l); }
+  .v6 .row { display:grid; grid-template-columns:64px minmax(0,1fr) 150px 120px 120px; gap:18px; align-items:center; padding:10px 0; }
+  .v6 .ubin-tgl { width:64px; height:64px; border-radius:14px; display:flex; flex-direction:column; justify-content:center; align-items:center; line-height:1; color:var(--navy); }
+  .v6 .ubin-tgl b { font-size:24px; font-weight:800; } .v6 .ubin-tgl small { font-size:11px; font-weight:700; margin-top:3px; }
+  .v6 .sisa b { display:block; font-size:22px; font-weight:800; letter-spacing:-.02em; } .v6 .sisa small { font-size:12px; color:var(--lembut); }
+
+  @media (max-width:900px) {
+    h1 { font-size:30px; }
+    .v1, .v5 { padding:56px 12px 12px; }
+    .v1 th:nth-child(3), .v1 td:nth-child(3), .v1 th:nth-child(4), .v1 td:nth-child(4) { display:none; }
+    .v2 .row { grid-template-columns:20px minmax(0,1fr) 100px; } .v2 .row > :nth-child(3), .v2 .row > :nth-child(4), .v2 .row > :nth-child(5) { display:none; }
+    .v3 { overflow-x:auto; }
+    .v4 .row { grid-template-columns:90px minmax(0,1fr); } .v4 .row > :nth-child(3), .v4 .row > :nth-child(4), .v4 .row > :nth-child(5) { display:none; } .v4 .besar { font-size:40px; }
+    .v5 .pil { grid-template-columns:56px minmax(0,1fr) 48px; border-radius:28px; } .v5 .pil > :nth-child(3), .v5 .pil > :nth-child(4), .v5 .pil > :nth-child(5) { display:none; }
+    .v6 .row { grid-template-columns:64px minmax(0,1fr) auto; } .v6 .row > :nth-child(3), .v6 .row > :nth-child(4) { display:none; }
+  }

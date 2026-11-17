@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Referensi gaya tabel kontrak (6 pilihan)</title>
+<!-- Semua data fiktif ("Contoh"). Gaya mengikuti arah Kavling dan referensi Hisyam: lapang, membulat, angka besar, serif miring sebagai aksen. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@1,8..60,400;1,8..60,500&display=swap">
+<style>
+  :root { --navy:#13254F; --aksi:#2B4C9B; --biru:#8FA8E8; --emas:#F2B829; --tanah:#E07B2C; --hijau:#1E9E6A; --abu:#8291A8;
+    --latar:#FAFAFC; --garis:#E4E7EF; --garis-l:#EEF0F4; --teks:#1A2142; --lembut:#59627D; --sorot:#EEF1F8;
+    --lewat-t:#9E4113; --lewat-l:#FCE6DA; --segera-t:#7A5700; --segera-l:#FBF0D3; --jalan-t:#11734B; --jalan-l:#E3F5EC; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--latar); color:var(--teks); font:14px/1.45 "Public Sans",system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  .wadah { max-width:1120px; margin:0 auto; padding:40px 24px 80px; }
+  h1 { font-size:40px; font-weight:800; letter-spacing:-.035em; margin:0; color:var(--navy); }
+  .serif { font-family:"Source Serif 4",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
+  .pengantar { color:var(--lembut); font-size:16px; margin:8px 0 0; max-width:720px; }
+  .varian { margin-top:72px; }
+  .kepala-varian { display:flex; align-items:baseline; gap:14px; flex-wrap:wrap; margin-bottom:6px; }
+  .no { display:inline-grid; place-items:center; width:34px; height:34px; border-radius:99px; background:var(--navy); color:#fff; font-weight:800; }
+  .kepala-varian h2 { margin:0; font-size:26px; font-weight:800; letter-spacing:-.03em; color:var(--navy); }
+  .catatan { color:var(--lembut); margin:0 0 18px; max-width:820px; }
+  .catatan b { color:var(--teks); }
+  .t-l { color:var(--lewat-t); } .t-s { color:var(--segera-t); } .t-j { color:var(--jalan-t); }
+
+  /* Mozaik kecil untuk latar beberapa varian */
+  .mozaik { position:absolute; inset:0 0 auto 0; height:220px; display:grid; grid-template-columns:repeat(24,1fr); gap:6px; padding:6px; overflow:hidden;
+    -webkit-mask-image:linear-gradient(#000 20%,transparent 95%); mask-image:linear-gradient(#000 20%,transparent 95%); pointer-events:none; }
+  .mozaik i { aspect-ratio:1; border-radius:9px; }
+
+  /* ---------- 1. Tabel kaca di atas mozaik ---------- */
+  .v1 { position:relative; border-radius:32px; overflow:hidden; padding:72px 28px 28px; background:#fff; border:1px solid var(--garis); }
+  .kaca { position:relative; background:rgb(255 255 255 / .72); -webkit-backdrop-filter:blur(18px); backdrop-filter:blur(18px); border:1px solid rgb(255 255 255 / .9);
+    border-radius:24px; box-shadow:0 20px 40px -24px rgb(19 37 79 / .35); padding:6px 8px; }
+  table { width:100%; border-collapse:collapse; }
+  .v1 th { text-align:left; font-size:12px; font-weight:600; color:var(--lembut); padding:14px 16px; }
+  .v1 td { padding:14px 16px; border-top:1px solid rgb(19 37 79 / .07); vertical-align:middle; }
+  .v1 tbody tr:hover td { background:rgb(238 241 248 / .7); }
+  .nama b { display:block; font-weight:650; font-weight:600; } .nama span { color:var(--lembut); font-size:13px; }
+  .titik { display:inline-flex; align-items:center; gap:8px; font-weight:600; white-space:nowrap; }
+  .titik::before { content:""; width:8px; height:8px; border-radius:99px; background:currentColor; }
+  .kanan { text-align:right; } th.kanan { text-align:right; }
+  .tgl b { display:block; } .tgl span { font-size:12px; color:var(--lembut); }
+  .judul-tabel { display:flex; justify-content:space-between; align-items:center; padding:12px 16px 4px; }
+  .judul-tabel h3 { margin:0; font-size:22px; font-weight:800; letter-spacing:-.02em; color:var(--navy); }
+  .pil-gelap { background:var(--navy); color:#fff; border-radius:99px; padding:10px 18px; font-weight:600; font-size:13px; }
+
+  /* ---------- 2. Ringkas ala aplikasi kerja (kelompok + baris tipis) ---------- */
+  .v2 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:8px 0 12px; }
+  .v2 .kelompok { display:flex; align-items:center; gap:10px; padding:16px 24px 8px; font-weight:700; color:var(--navy); }
+  .v2 .kelompok small { color:var(--lembut); font-weight:500; }
+  .ubin { width:12px; height:12px; border-radius:4px; display:inline-block; flex:none; }
+  .v2 .row { display:grid; grid-template-columns:20px minmax(0,1.6fr) 1fr 150px 120px 110px; gap:16px; align-items:center; padding:0 24px; min-height:48px; border-top:1px solid var(--garis-l); }
+  .v2 .row:hover { background:var(--latar); }
+  .v2 .row .n { font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .v2 .row .p, .v2 .row .k { color:var(--lembut); font-size:13px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .v2 .hdr { min-height:36px; font-size:12px; color:var(--lembut); border-top:0; }
+
+  /* ---------- 3. Garis 90 hari di dalam tabel ---------- */
+  .v3 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:6px 24px 14px; }
+  .v3 th { text-align:left; font-size:12px; font-weight:600; color:var(--lembut); padding:16px 0 10px; }
+  .v3 td { padding:16px 12px 16px 0; border-top:1px solid var(--garis-l); vertical-align:middle; }
+  .trek { position:relative; height:34px; min-width:300px; }
+  .trek .rel { position:absolute; left:0; right:0; top:20px; height:4px; border-radius:99px; background:linear-gradient(90deg, var(--lewat-l) 0 25%, var(--segera-l) 25% 100%); }
+  .trek .kini { position:absolute; left:25%; top:12px; width:2px; height:20px; background:var(--navy); border-radius:2px; }
+  .trek .tanda { position:absolute; top:13px; width:18px; height:18px; border-radius:6px; transform:translateX(-50%); border:3px solid #fff; box-shadow:0 2px 6px rgb(19 37 79 / .25); }
+  .trek .lbl { position:absolute; top:-2px; font-size:11px; font-weight:700; transform:translateX(-50%); white-space:nowrap; }
+  .skala { display:flex; justify-content:space-between; font-size:11px; color:var(--lembut); min-width:300px; }
+
+  /* ---------- 4. Angka serif besar (gaya editorial referensi) ---------- */
+  .v4 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:4px 28px; }
+  .v4 .row { display:grid; grid-template-columns:130px minmax(0,1fr) 170px 120px 40px; gap:20px; align-items:center; padding:18px 0; border-top:1px solid var(--garis-l); }
+  .v4 .row:first-child { border-top:0; }
+  .v4 .besar { font-family:"Source Serif 4",Georgia,serif; font-style:italic; font-size:52px; line-height:.9; letter-spacing:-.02em; }
+  .v4 .besar small { display:block; font-family:"Public Sans",sans-serif; font-style:normal; font-size:12px; font-weight:600; letter-spacing:0; margin-top:6px; }
+  .v4 .n { font-size:17px; font-weight:700; letter-spacing:-.01em; color:var(--navy); }
+  .panah { width:40px; height:40px; border-radius:99px; border:1px solid var(--garis); display:grid; place-items:center; color:var(--navy); }
+
+  /* ---------- 5. Baris pil mengambang di atas mozaik ---------- */
+  .v5 { position:relative; border-radius:32px; overflow:hidden; padding:64px 28px 28px; background:linear-gradient(#fff, var(--latar)); border:1px solid var(--garis); }
+  .v5 .daftar { position:relative; display:flex; flex-direction:column; gap:10px; }
+  .v5 .pil { display:grid; grid-template-columns:56px minmax(0,1fr) 160px 120px 130px 48px; gap:16px; align-items:center; background:#fff; border:1px solid var(--garis);
+    border-radius:99px; padding:8px 8px 8px 8px; box-shadow:0 12px 28px -20px rgb(19 37 79 / .45); }
+  .v5 .bulat { width:56px; height:56px; border-radius:99px; display:grid; place-items:center; text-align:center; line-height:1; font-weight:800; color:var(--navy); }
+  .v5 .bulat small { display:block; font-size:10px; font-weight:700; }
+  .v5 .aksi { width:48px; height:48px; border-radius:99px; background:var(--navy); color:#fff; display:grid; place-items:center; }
+
+  /* ---------- 6. Ubin status mozaik sebagai tanggal ---------- */
+  .v6 { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:12px 24px; }
+  .v6 .row + .row { border-top:1px solid var(--garis-l); }
+  .v6 .row { display:grid; grid-template-columns:64px minmax(0,1fr) 150px 120px 120px; gap:18px; align-items:center; padding:10px 0; }
+  .v6 .ubin-tgl { width:64px; height:64px; border-radius:14px; display:flex; flex-direction:column; justify-content:center; align-items:center; line-height:1; color:var(--navy); }
+  .v6 .ubin-tgl b { font-size:24px; font-weight:800; } .v6 .ubin-tgl small { font-size:11px; font-weight:700; margin-top:3px; }
+  .v6 .sisa b { display:block; font-size:22px; font-weight:800; letter-spacing:-.02em; } .v6 .sisa small { font-size:12px; color:var(--lembut); }
+
+  @media (max-width:900px) {
+    h1 { font-size:30px; }
+    .v1, .v5 { padding:56px 12px 12px; }
+    .v1 th:nth-child(3), .v1 td:nth-child(3), .v1 th:nth-child(4), .v1 td:nth-child(4) { display:none; }
+    .v2 .row { grid-template-columns:20px minmax(0,1fr) 100px; } .v2 .row > :nth-child(3), .v2 .row > :nth-child(4), .v2 .row > :nth-child(5) { display:none; }
+    .v3 { overflow-x:auto; }
+    .v4 .row { grid-template-columns:90px minmax(0,1fr); } .v4 .row > :nth-child(3), .v4 .row > :nth-child(4), .v4 .row > :nth-child(5) { display:none; } .v4 .besar { font-size:40px; }
+    .v5 .pil { grid-template-columns:56px minmax(0,1fr) 48px; border-radius:28px; } .v5 .pil > :nth-child(3), .v5 .pil > :nth-child(4), .v5 .pil > :nth-child(5) { display:none; }
+    .v6 .row { grid-template-columns:64px minmax(0,1fr) auto; } .v6 .row > :nth-child(3), .v6 .row > :nth-child(4) { display:none; }
+  }
+</style>
+</head>
+<body>
+<div class="wadah">
+  <h1>Referensi gaya <span class="serif">tabel</span> kontrak</h1>
+  <p class="pengantar">Enam cara menampilkan daftar kontrak yang sama, mengikuti suasana referensi (lapang, membulat, mozaik, judul tebal dengan serif miring).
+    Semua bisa dipakai di Beranda, Kontrak, dan Pengingat. Data fiktif. Hari ini: 17 November 2026.</p>
+
+  <!-- 1 -->
+  <section class="varian">
+    <div class="kepala-varian"><span class="no">1</span><h2>Tabel kaca di atas mozaik</h2></div>
+    <p class="catatan">Paling dekat dengan referensi: tabel berlapis kaca buram di atas kotak mozaik. Kolom rapi seperti tabel sungguhan,
+      status cukup titik + teks. <b>Catatan:</b> kaca buram (blur) sebelumnya masuk daftar "ciri AI". Kalau dipilih, aturan itu dilonggarkan khusus untuk tabel.</p>
+    <div class="v1">
+      <div class="mozaik" data-mozaik></div>
+      <div class="kaca">
+        <div class="judul-tabel"><h3>Agenda <span class="serif">kontrak</span></h3><span class="pil-gelap">Lihat semua</span></div>
+        <table>
+          <thead><tr><th>Kontrak</th><th>Berakhir</th><th>Nomor PKS</th><th class="kanan">Nilai</th><th>Status</th></tr></thead>
+          <tbody>
+            <tr><td class="nama"><b>Survei dan pengukuran bidang tanah</b><span>PT Contoh Geospasial</span></td><td class="tgl"><b>7 Nov 2026</b><span>Sabtu</span></td><td>019/BBT/PKS/2025</td><td class="kanan"><b>Rp 2,1 M</b></td><td><span class="titik t-l">Lewat 10 hari</span></td></tr>
+            <tr><td class="nama"><b>Jasa penilaian aset</b><span>KJPP Contoh</span></td><td class="tgl"><b>9 Nov 2026</b><span>Senin</span></td><td>008/BBT/PKS/2026</td><td class="kanan"><b>Rp 285 jt</b></td><td><span class="titik t-l">Lewat 8 hari</span></td></tr>
+            <tr><td class="nama"><b>Kerja sama pemanfaatan lahan</b><span>PT Contoh Agro Lestari</span></td><td class="tgl"><b>5 Des 2026</b><span>Sabtu</span></td><td>015/BBT/PKS/2026</td><td class="kanan"><b>Rp 1,2 M</b></td><td><span class="titik t-s">18 hari lagi</span></td></tr>
+            <tr><td class="nama"><b>Jasa konsultan hukum</b><span>Kantor Hukum Contoh dan Rekan</span></td><td class="tgl"><b>10 Des 2026</b><span>Kamis</span></td><td>027/BBT/PKS/2026</td><td class="kanan"><b>Rp 640 jt</b></td><td><span class="titik t-s">23 hari lagi</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="varian">
+    <div class="kepala-varian"><span class="no">2</span><h2>Ringkas ala aplikasi kerja</h2></div>
+    <p class="catatan">Gaya aplikasi kerja modern: baris tipis 48px, kelompok per status dengan ubin warna kecil, tanpa pil. Paling padat dan cepat dipindai.
+      Cocok untuk halaman Kontrak yang isinya bisa puluhan.</p>
+    <div class="v2">
+      <div class="row hdr"><span></span><span>Kontrak</span><span>Penyedia</span><span>Nomor PKS</span><span class="kanan">Nilai</span><span class="kanan">Berakhir</span></div>
+      <div class="kelompok"><i class="ubin" style="background:var(--tanah)"></i>Sudah lewat <small>2</small></div>
+      <div class="row"><i class="ubin" style="background:var(--tanah)"></i><span class="n">Survei dan pengukuran bidang tanah</span><span class="p">PT Contoh Geospasial</span><span class="k">019/BBT/PKS/2025</span><span class="kanan"><b>Rp 2,1 M</b></span><span class="kanan t-l"><b>Lewat 10 hari</b></span></div>
+      <div class="row"><i class="ubin" style="background:var(--tanah)"></i><span class="n">Jasa penilaian aset</span><span class="p">KJPP Contoh</span><span class="k">008/BBT/PKS/2026</span><span class="kanan"><b>Rp 285 jt</b></span><span class="kanan t-l"><b>Lewat 8 hari</b></span></div>
+      <div class="kelompok"><i class="ubin" style="background:var(--emas)"></i>Habis dalam 90 hari <small>3</small></div>
+      <div class="row"><i class="ubin" style="background:var(--emas)"></i><span class="n">Kerja sama pemanfaatan lahan</span><span class="p">PT Contoh Agro Lestari</span><span class="k">015/BBT/PKS/2026</span><span class="kanan"><b>Rp 1,2 M</b></span><span class="kanan t-s"><b>18 hari lagi</b></span></div>
+      <div class="row"><i class="ubin" style="background:var(--emas)"></i><span class="n">Jasa konsultan hukum</span><span class="p">Kantor Hukum Contoh dan Rekan</span><span class="k">027/BBT/PKS/2026</span><span class="kanan"><b>Rp 640 jt</b></span><span class="kanan t-s"><b>23 hari lagi</b></span></div>
+      <div class="row"><i class="ubin" style="background:var(--emas)"></i><span class="n">Pengembangan sistem informasi</span><span class="p">PT Contoh Solusi Digital</span><span class="k">031/BBT/PKS/2026</span><span class="kanan"><b>Rp 980 jt</b></span><span class="kanan t-s"><b>27 hari lagi</b></span></div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="varian">
+    <div class="kepala-varian"><span class="no">3</span><h2>Garis 90 hari di dalam tabel</h2></div>
+    <p class="catatan">Setiap baris punya garis waktu mini: dari 30 hari lalu sampai 90 hari ke depan, dengan garis "hari ini" dan ubin tanggal akhir.
+      Kepala divisi langsung melihat mana yang paling dekat tanpa membaca angka.</p>
+    <div class="v3">
+      <table>
+        <thead><tr><th>Kontrak</th><th class="kanan" style="padding-right:24px">Nilai</th><th><div class="skala"><span>17 Okt</span><span>Hari ini</span><span>17 Des</span><span>15 Feb</span></div></th></tr></thead>
+        <tbody>
+          <tr><td class="nama"><b>Survei dan pengukuran bidang tanah</b><span>PT Contoh Geospasial</span></td><td class="kanan" style="padding-right:24px"><b>Rp 2,1 M</b></td><td><div class="trek"><i class="rel"></i><i class="kini"></i><i class="tanda" style="left:17%;background:var(--tanah)"></i><span class="lbl t-l" style="left:17%">7 Nov, lewat 10 hari</span></div></td></tr>
+          <tr><td class="nama"><b>Jasa penilaian aset</b><span>KJPP Contoh</span></td><td class="kanan" style="padding-right:24px"><b>Rp 285 jt</b></td><td><div class="trek"><i class="rel"></i><i class="kini"></i><i class="tanda" style="left:19%;background:var(--tanah)"></i><span class="lbl t-l" style="left:12%">9 Nov, lewat 8 hari</span></div></td></tr>
+          <tr><td class="nama"><b>Kerja sama pemanfaatan lahan</b><span>PT Contoh Agro Lestari</span></td><td class="kanan" style="padding-right:24px"><b>Rp 1,2 M</b></td><td><div class="trek"><i class="rel"></i><i class="kini"></i><i class="tanda" style="left:40%;background:var(--emas)"></i><span class="lbl t-s" style="left:40%">5 Des, 18 hari lagi</span></div></td></tr>
+          <tr><td class="nama"><b>Pengembangan sistem informasi</b><span>PT Contoh Solusi Digital</span></td><td class="kanan" style="padding-right:24px"><b>Rp 980 jt</b></td><td><div class="trek"><i class="rel"></i><i class="kini"></i><i class="tanda" style="left:48%;background:var(--emas)"></i><span class="lbl t-s" style="left:48%">14 Des, 27 hari lagi</span></div></td></tr>
+          <tr><td class="nama"><b>Pemeliharaan gedung kantor</b><span>PT Contoh Graha Prima</span></td><td class="kanan" style="padding-right:24px"><b>Rp 450 jt</b></td><td><div class="trek"><i class="rel"></i><i class="kini"></i><i class="tanda" style="left:79%;background:var(--emas)"></i><span class="lbl t-s" style="left:79%">21 Jan, 65 hari lagi</span></div></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="varian">
+    <div class="kepala-varian"><span class="no">4</span><h2>Angka serif besar</h2></div>
+    <p class="catatan">Meminjam gaya judul referensi (sans tebal + serif miring): sisa hari ditulis besar dengan serif miring di kiri, nama kontrak tebal.
+      Terasa elegan dan berkarakter, tapi lebih renggang.</p>
+    <div class="v4">
+      <div class="row"><div class="besar t-l">10<small>hari lewat</small></div><div><div class="n">Survei dan pengukuran bidang tanah</div><div class="nama"><span>PT Contoh Geospasial, berakhir 7 Nov 2026</span></div></div><span class="nama"><span>019/BBT/PKS/2025</span></span><span class="kanan"><b>Rp 2,1 M</b></span><span class="panah">›</span></div>
+      <div class="row"><div class="besar t-l">8<small>hari lewat</small></div><div><div class="n">Jasa penilaian aset</div><div class="nama"><span>KJPP Contoh, berakhir 9 Nov 2026</span></div></div><span class="nama"><span>008/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 285 jt</b></span><span class="panah">›</span></div>
+      <div class="row"><div class="besar t-s">18<small>hari lagi</small></div><div><div class="n">Kerja sama pemanfaatan lahan</div><div class="nama"><span>PT Contoh Agro Lestari, berakhir 5 Des 2026</span></div></div><span class="nama"><span>015/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 1,2 M</b></span><span class="panah">›</span></div>
+      <div class="row"><div class="besar t-s">23<small>hari lagi</small></div><div><div class="n">Jasa konsultan hukum</div><div class="nama"><span>Kantor Hukum Contoh dan Rekan, berakhir 10 Des 2026</span></div></div><span class="nama"><span>027/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 640 jt</b></span><span class="panah">›</span></div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="varian">
+    <div class="kepala-varian"><span class="no">5</span><h2>Baris pil mengambang</h2></div>
+    <p class="catatan">Setiap kontrak jadi pil putih panjang yang mengambang di atas mozaik, mirip kotak isian email + tombol gelap di referensi.
+      Tombol bulat gelap di ujung membuka detail. Sangat "modern", tapi kurang padat untuk daftar panjang.</p>
+    <div class="v5">
+      <div class="mozaik" data-mozaik></div>
+      <div class="daftar">
+        <div class="pil"><div class="bulat" style="background:var(--lewat-l)">7<small>Nov</small></div><div class="nama"><b>Survei dan pengukuran bidang tanah</b><span>PT Contoh Geospasial</span></div><span class="nama"><span>019/BBT/PKS/2025</span></span><span class="kanan"><b>Rp 2,1 M</b></span><span class="titik t-l">Lewat 10 hari</span><span class="aksi">→</span></div>
+        <div class="pil"><div class="bulat" style="background:var(--lewat-l)">9<small>Nov</small></div><div class="nama"><b>Jasa penilaian aset</b><span>KJPP Contoh</span></div><span class="nama"><span>008/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 285 jt</b></span><span class="titik t-l">Lewat 8 hari</span><span class="aksi">→</span></div>
+        <div class="pil"><div class="bulat" style="background:var(--segera-l)">5<small>Des</small></div><div class="nama"><b>Kerja sama pemanfaatan lahan</b><span>PT Contoh Agro Lestari</span></div><span class="nama"><span>015/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 1,2 M</b></span><span class="titik t-s">18 hari lagi</span><span class="aksi">→</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="varian">
+    <div class="kepala-varian"><span class="no">6</span><h2>Ubin mozaik sebagai tanggal</h2></div>
+    <p class="catatan">Kotak kalender diganti ubin berwarna seperti potongan mozaik header, berisi tanggal akhir. Mozaik jadi bahasa visual yang sama dari atas sampai ke tabel.
+      Sisa hari tetap besar di kanan.</p>
+    <div class="v6">
+      <div class="row"><div class="ubin-tgl" style="background:color-mix(in srgb,var(--tanah) 35%,white)"><b>7</b><small>Nov</small></div><div class="nama"><b>Survei dan pengukuran bidang tanah</b><span>PT Contoh Geospasial</span></div><span class="nama"><span>019/BBT/PKS/2025</span></span><span class="kanan"><b>Rp 2,1 M</b></span><span class="sisa kanan t-l"><b>10 hari</b><small>sudah lewat</small></span></div>
+      <div class="row"><div class="ubin-tgl" style="background:color-mix(in srgb,var(--tanah) 35%,white)"><b>9</b><small>Nov</small></div><div class="nama"><b>Jasa penilaian aset</b><span>KJPP Contoh</span></div><span class="nama"><span>008/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 285 jt</b></span><span class="sisa kanan t-l"><b>8 hari</b><small>sudah lewat</small></span></div>
+      <div class="row"><div class="ubin-tgl" style="background:color-mix(in srgb,var(--emas) 40%,white)"><b>5</b><small>Des</small></div><div class="nama"><b>Kerja sama pemanfaatan lahan</b><span>PT Contoh Agro Lestari</span></div><span class="nama"><span>015/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 1,2 M</b></span><span class="sisa kanan t-s"><b>18 hari</b><small>lagi</small></span></div>
+      <div class="row"><div class="ubin-tgl" style="background:color-mix(in srgb,var(--biru) 45%,white)"><b>22</b><small>Mar</small></div><div class="nama"><b>Audit laporan keuangan</b><span>KAP Contoh</span></div><span class="nama"><span>044/BBT/PKS/2026</span></span><span class="kanan"><b>Rp 310 jt</b></span><span class="sisa kanan t-j"><b>125 hari</b><small>berjalan</small></span></div>
+    </div>
+  </section>
+</div>
+
+<script>
+  // Mozaik latar untuk varian 1 dan 5 (pola tetap, warna BBT).
+  const warna = ['#13254F', '#2B4C9B', '#8FA8E8', '#ffffff', '#F2B829', '#E07B2C']
+  for (const el of document.querySelectorAll('[data-mozaik]')) {
+    const kolom = innerWidth <= 900 ? 10 : 24
+    el.style.gridTemplateColumns = `repeat(${kolom}, 1fr)`
+    for (let i = 0; i < kolom * 4; i++) {
+      const x = i % kolom, y = Math.floor(i / kolom), t = x / (kolom - 1) * (warna.length - 1)
+      const kiri = Math.floor(t), kanan = Math.min(warna.length - 1, kiri + 1), porsi = Math.round((1 - (t - kiri)) * 100)
+      const pucat = Math.min(90, 35 + y * 16 + ((x * 7 + y * 3) % 5) * 6)
+      const k = document.createElement('i')
+      if ((x * 7 + y * 11) % 9 !== 0) k.style.background = `color-mix(in srgb, color-mix(in srgb, ${warna[kiri]} ${porsi}%, ${warna[kanan]}) ${100 - pucat}%, white)`
+      el.appendChild(k)
+    }
+  }
+</script>
+</body>
+</html>

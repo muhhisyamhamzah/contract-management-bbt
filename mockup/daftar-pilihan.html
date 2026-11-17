@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gambaran pilihan daftar kontrak (A, B, C)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@1,8..60,400&display=swap">
+<style>
+  :root { --navy:#13254F; --aksi:#2B4C9B; --emas:#F2B829; --tanah:#E07B2C; --latar:#FAFAFC; --garis:#E4E7EF; --garis-l:#ECEEF3;
+    --teks:#1A2142; --lembut:#59627D; --lewat:#E36A2E; --lewat-t:#9E4113; --lewat-l:#FCE6DA; --segera:#E0A100; --segera-t:#7A5700; --segera-l:#FBF0D3; --sorot:#EEF1F8; }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--latar); color:var(--teks); font:14px/1.45 "Public Sans",system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  .wadah { max-width:1120px; margin:0 auto; padding:32px 24px 64px; }
+  .label-pilihan { display:inline-block; background:var(--navy); color:#fff; font-weight:700; border-radius:99px; padding:4px 14px; margin:40px 0 12px; }
+  h2 { margin:0 0 4px; font-size:22px; letter-spacing:-.02em; color:var(--navy); }
+  h2 em { font-family:"Source Serif 4",Georgia,serif; font-weight:400; }
+  .ket { color:var(--lembut); margin:0 0 16px; }
+  .kal { width:54px; flex:none; border:1px solid var(--garis); border-radius:12px; overflow:hidden; text-align:center; background:#fff; }
+  .kal i { display:block; font-style:normal; font-size:11px; font-weight:700; color:var(--navy); line-height:16px; }
+  .kal b { display:block; font-size:20px; line-height:1; padding:4px 0 2px; color:var(--navy); }
+  .kal small { display:block; font-size:11px; color:var(--lembut); padding-bottom:5px; }
+  .kal.besar { width:72px; } .kal.besar b { font-size:28px; }
+  .p-l { background:var(--tanah); } .p-s { background:var(--emas); }
+  .masa { height:6px; border-radius:99px; background:var(--garis-l); overflow:hidden; }
+  .masa span { display:block; height:100%; border-radius:99px; }
+  .b-l { background:var(--lewat); } .b-s { background:var(--segera); }
+
+  /* A: kartu bergrid */
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  .kartu { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:20px; display:flex; flex-direction:column; gap:14px; }
+  .kartu .atas { display:flex; justify-content:space-between; align-items:flex-start; }
+  .angka { text-align:right; line-height:1; }
+  .angka strong { display:block; font-size:44px; font-weight:800; letter-spacing:-.03em; }
+  .angka small { font-size:13px; font-weight:600; }
+  .t-l { color:var(--lewat-t); } .t-s { color:var(--segera-t); }
+  .kartu .nama { font-weight:700; font-size:16px; color:var(--navy); }
+  .kartu .peny { color:var(--lembut); font-size:13px; }
+  .kartu .bawah { display:flex; justify-content:space-between; font-size:13px; color:var(--lembut); }
+  .kartu .bawah b { color:var(--navy); font-size:15px; }
+
+  /* B: garis masa per bulan */
+  .panel { background:#fff; border:1px solid var(--garis); border-radius:24px; padding:8px 28px 20px; }
+  .bulan { display:grid; grid-template-columns:120px 1fr; gap:20px; padding-top:18px; }
+  .bulan h3 { margin:6px 0 0; font-size:15px; color:var(--navy); }
+  .bulan h3 small { display:block; color:var(--lembut); font-weight:400; font-size:13px; }
+  .jalur { position:relative; padding-left:28px; border-left:2px solid var(--garis); }
+  .butir { position:relative; display:flex; align-items:center; gap:14px; padding:10px 0; }
+  .butir::before { content:""; position:absolute; left:-36px; width:12px; height:12px; border-radius:50%; background:#fff; border:3px solid var(--segera); }
+  .butir.l::before { border-color:var(--lewat); }
+  .butir .info { flex:1; } .butir .info b { display:block; } .butir .info span { color:var(--lembut); font-size:13px; }
+  .pil { font-weight:700; font-size:13px; border-radius:99px; padding:4px 12px; white-space:nowrap; }
+  .pil.l { background:var(--lewat-l); color:var(--lewat-t); } .pil.s { background:var(--segera-l); color:var(--segera-t); }
+  .hari-ini { display:flex; align-items:center; gap:10px; margin:14px 0 0 0; color:var(--navy); font-weight:700; font-size:13px; }
+  .hari-ini::before, .hari-ini::after { content:""; flex:1; height:2px; background:var(--navy); }
+
+  /* C: baris lebih kaya */
+  .baris { display:grid; grid-template-columns:54px 1fr 150px 100px 110px; gap:18px; align-items:center; padding:16px 0; border-bottom:1px solid var(--garis-l); }
+  .baris:last-child { border-bottom:0; }
+  .baris.sorot { background:var(--lewat-l); margin:0 -28px; padding:16px 28px; border-radius:18px; border-bottom:0; }
+  .baris .nama b { display:block; font-size:15px; } .baris .nama span { color:var(--lembut); font-size:13px; }
+  .baris .masa { margin-top:8px; max-width:360px; }
+  .baris .pks { color:var(--lembut); font-size:13px; } .baris .nilai { text-align:right; font-weight:700; }
+  .baris .angka strong { font-size:30px; }
+
+  @media (max-width:900px) {
+    .grid { grid-template-columns:1fr; }
+    .bulan { grid-template-columns:1fr; gap:8px; }
+    .baris { grid-template-columns:54px 1fr auto; }
+    .baris .pks, .baris .nilai { display:none; }
+    .panel { padding:8px 16px 16px; }
+    .baris.sorot { margin:0 -16px; padding:16px; }
+  }
+</style>
+</head>
+<body>
+<div class="wadah">
+  <h2>Gambaran pilihan daftar <em>kontrak</em></h2>
+  <p class="ket">Data contoh yang sama ditampilkan dengan tiga cara. Hari ini: 17 November 2026.</p>
+
+  <span class="label-pilihan">Pilihan A: kartu bergrid</span>
+  <div class="grid">
+    <div class="kartu"><div class="atas"><div class="kal besar"><i class="p-l">Nov</i><b>7</b><small>Sabtu</small></div><div class="angka t-l"><strong>10</strong><small>hari lewat</small></div></div>
+      <div><div class="nama">Survei dan pengukuran bidang tanah</div><div class="peny">PT Contoh Geospasial</div></div>
+      <div class="masa"><span class="b-l" style="width:100%"></span></div>
+      <div class="bawah"><span>019/BBT/PKS/2025</span><b>Rp 2,1 M</b></div></div>
+    <div class="kartu"><div class="atas"><div class="kal besar"><i class="p-l">Nov</i><b>9</b><small>Senin</small></div><div class="angka t-l"><strong>8</strong><small>hari lewat</small></div></div>
+      <div><div class="nama">Jasa penilaian aset</div><div class="peny">KJPP Contoh</div></div>
+      <div class="masa"><span class="b-l" style="width:100%"></span></div>
+      <div class="bawah"><span>008/BBT/PKS/2026</span><b>Rp 285 jt</b></div></div>
+    <div class="kartu"><div class="atas"><div class="kal besar"><i class="p-s">Des</i><b>5</b><small>Sabtu</small></div><div class="angka t-s"><strong>18</strong><small>hari lagi</small></div></div>
+      <div><div class="nama">Kerja sama pemanfaatan lahan</div><div class="peny">PT Contoh Agro Lestari</div></div>
+      <div class="masa"><span class="b-s" style="width:95%"></span></div>
+      <div class="bawah"><span>015/BBT/PKS/2026</span><b>Rp 1,2 M</b></div></div>
+  </div>
+
+  <span class="label-pilihan">Pilihan B: garis masa per bulan</span>
+  <div class="panel">
+    <div class="bulan"><h3>November 2026<small>2 sudah lewat</small></h3>
+      <div class="jalur">
+        <div class="butir l"><div class="kal"><i class="p-l">Nov</i><b>7</b><small>Sabtu</small></div><div class="info"><b>Survei dan pengukuran bidang tanah</b><span>PT Contoh Geospasial, Rp 2,1 M</span></div><span class="pil l">Lewat 10 hari</span></div>
+        <div class="butir l"><div class="kal"><i class="p-l">Nov</i><b>9</b><small>Senin</small></div><div class="info"><b>Jasa penilaian aset</b><span>KJPP Contoh, Rp 285 jt</span></div><span class="pil l">Lewat 8 hari</span></div>
+      </div></div>
+    <div class="hari-ini">Hari ini, 17 November</div>
+    <div class="bulan"><h3>Desember 2026<small>3 kontrak berakhir</small></h3>
+      <div class="jalur">
+        <div class="butir"><div class="kal"><i class="p-s">Des</i><b>5</b><small>Sabtu</small></div><div class="info"><b>Kerja sama pemanfaatan lahan</b><span>PT Contoh Agro Lestari, Rp 1,2 M</span></div><span class="pil s">18 hari lagi</span></div>
+        <div class="butir"><div class="kal"><i class="p-s">Des</i><b>10</b><small>Kamis</small></div><div class="info"><b>Jasa konsultan hukum</b><span>Kantor Hukum Contoh dan Rekan, Rp 640 jt</span></div><span class="pil s">23 hari lagi</span></div>
+      </div></div>
+  </div>
+
+  <span class="label-pilihan">Pilihan C: baris lebih kaya</span>
+  <div class="panel">
+    <div class="baris sorot"><div class="kal"><i class="p-l">Nov</i><b>7</b><small>Sabtu</small></div>
+      <div class="nama"><b>Survei dan pengukuran bidang tanah</b><span>PT Contoh Geospasial</span><div class="masa"><span class="b-l" style="width:100%"></span></div></div>
+      <span class="pks">019/BBT/PKS/2025</span><span class="nilai">Rp 2,1 M</span><div class="angka t-l"><strong>10</strong><small>hari lewat</small></div></div>
+    <div class="baris"><div class="kal"><i class="p-l">Nov</i><b>9</b><small>Senin</small></div>
+      <div class="nama"><b>Jasa penilaian aset</b><span>KJPP Contoh</span><div class="masa"><span class="b-l" style="width:100%"></span></div></div>
+      <span class="pks">008/BBT/PKS/2026</span><span class="nilai">Rp 285 jt</span><div class="angka t-l"><strong>8</strong><small>hari lewat</small></div></div>
+    <div class="baris"><div class="kal"><i class="p-s">Des</i><b>5</b><small>Sabtu</small></div>
+      <div class="nama"><b>Kerja sama pemanfaatan lahan</b><span>PT Contoh Agro Lestari</span><div class="masa"><span class="b-s" style="width:95%"></span></div></div>
+      <span class="pks">015/BBT/PKS/2026</span><span class="nilai">Rp 1,2 M</span><div class="angka t-s"><strong>18</strong><small>hari lagi</small></div></div>
+  </div>
+</div>
+</body>
+</html>

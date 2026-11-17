@@ -30,3 +30,6 @@ dist-ssr
 
 # Berkas kerja skill impeccable (laporan, mode live)
 .impeccable/
+
+# Screenshot mockup (bisa dibuat ulang dari file HTML di mockup/)
+mockup/*.png

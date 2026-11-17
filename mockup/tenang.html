@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mockup versi tenang</title>
+<!-- Buka dengan ?v=1|2&h=beranda|kontrak|pengingat|tambah.
+     v=1 "Tenang": gaya Kavling yang diredam. v=2 "Polos kantor": tanpa mozaik, bilah atas biasa.
+     Aturan: satu warna aksi (navy), warna status hanya di teks sisa waktu, pil hanya untuk tombol dan kotak cari,
+     paling banyak 3 ukuran huruf di halaman kerja (28 / 15 / 13), serif miring hanya di judul Beranda.
+     Data fiktif ("Contoh"). Hanya mockup. -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@1,8..60,400&display=swap">
+<style>
+  :root { --navy:#13254F; --aksi:#2B4C9B; --latar:#FAFAFC; --garis:#E4E7EF; --garis-l:#EEF0F4; --teks:#1A2142; --lembut:#59627D;
+    --t-lewat:#9E4113; --t-segera:#7A5700; --t-jalan:#11734B; --input:#7D88A3; --sorot:#EEF1F8; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--latar); color:var(--teks); font:15px/1.5 "Public Sans",system-ui,sans-serif; font-variant-numeric:tabular-nums; }
+  .serif { font-family:"Source Serif 4",Georgia,serif; font-style:italic; font-weight:400; letter-spacing:-.01em; }
+  .wadah { position:relative; max-width:1120px; margin:0 auto; padding:0 24px 64px; }
+  .kecil { font-size:13px; color:var(--lembut); }
+  .kanan { text-align:right; }
+  .t-lewat { color:var(--t-lewat); } .t-segera { color:var(--t-segera); } .t-jalan { color:var(--t-jalan); }
+
+  /* Mozaik pudar (hanya Beranda di opsi 1) */
+  .mozaik { position:absolute; inset:0 0 auto 0; height:200px; display:grid; gap:6px; padding:6px; overflow:hidden; pointer-events:none;
+    -webkit-mask-image:linear-gradient(#000 10%,transparent 90%); mask-image:linear-gradient(#000 10%,transparent 90%); }
+  .mozaik i { aspect-ratio:1; border-radius:10px; }
+
+  /* Navigasi */
+  .nav { display:flex; align-items:center; gap:24px; background:#fff; }
+  .v1 .nav { position:sticky; top:12px; z-index:5; margin-top:12px; border:1px solid var(--garis); border-radius:20px; padding:8px 8px 8px 18px; box-shadow:0 10px 28px -20px rgb(19 37 79 / .35); }
+  .v2 .bilah { position:sticky; top:0; z-index:5; background:#fff; border-bottom:1px solid var(--garis); }
+  .v2 .nav { max-width:1120px; margin:0 auto; padding:10px 24px; }
+  .merek { display:flex; align-items:center; gap:14px; }
+  .merek img { height:40px; display:block; }
+  .merek i { width:1px; height:30px; background:var(--garis); }
+  .merek b { font-size:20px; font-weight:800; letter-spacing:-.02em; color:var(--navy); white-space:nowrap; }
+  .menu { display:flex; gap:4px; margin:0 auto; }
+  .menu a { position:relative; display:inline-flex; align-items:center; gap:6px; min-height:44px; padding:0 12px; color:var(--teks); text-decoration:none; font-weight:500; }
+  .menu a.aktif { color:var(--navy); font-weight:700; }
+  .menu a.aktif::after { content:""; position:absolute; left:12px; right:12px; bottom:4px; height:2px; background:var(--navy); border-radius:2px; }
+  .menu .jml { font-size:13px; font-weight:700; color:var(--navy); }
+  .kanan-nav { display:flex; align-items:center; gap:10px; }
+  .av { width:38px; height:38px; border-radius:99px; background:var(--sorot); display:grid; place-items:center; font-weight:700; font-size:13px; color:var(--navy); }
+  .tombol { display:inline-flex; align-items:center; gap:8px; height:44px; padding:0 20px; border-radius:99px; background:var(--navy); color:#fff; font-weight:600; white-space:nowrap; border:0; font-size:15px; }
+  .tombol.kedua { background:#fff; color:var(--navy); border:1px solid var(--input); }
+  .v2 .tombol { border-radius:10px; }
+
+  /* Beranda */
+  .pembuka { text-align:center; padding:72px 0 0; position:relative; }
+  .v2 .pembuka { text-align:left; padding:40px 0 0; }
+  .pembuka .tgl { margin:0; color:var(--lembut); font-size:13px; }
+  .pembuka h1 { margin:6px 0 0; font-size:46px; line-height:1.08; font-weight:800; letter-spacing:-.03em; color:var(--navy); }
+  .v2 .pembuka h1 { font-size:34px; }
+  .pembuka p.ring { margin:10px 0 0; color:var(--lembut); }
+  .cari { display:flex; align-items:center; gap:10px; max-width:560px; margin:22px auto 0; background:#fff; border:1px solid var(--input); border-radius:99px; padding:5px 5px 5px 20px; min-height:50px; }
+  .v2 .cari { margin-left:0; border-radius:10px; }
+  .cari span { flex:1; color:var(--lembut); text-align:left; } .cari em { font-style:normal; background:var(--navy); color:#fff; border-radius:99px; padding:10px 20px; font-weight:600; }
+  .v2 .cari em { border-radius:8px; }
+  .rekap { display:flex; justify-content:center; gap:28px; flex-wrap:wrap; margin:18px 0 0; }
+  .v2 .rekap { justify-content:flex-start; }
+  .rekap a { color:var(--teks); text-decoration:none; } .rekap b { color:var(--navy); margin-right:4px; }
+  .kepala { display:flex; justify-content:space-between; align-items:baseline; margin:48px 0 14px; }
+  .kepala h2 { margin:0; font-size:15px; font-weight:700; color:var(--navy); }
+  .kepala a { color:var(--aksi); font-size:13px; font-weight:600; text-decoration:none; }
+  .grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  .kartu { background:#fff; border:1px solid var(--garis); border-radius:20px; padding:18px; display:flex; flex-direction:column; gap:12px; }
+  .v2 .kartu { border-radius:12px; }
+  .kartu .atas { display:flex; justify-content:space-between; align-items:flex-start; }
+  .kal { width:52px; border:1px solid var(--garis); border-radius:10px; overflow:hidden; text-align:center; }
+  .kal i { display:block; font-style:normal; font-size:13px; font-weight:700; background:var(--sorot); color:var(--navy); line-height:20px; }
+  .kal b { display:block; font-size:22px; line-height:1; padding:6px 0 7px; color:var(--navy); }
+  .angka { text-align:right; line-height:1; } .angka strong { display:block; font-size:34px; font-weight:800; letter-spacing:-.02em; } .angka span { font-size:13px; }
+  .kartu .nm { font-weight:600; color:var(--navy); } .kartu .bawah { display:flex; justify-content:space-between; }
+
+  /* Halaman kerja */
+  .judul { padding:40px 0 18px; } .judul h1 { margin:0; font-size:28px; font-weight:800; letter-spacing:-.02em; color:var(--navy); } .judul p { margin:4px 0 0; }
+  .judul.flex { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; }
+  .tab { display:flex; gap:22px; border-bottom:1px solid var(--garis); margin:16px 0 0; }
+  .tab a { padding:10px 0; color:var(--lembut); font-weight:500; position:relative; }
+  .tab a.aktif { color:var(--navy); font-weight:700; } .tab a.aktif::after { content:""; position:absolute; left:0; right:0; bottom:-1px; height:2px; background:var(--navy); }
+  .tab .urut { margin-left:auto; color:var(--navy); font-size:13px; font-weight:600; align-self:center; }
+  .tabel { background:#fff; border:1px solid var(--garis); border-radius:20px; overflow:clip; margin-top:16px; }
+  .v2 .tabel { border-radius:12px; }
+  .baris { display:grid; grid-template-columns:minmax(0,2fr) 160px 120px 120px 120px; gap:16px; align-items:center; padding:0 22px; min-height:54px; border-top:1px solid var(--garis-l); }
+  .baris.kepala-t { min-height:42px; border-top:0; font-size:13px; color:var(--lembut); }
+  .baris .n { font-weight:600; color:var(--navy); display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .bulan { padding:14px 22px 6px; font-size:13px; color:var(--lembut); font-weight:600; border-top:1px solid var(--garis-l); }
+  .kini { display:flex; align-items:center; gap:10px; padding:6px 22px; font-size:13px; color:var(--lembut); }
+  .kini::after { content:""; flex:1; height:1px; background:var(--input); }
+  .baris-p { grid-template-columns:minmax(0,2fr) minmax(0,1.4fr) 120px 120px; }
+  .bagian-p { margin-top:28px; } .bagian-p h2 { margin:0; font-size:15px; font-weight:700; color:var(--navy); } .bagian-p p { margin:2px 0 0; }
+
+  /* Form */
+  .form { max-width:760px; background:#fff; border:1px solid var(--garis); border-radius:20px; padding:4px 28px 24px; }
+  .v2 .form { border-radius:12px; }
+  .seksi { padding:22px 0 4px; border-top:1px solid var(--garis-l); } .seksi:first-child { border-top:0; }
+  .seksi h2 { margin:0 0 14px; font-size:15px; font-weight:700; color:var(--navy); }
+  .kolom { display:grid; gap:14px; margin-bottom:14px; } .dua { grid-template-columns:1fr 1fr; } .tiga { grid-template-columns:1fr 1fr 1fr; }
+  .isian label { display:block; font-size:13px; font-weight:600; color:var(--navy); margin-bottom:6px; } .isian label i { color:#9F2430; font-style:normal; }
+  .isian div { height:46px; border:1px solid var(--input); border-radius:10px; display:flex; align-items:center; padding:0 14px; background:#fff; }
+  .isian small { display:block; margin-top:5px; font-size:13px; color:var(--lembut); }
+  .unggah { border:1px dashed var(--input); border-radius:12px; padding:16px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+  .teks-tombol { color:var(--aksi); font-weight:600; }
+  .aksi { display:flex; justify-content:flex-end; gap:10px; max-width:760px; margin-top:16px; }
+
+  .label-var { position:fixed; right:16px; bottom:16px; z-index:9; background:var(--navy); color:#fff; border-radius:99px; padding:9px 16px; font-weight:700; font-size:13px; }
+
+  @media (max-width:900px) {
+    .nav { flex-wrap:wrap; gap:6px; } .v1 .nav { padding:8px 8px 6px 14px; } .v2 .nav { padding:8px 16px; }
+    .merek img { height:30px; } .merek b { font-size:16px; } .merek i { height:24px; }
+    .menu { order:3; width:100%; justify-content:space-between; margin:0; } .menu a { padding:0 4px; font-size:14px; }
+    .kanan-nav { margin-left:auto; } .kanan-nav .tombol { display:none; }
+    .wadah { padding:0 16px 48px; }
+    .pembuka { padding-top:40px; } .pembuka h1 { font-size:32px; } .v2 .pembuka h1 { font-size:28px; }
+    .rekap { gap:16px; }
+    .grid { grid-template-columns:1fr; }
+    .baris { grid-template-columns:minmax(0,1fr) auto; padding:10px 16px; gap:2px 12px; }
+    .baris > :nth-child(2), .baris > :nth-child(3) { display:none; }
+    .baris > :nth-child(4) { grid-column:1; grid-row:2; font-size:13px; color:var(--lembut); text-align:left; }
+    .baris > :nth-child(5) { grid-column:2; grid-row:1 / span 2; }
+    .baris.kepala-t { display:none; }
+    .baris-p > :nth-child(2) { display:block; grid-column:1 / span 2; grid-row:2; }
+    .baris-p > :nth-child(3) { display:none; } .baris-p > :nth-child(4) { grid-column:2; grid-row:1; }
+    .bulan, .kini { padding-left:16px; padding-right:16px; }
+    .tab { overflow-x:auto; gap:16px; } .tab a { white-space:nowrap; } .tab .urut { display:none; }
+    .form { padding:4px 16px 18px; } .dua, .tiga { grid-template-columns:1fr; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const K = [
+  { n:'Survei dan pengukuran bidang tanah', p:'PT Contoh Geospasial', pks:'019/BBT/PKS/2025', v:'Rp 2,1 M', tgl:'7 Nov 2026', b:'Nov', d:7, sisa:-10, st:'lewat', bln:'November 2026', next:'Semua pengingat sudah terkirim' },
+  { n:'Jasa penilaian aset', p:'KJPP Contoh', pks:'008/BBT/PKS/2026', v:'Rp 285 jt', tgl:'9 Nov 2026', b:'Nov', d:9, sisa:-8, st:'lewat', bln:'November 2026', next:'Semua pengingat sudah terkirim' },
+  { n:'Kerja sama pemanfaatan lahan', p:'PT Contoh Agro Lestari', pks:'015/BBT/PKS/2026', v:'Rp 1,2 M', tgl:'5 Des 2026', b:'Des', d:5, sisa:18, st:'segera', bln:'Desember 2026', next:'Semua pengingat sudah terkirim' },
+  { n:'Jasa konsultan hukum', p:'Kantor Hukum Contoh dan Rekan', pks:'027/BBT/PKS/2026', v:'Rp 640 jt', tgl:'10 Des 2026', b:'Des', d:10, sisa:23, st:'segera', bln:'Desember 2026', next:'Semua pengingat sudah terkirim' },
+  { n:'Pengembangan sistem informasi', p:'PT Contoh Solusi Digital', pks:'031/BBT/PKS/2026', v:'Rp 980 jt', tgl:'14 Des 2026', b:'Des', d:14, sisa:27, st:'segera', bln:'Desember 2026', next:'Semua pengingat sudah terkirim' },
+  { n:'Pemeliharaan gedung kantor', p:'PT Contoh Graha Prima', pks:'036/BBT/PKS/2026', v:'Rp 450 jt', tgl:'21 Jan 2027', b:'Jan', d:21, sisa:65, st:'segera', bln:'Januari 2027', next:'Pengingat 2 bulan dikirim 21 Nov' },
+  { n:'Audit laporan keuangan', p:'KAP Contoh', pks:'044/BBT/PKS/2026', v:'Rp 310 jt', tgl:'22 Mar 2027', b:'Mar', d:22, sisa:125, st:'jalan', bln:'Maret 2027' },
+  { n:'Kerja sama pengembangan kawasan', p:'PT Contoh Properti', pks:'040/BBT/PKS/2026', v:'Rp 2,4 M', tgl:'7 Jul 2027', b:'Jul', d:7, sisa:232, st:'jalan', bln:'Juli 2027' },
+]
+const sisa = (k) => k.sisa < 0 ? `Lewat ${-k.sisa} hari` : `${k.sisa} hari lagi`
+const q = new URLSearchParams(location.search), v = q.get('v') === '2' ? 2 : 1, h = q.get('h') || 'beranda'
+document.body.className = `v${v}`
+
+const NAMA_OPSI = { 1: 'Opsi 1: Tenang', 2: 'Opsi 2: Polos kantor' }
+const nav = (aktif, tambah = true) => {
+  const isi = `<nav class="nav"><div class="merek"><img src="/logo-bbt.png" alt="Badan Bank Tanah"><i></i><b>Contract Management</b></div>
+    <div class="menu">${['Beranda','Kontrak','Pengingat','Admin'].map((m) => `<a class="${m === aktif ? 'aktif' : ''}">${m}${m === 'Pengingat' ? ' <span class="jml">6</span>' : ''}</a>`).join('')}</div>
+    <div class="kanan-nav"><span class="av">AI</span>${tambah ? '<span class="tombol">+ Tambah kontrak</span>' : ''}</div></nav>`
+  return v === 2 ? `<div class="bilah">${isi}</div>` : isi
+}
+const baris = (k) => `<div class="baris"><span style="min-width:0"><span class="n">${k.n}</span><span class="kecil">${k.p}</span></span><span class="kecil">${k.pks}</span><span class="kanan">${k.v}</span><span>${k.tgl}</span><span class="kanan t-${k.st}"><b>${sisa(k)}</b></span></div>`
+
+const HAL = {
+  beranda: () => {
+    const perlu = K.filter((k) => k.st !== 'jalan')
+    return `${v === 1 ? '<div class="mozaik" data-mozaik></div>' : ''}${v === 2 ? nav('Beranda') : ''}<div class="wadah">${v === 1 ? nav('Beranda') : ''}
+      <section class="pembuka"><p class="tgl">Selasa, 17 November 2026</p>
+        <h1>6 kontrak perlu <span class="serif">ditindaklanjuti</span></h1>
+        <p class="ring">2 sudah lewat tanggal akhir dan 4 habis dalam 90 hari, senilai Rp 5,7 M.</p>
+        <div class="cari"><span>Cari nama, penyedia, atau nomor PKS</span><em>Cari</em></div>
+        <div class="rekap"><a><b>2</b>sudah lewat</a><a><b>4</b>segera habis</a><a><b>2</b>berjalan</a><a><b>1</b>selesai</a></div></section>
+      <div class="kepala"><h2>Agenda kontrak</h2><a>Lihat pengingat</a></div>
+      <div class="grid">${perlu.map((k) => `<div class="kartu"><div class="atas"><div class="kal"><i>${k.b}</i><b>${k.d}</b></div>
+        <div class="angka t-${k.st}"><strong>${Math.abs(k.sisa)}</strong><span>${k.sisa < 0 ? 'hari lewat' : 'hari lagi'}</span></div></div>
+        <div><span class="nm">${k.n}</span><br><span class="kecil">${k.p}</span></div>
+        <div class="bawah"><span class="kecil">${k.pks}</span><b>${k.v}</b></div></div>`).join('')}</div></div>`
+  },
+  kontrak: () => {
+    let isi = '', bln = '', kini = false
+    for (const k of K) {
+      if (!kini && k.sisa >= 0) { kini = true; isi += '<div class="kini">Hari ini, 17 Nov 2026</div>' }
+      if (k.bln !== bln) { bln = k.bln; isi += `<div class="bulan">${k.bln}</div>` }
+      isi += baris(k)
+    }
+    return `${v === 2 ? nav('Kontrak') : ''}<div class="wadah">${v === 1 ? nav('Kontrak') : ''}
+      <div class="judul"><h1>Kontrak</h1><p class="kecil">8 kontrak aktif</p></div>
+      <div class="cari" style="max-width:none;margin:0"><span>Cari nama, penyedia, atau nomor PKS</span></div>
+      <div class="tab"><a class="aktif">Aktif 8</a><a>Sudah lewat 2</a><a>Segera habis 4</a><a>Berjalan 2</a><a>Selesai 1</a><span class="urut">Urutkan: Tanggal akhir</span></div>
+      <div class="tabel"><div class="baris kepala-t"><span>Kontrak</span><span>Nomor PKS</span><span class="kanan">Nilai</span><span>Berakhir</span><span class="kanan">Sisa waktu</span></div>${isi}</div></div>`
+  },
+  pengingat: () => {
+    const bp = (k) => `<div class="baris baris-p"><span style="min-width:0"><span class="n">${k.n}</span><span class="kecil">${k.p}, berakhir ${k.tgl}</span></span><span class="kecil">${k.next}</span><span class="kanan">${k.v}</span><span class="kanan t-${k.st}"><b>${sisa(k)}</b></span></div>`
+    const lewat = K.filter((k) => k.st === 'lewat'), akan = K.filter((k) => k.st === 'segera')
+    return `${v === 2 ? nav('Pengingat') : ''}<div class="wadah">${v === 1 ? nav('Pengingat') : ''}
+      <div class="judul"><h1>Pengingat</h1><p class="kecil">Dikirim otomatis 3, 2, dan 1 bulan sebelum kontrak habis ke seluruh tim pengadaan dan kepala divisi umum.</p></div>
+      <section class="bagian-p"><h2>Perlu keputusan sekarang</h2><p class="kecil">Sudah lewat tanggal akhir. Perpanjang lewat adendum, atau tandai selesai.</p><div class="tabel">${lewat.map(bp).join('')}</div></section>
+      <section class="bagian-p" style="margin-top:36px"><h2>Akan habis</h2><p class="kecil">Berakhir dalam 90 hari.</p><div class="tabel">${akan.map(bp).join('')}</div></section></div>`
+  },
+  tambah: () => `${v === 2 ? nav('Kontrak', false) : ''}<div class="wadah">${v === 1 ? nav('Kontrak', false) : ''}
+    <div class="judul"><h1>Tambah kontrak</h1><p class="kecil">Isi sesuai dokumen PKS. Kolom bertanda * wajib.</p></div>
+    <div class="form">
+      <section class="seksi"><h2>1. Data kontrak</h2>
+        <div class="kolom"><div class="isian"><label>Nama kontrak <i>*</i></label><div>Pemeliharaan jaringan kantor</div></div>
+        <div class="isian"><label>Penyedia <i>*</i></label><div>PT Contoh Jaringan Nusantara</div></div></div>
+        <div class="kolom dua"><div class="isian"><label>Nomor PKS <i>*</i></label><div>045/BBT/PKS/2026</div><small>Harus unik.</small></div><div class="isian"><label>Tanggal PKS <i>*</i></label><div>3 Feb 2026</div></div></div></section>
+      <section class="seksi"><h2>2. Waktu dan nilai</h2>
+        <div class="kolom tiga"><div class="isian"><label>Awal kontrak <i>*</i></label><div>1 Mar 2026</div></div><div class="isian"><label>Akhir kontrak <i>*</i></label><div>28 Feb 2027</div><small>Pengingat 28 Nov, 28 Des, 28 Jan.</small></div><div class="isian"><label>Nilai kontrak <i>*</i></label><div>Rp 735.000.000</div></div></div></section>
+      <section class="seksi"><h2>3. Critical point <span class="kecil" style="font-weight:400">(opsional)</span></h2>
+        <p style="margin:0 0 14px"><span class="teks-tombol">+ Tambah critical point</span> <span class="kecil">untuk klausul pengakhiran kontrak atau denda.</span></p></section>
+      <section class="seksi"><h2>4. PDF PKS <span style="color:#9F2430">*</span></h2>
+        <div class="unggah"><span>Tarik file PDF ke sini <span class="kecil">(maksimal 10 MB)</span></span><span class="tombol kedua">Pilih file</span></div></section>
+    </div>
+    <div class="aksi"><span class="tombol kedua">Batal</span><span class="tombol">Simpan kontrak</span></div></div>`,
+}
+document.getElementById('app').innerHTML = (HAL[h] || HAL.beranda)() + `<span class="label-var">${NAMA_OPSI[v]}</span>`
+
+// Mozaik pudar (opsi 1, Beranda saja)
+const warna = ['#13254F', '#2B4C9B', '#8FA8E8', '#ffffff', '#F2B829', '#E07B2C']
+document.querySelectorAll('[data-mozaik]').forEach((el) => {
+  const kolom = innerWidth <= 900 ? 8 : 20
+  el.style.gridTemplateColumns = `repeat(${kolom}, 1fr)`
+  for (let i = 0; i < kolom * 3; i++) {
+    const x = i % kolom, y = Math.floor(i / kolom), t = x / (kolom - 1) * (warna.length - 1)
+    const a = Math.floor(t), b = Math.min(warna.length - 1, a + 1), porsi = Math.round((1 - (t - a)) * 100)
+    const pucat = Math.min(92, 58 + y * 12 + ((x * 7 + y * 3) % 5) * 4)
+    const k = document.createElement('i')
+    if ((x * 7 + y * 11) % 9 !== 0 && (x + y * 3) % 13 !== 4) k.style.background = `color-mix(in srgb, color-mix(in srgb, ${warna[a]} ${porsi}%, ${warna[b]}) ${100 - pucat}%, white)`
+    el.appendChild(k)
+  }
+})
+</script>
+</body>
+</html>
