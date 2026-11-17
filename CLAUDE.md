@@ -18,6 +18,10 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 - Halaman Profil diganti menu akun di navigasi atas.
 - Hapus kontrak langsung permanen, tanpa arsip. Penghapusan tetap dicatat di riwayat perubahan.
 - Logo BBT menjadi merek utama di navigasi atas (menggantikan ikon dokumen emas di desain v4). Layar pembuka dihapus.
+- Arah visual "Kavling" dipilih (Hisyam, 17 Nov 2026), dari referensi gaya Hisyam. Acuan: `DESIGN.md` dan
+  `design-system/contract-management-bbt/MASTER.md`. Mockup: `mockup/arah-4-kavling.html` (arah 1–3 hanya pembanding).
+- Font: Public Sans (isi dan judul) + Source Serif 4 miring untuk SATU kata penekanan per judul.
+  Menggantikan Plus Jakarta Sans.
 
 ## Ruang lingkup
 
@@ -49,46 +53,55 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 
 ## Acuan desain
 
-- Acuan visual: `~/Downloads/MAGANG/figma_contract_management/versi_4_sederhana_bercorak/png/`.
+- Acuan visual utama: `DESIGN.md` (arah Kavling). Desain v4 di
+  `~/Downloads/MAGANG/figma_contract_management/versi_4_sederhana_bercorak/png/` hanya acuan isi dan alur.
   Versi 1–3 hanya pembanding.
 - Acuan alur: `~/Downloads/MAGANG/Flowchart_ContractManagement/` (Flowchart 0–7).
 - `docs/prototipe-referensi.html` adalah prototipe versi HP lama. Hanya arsip, bukan acuan lagi.
-- Pertahankan: palet navy dan emas (`src/index.css`), header navy bergelombang, kotak kalender untuk
-  tanggal akhir, ikon garis dari `src/components/Ikon.tsx`, satu tombol utama per layar.
-- TIDAK ADA sidebar. Navigasi ada di atas. Polanya boleh mirip Sismon (logo di kiri, menu, akun di kanan),
-  tapi tampilannya harus berbeda dari Sismon.
+- Pertahankan: palet navy dan emas (`src/index.css`), kotak kalender untuk tanggal akhir,
+  ikon garis dari `src/components/Ikon.tsx`, satu tombol utama per layar.
+- TIDAK ADA sidebar. Navigasi berupa pil putih yang melayang di atas, di semua halaman
+  (logo di kiri, menu, lonceng, akun, tombol Tambah kontrak). Header navy bergelombang DIHAPUS.
+- Mozaik kavling (kotak warna BBT yang memudar ke putih) dan judul besar rata tengah HANYA di Beranda dan Masuk.
+  Halaman kerja memakai judul rata kiri dan panel padat.
+- Larangan "ciri AI" (lingkaran blur, kaca buram, gradasi, emoji, eyebrow, kartu berbayangan seragam, dll.):
+  lihat `DESIGN.md` bagian Do's and Don'ts.
 - Logo BBT (`/logo-bbt.png`) adalah merek utama di navigasi atas dan di halaman Masuk.
+  Logo duduk langsung di atas putih navigasi pil (44px, 34px di HP), tanpa alas tambahan.
   - JANGAN mewarnai ulang, memberi filter (`brightness`, `invert`, `grayscale`, `opacity`), memotong,
     atau mengubah bentuk logo. Warna aslinya (hijau dan kuning) harus tetap.
-  - Kalau logo kurang terbaca di atas navy, beri alas putih di belakangnya. Yang diubah alasnya, bukan logonya.
+  - Logo tidak diletakkan di atas latar navy. Kalau suatu saat terpaksa, beri alas putih; yang diubah alasnya, bukan logonya.
   - Logo wajib punya `alt` yang jelas, misalnya "Badan Bank Tanah".
 - Warna utama navy, BUKAN hijau atau teal. Warna logo (hijau, emas, oranye tanah) hanya untuk aksen kecil.
 - Garis tepi memakai `border`, bukan `ring`. Fokus keyboard memakai `outline` (`:focus-visible`).
 - Ikon 3D atau gambar ikon dari luar sudah DITOLAK, jangan dipakai.
-- [TERBUKA] Usulan visual di KEBUTUHAN-WEBSITE.md bagian 8 belum diputuskan. Jangan dikerjakan sebelum ada keputusan.
+- [DIPUTUSKAN] Usulan visual KEBUTUHAN-WEBSITE.md bagian 8: usulan 2, 3, 4 diterapkan. Usulan 1 diganti
+  agenda kontrak + rekap status berupa pil. Usulan 5 tidak berlaku (gelombang dihapus).
 - [TERBUKA] Nama resmi aplikasi. Sementara "Contract Management".
 
 ## Tampilan
 
-- Website responsif. Acuan desktop 1440px dengan konten di tengah (lebar maksimal sesuai desain v4).
+- Website responsif. Acuan desktop 1440px dengan konten di tengah (lebar maksimal 1120px, `KELAS_WADAH`).
   Tampilan HP (mulai 390px) tetap harus bisa dipakai: tanpa scroll ke samping, area sentuh minimal 44px.
-- Font: Plus Jakarta Sans (dimuat di `index.html`). Ukuran huruf dasar 14px.
+- Font: Public Sans + Source Serif 4 miring (dimuat di `index.html`). Ukuran huruf dasar 14px.
+  Kata penekanan: `font-judul italic font-normal`, paling banyak satu kata per judul.
+- Sudut: panel 24px (20px di HP), kotak kalender 12px, kotak isian 12px. Tombol, chip, kotak cari, item menu berbentuk pil.
 - Ukuran huruf ditulis dalam piksel, misalnya `text-[12px]`. JANGAN pakai `text-xs`, `text-sm`, `text-lg`
   dan sejenisnya, karena ikut mengubah jarak baris. Jarak baris dasar `normal` (diatur di `src/index.css`).
-- Judul `h1`–`h3` sudah tebal (700) dari `src/index.css`.
+- Judul `h1`–`h3` sudah tebal (700) dari `src/index.css`; `h1` dan `h2` berjarak huruf rapat (-0.02em).
 - Warna, bayangan, dan animasi didaftarkan di `src/index.css` lewat `@theme`. Pakai class dari token itu,
   JANGAN menulis kode hex di komponen. Warna baru ditambahkan sebagai token dengan nama yang jelas.
-  - `galaxy-900`, `galaxy-700`: navy tua dan navy (header, tombol utama)
-  - `judul`, `teks`, `teks-lembut`, `teks-header`: warna teks
+  - `galaxy-900`, `galaxy-700`: navy tua dan navy (tombol utama, judul, mozaik)
+  - `judul`, `teks`, `teks-lembut`: warna teks
   - `aksi`, `aksi-tua`: tombol, tautan, menu aktif
-  - `aksen`, `lembut`, `latar`, `latar-tab`: sorotan dan latar
+  - `lembut`, `latar`: sorotan dan latar; `mozaik-biru`: HANYA warna tengah mozaik
   - `garis`: pembatas dekoratif; `garis-input`: tepi kotak isian (minimal 3:1 terhadap latarnya); `garis-lembut`: pembatas baris
   - `logo-hijau`, `logo-emas`, `logo-tanah`: HANYA aksen kecil
   - `berjalan`, `segera`, `lewat`, `selesai` + `<status>-latar` / `<status>-teks`: warna status.
     Jangan pakai opacity seperti `bg-segera/15`.
   - `hapus`, `hapus-latar`, `hapus-teks`: HANYA aksi menghapus dan pesan kesalahan
-  - `tombol-emas`, `tombol-emas-tua`: tombol utama di atas header navy (desain v4), teks di atasnya `galaxy-900`
-  - Bayangan: `shadow-kotak`, `shadow-menu`, `shadow-menu-tebal`, `shadow-toast`, `shadow-tombol-tambah`, `shadow-tombol-emas`
+  - Bayangan: `shadow-pil` (HANYA navigasi pil dan kotak cari), `shadow-menu`, `shadow-menu-tebal`, `shadow-toast`.
+    Panel tanpa bayangan.
   - Class tata letak bersama (lebar konten, kotak, tombol, kotak isian) ada di `src/lib/tataLetak.ts`.
   - Token yang tidak terpakai lagi setelah perubahan ke website dihapus di commit yang sama.
 - Efek gerak selalu memakai `motion-safe:` dan `motion-reduce:transition-none`.
@@ -154,9 +167,8 @@ Admin (hanya admin), lonceng notifikasi, dan menu akun.
 
 1. **Masuk**: logo BBT, email kantor + kata sandi. Pesan gagal: akun tidak ditemukan/nonaktif,
    kata sandi salah, akun dikunci sementara.
-2. **Beranda**: kontrak yang perlu perhatian (sudah lewat + habis dalam 90 hari, dengan kotak kalender),
-   ringkasan jumlah per status, tombol Tambah kontrak. [TERBUKA] Bentuk ringkasannya
-   (tiga kartu angka di v4, atau kalender besar di usulan visual 1).
+2. **Beranda**: judul rata tengah, kotak cari pil, rekap jumlah per status berupa pil (tautan ke daftar terfilter),
+   panel "Agenda kontrak" (sudah lewat + habis dalam 90 hari, dengan kotak kalender), tombol Tambah kontrak.
 3. **Daftar kontrak**: cari (nama, penyedia, nomor PKS), filter status, urutkan. Ada tampilan daftar kosong
    dan hasil pencarian kosong.
 4. **Detail kontrak**: data kontrak, critical point, dokumen PDF, jadwal pengingat, monitoring dan catatan,
