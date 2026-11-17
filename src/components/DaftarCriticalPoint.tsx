@@ -28,7 +28,7 @@ function DaftarCriticalPoint({ daftar, onTandaiSelesai }: Props) {
 
   if (daftar.length === 0) {
     return (
-      <p className="m-0 rounded-xl bg-latar px-4 py-5 text-center text-teks-lembut">
+      <p className="m-0 py-4 text-teks-lembut">
         Belum ada critical point. Tambahkan klausul berisiko seperti pengakhiran kontrak atau denda.
       </p>
     )
@@ -36,17 +36,17 @@ function DaftarCriticalPoint({ daftar, onTandaiSelesai }: Props) {
 
   return (
     <>
-      <ul className="m-0 flex list-none flex-col gap-3 p-0">
+      <ul className="m-0 list-none p-0">
         {daftar.map((butir) => {
           const selesai = butir.status === 'selesai'
           return (
-            <li key={butir.id} className={`flex gap-4 rounded-xl bg-latar p-4 md:p-5 ${selesai ? 'opacity-80' : ''}`}>
-              <span aria-hidden="true" className={`w-1 flex-none rounded-full ${selesai ? 'bg-selesai' : WARNA_GARIS[butir.jenis]}`} />
+            <li key={butir.id} className="flex gap-3 border-b border-garis-lembut py-4 first:pt-1 last:border-b-0 last:pb-0">
+              <span aria-hidden="true" className={`mt-1.5 size-2.5 flex-none rounded-[3px] ${selesai ? 'bg-selesai' : WARNA_GARIS[butir.jenis]}`} />
               <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                 <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-1">
-                  <span className="font-semibold text-judul">
-                    {LABEL_CRITICAL_POINT[butir.jenis]}
-                    {butir.pasal && <span className="font-normal text-teks-lembut"> · {butir.pasal}</span>}
+                  <span className="flex flex-wrap items-baseline gap-x-2">
+                    <span className="font-bold text-judul">{LABEL_CRITICAL_POINT[butir.jenis]}</span>
+                    {butir.pasal && <span className="text-teks-lembut">{butir.pasal}</span>}
                   </span>
                   {selesai ? (
                     <span className="inline-flex items-center gap-1 rounded-full bg-selesai-latar px-2.5 py-1 text-[12px] font-semibold text-selesai-teks">
@@ -66,11 +66,11 @@ function DaftarCriticalPoint({ daftar, onTandaiSelesai }: Props) {
                     </button>
                   )}
                 </div>
-                <p className="m-0 leading-relaxed text-teks">{butir.ringkasan}</p>
+                <p className={`m-0 max-w-[72ch] leading-relaxed ${selesai ? 'text-teks-lembut' : 'text-teks'}`}>{butir.ringkasan}</p>
                 {butir.tanggalPenting && !selesai && (
                   <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-segera-teks">
                     <Ikon nama="kalender" ukuran={15} />
-                    {formatTanggal(butir.tanggalPenting)} · {teksJarakHari(butir.tanggalPenting)} · ikut diingatkan
+                    {formatTanggal(butir.tanggalPenting)}, {teksJarakHari(butir.tanggalPenting)}. Ikut diingatkan.
                   </span>
                 )}
                 {selesai && butir.penanganan && (

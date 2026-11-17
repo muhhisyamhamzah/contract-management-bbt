@@ -41,17 +41,17 @@ function KartuSandiSementara({ isi, onTutup }: Props) {
       }}
     >
       {isi && (
-        <div className="flex flex-col gap-3 rounded-2xl bg-linear-135 from-galaxy-900 to-galaxy-700 p-5 text-white">
-          <div className="flex items-center gap-2 text-[13px] text-teks-header">
+        <div className="flex flex-col gap-3 rounded-[20px] bg-galaxy-900 p-5 text-white">
+          <div className="flex items-center gap-2 text-[13px] text-white">
             <Ikon nama="perisai" ukuran={16} />
-            {isi.nama} · {isi.email}
+            {isi.nama}, {isi.email}
           </div>
           <div className="flex items-center justify-between gap-3">
-            <span className="font-mono text-[24px] font-bold tracking-[0.08em] break-all">{isi.sandi}</span>
+            <span className="font-mono text-[26px] font-bold tracking-[0.08em] break-all">{isi.sandi}</span>
             <button
               type="button"
               onClick={salin}
-              className="flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-xl border-none bg-tombol-emas px-3.5 font-semibold text-galaxy-900"
+              className="flex h-11 flex-none cursor-pointer items-center gap-1.5 rounded-full border-none bg-white px-4 font-semibold text-galaxy-900"
             >
               <Ikon nama={tersalin ? 'centang' : 'salin'} ukuran={16} tebal={2.3} />
               {tersalin ? 'Tersalin' : 'Salin'}

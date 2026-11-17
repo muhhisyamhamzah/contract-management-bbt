@@ -8,7 +8,7 @@ import BadgeStatus from '../components/BadgeStatus'
 import DaftarCriticalPoint from '../components/DaftarCriticalPoint'
 import DaftarDokumen from '../components/DaftarDokumen'
 import DialogKonfirmasi from '../components/DialogKonfirmasi'
-import HeaderGelombang from '../components/HeaderGelombang'
+import KepalaHalaman from '../components/KepalaHalaman'
 import Ikon from '../components/Ikon'
 import JadwalPengingat from '../components/JadwalPengingat'
 import KartuBagian from '../components/KartuBagian'
@@ -23,8 +23,7 @@ import {
   KELAS_ISIAN,
   KELAS_KOTAK,
   KELAS_TAUTAN_AKSI,
-  KELAS_TOMBOL_EMAS,
-  KELAS_TOMBOL_GELAP,
+  KELAS_TOMBOL_UTAMA,
   KELAS_TOMBOL_KEDUA,
   KELAS_WADAH,
 } from '../lib/tataLetak'
@@ -47,8 +46,8 @@ function DetailKontrak() {
   if (!kontrak) {
     return (
       <>
-        <HeaderGelombang judul="Kontrak tidak ditemukan" />
-        <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-12`}>
+        <KepalaHalaman judul="Kontrak tidak ditemukan" />
+        <main id="konten" className={`${KELAS_WADAH}`}>
           <div className={KELAS_KOTAK}>
             <KeadaanKosong
               ikon="cari"
@@ -96,13 +95,13 @@ function DetailKontrak() {
 
   return (
     <>
-      <HeaderGelombang
+      <KepalaHalaman
         atas={
           <div className="mb-1 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={kembali}
-              className="-ml-2 inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-xl border-none bg-transparent px-2 text-[14px] font-semibold text-white hover:bg-white/10"
+              className="-ml-2 inline-flex min-h-11 cursor-pointer items-center gap-1 rounded-full border-none bg-transparent px-2 text-[14px] font-semibold text-aksi hover:bg-lembut"
             >
               <Ikon nama="kiri" ukuran={18} tebal={2.5} />
               Kontrak
@@ -114,13 +113,14 @@ function DetailKontrak() {
         }
         judul={kontrak.nama}
         keterangan={
-          <>
-            {kontrak.penyedia} · {kontrak.nomorPks}
-          </>
+          <span className="flex flex-wrap gap-x-5 gap-y-0.5">
+            <span>{kontrak.penyedia}</span>
+            <span>Nomor PKS {kontrak.nomorPks}</span>
+          </span>
         }
         aksi={
           <>
-            <Link to={`/kontrak/${kontrak.id}/ubah`} className={KELAS_TOMBOL_GELAP}>
+            <Link to={`/kontrak/${kontrak.id}/ubah`} className={KELAS_TOMBOL_KEDUA}>
               <Ikon nama="pensil" ukuran={17} />
               Ubah
             </Link>
@@ -131,7 +131,7 @@ function DetailKontrak() {
                   setKeteranganSelesai('')
                   setKonfirmasiSelesai(true)
                 }}
-                className={KELAS_TOMBOL_EMAS}
+                className={KELAS_TOMBOL_UTAMA}
               >
                 <Ikon nama="centang" ukuran={17} tebal={2.5} />
                 Tandai selesai
@@ -140,7 +140,7 @@ function DetailKontrak() {
             <MenuDropdown
               labelTombol="Menu lainnya"
               isiTombol={<Ikon nama="titikTiga" />}
-              kelasTombol="flex size-11 cursor-pointer items-center justify-center rounded-[14px] border border-white/25 bg-white/10 text-white hover:bg-white/20"
+              kelasTombol="flex size-11 cursor-pointer items-center justify-center rounded-full border border-garis-input bg-white text-judul hover:bg-latar"
               lebar={230}
               item={[
                 { label: 'Unduh semua dokumen', onPilih: () => tampilkanToast('Dokumen diunduh (contoh)') },
@@ -151,10 +151,10 @@ function DetailKontrak() {
         }
       />
 
-      <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-14 grid gap-5 pb-4 lg:grid-cols-[minmax(0,1fr)_330px]`}>
+      <main id="konten" className={`${KELAS_WADAH} grid gap-5 pb-4 lg:grid-cols-[minmax(0,1fr)_330px]`}>
         <div className="flex min-w-0 flex-col gap-5">
           {sudahSelesai && (
-            <div role="status" className="flex gap-3 rounded-2xl border border-garis bg-selesai-latar p-4 text-selesai-teks">
+            <div role="status" className="flex gap-3 rounded-[20px] bg-selesai-latar p-4 text-selesai-teks">
               <Ikon nama="centangLingkaran" ukuran={20} className="flex-none" />
               <span>
                 <strong>Kontrak sudah ditandai selesai.</strong> Pengingat untuk kontrak ini sudah berhenti.
@@ -165,7 +165,7 @@ function DetailKontrak() {
           {(status === 'lewat' || status === 'segera') && (
             <div
               role="status"
-              className={`flex gap-3 rounded-2xl p-4 ${status === 'lewat' ? 'bg-lewat-latar text-lewat-teks' : 'bg-segera-latar text-segera-teks'}`}
+              className={`flex gap-3 rounded-[20px] p-4 ${status === 'lewat' ? 'bg-lewat-latar text-lewat-teks' : 'bg-segera-latar text-segera-teks'}`}
             >
               <Ikon nama="info" ukuran={20} className="flex-none" />
               <span>
@@ -174,8 +174,8 @@ function DetailKontrak() {
             </div>
           )}
 
-          <KartuBagian id="data-kontrak" judul="Data kontrak" ikon="dokumen">
-            <dl className="m-0 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 md:grid-cols-3">
+          <KartuBagian id="data-kontrak" judul="Data kontrak">
+            <dl className="m-0 grid grid-cols-2 gap-x-6 gap-y-4 md:grid-cols-3">
               {dataKontrak.map(([label, nilai]) => (
                 <div key={label} className="flex flex-col gap-0.5">
                   <dt className="text-[13px] text-teks-lembut">{label}</dt>
@@ -184,10 +184,8 @@ function DetailKontrak() {
               ))}
             </dl>
             <div className="mt-6 border-t border-garis-lembut pt-5">
-              <h3 className="m-0 mb-3 text-[14px] font-semibold text-judul">
-                Jadwal pengingat
-                <span className="font-normal text-teks-lembut"> · ke seluruh tim pengadaan dan kepala divisi</span>
-              </h3>
+              <h3 className="m-0 text-[15px] font-semibold text-judul">Jadwal pengingat</h3>
+              <p className="m-0 mt-0.5 mb-3 text-[13px] text-teks-lembut">Dikirim ke seluruh tim pengadaan dan kepala divisi umum.</p>
               {sudahSelesai ? (
                 <p className="m-0 text-teks-lembut">Pengingat berhenti karena kontrak sudah selesai.</p>
               ) : (
@@ -199,7 +197,6 @@ function DetailKontrak() {
           <KartuBagian
             id="critical-point"
             judul="Critical point"
-            ikon="peringatan"
             keterangan={kontrak.criticalPoint.length > 0 ? `${criticalAktif} aktif` : undefined}
             aksi={
               <Link to={`/kontrak/${kontrak.id}/ubah#critical-point`} className={KELAS_TAUTAN_AKSI}>
@@ -216,13 +213,13 @@ function DetailKontrak() {
             />
           </KartuBagian>
 
-          <KartuBagian id="dokumen" judul="Dokumen PDF" ikon="kontrak" keterangan={`${kontrak.dokumen.length} file`}>
+          <KartuBagian id="dokumen" judul="Dokumen PDF" keterangan={`${kontrak.dokumen.length} file`}>
             <DaftarDokumen daftar={kontrak.dokumen} onUnggah={(dokumen) => tambahDokumen(kontrak.id, dokumen)} />
           </KartuBagian>
         </div>
 
         <div className="flex min-w-0 flex-col gap-5">
-          <KartuBagian id="monitoring" judul="Monitoring dan catatan" ikon="catatan">
+          <KartuBagian id="monitoring" judul="Monitoring dan catatan">
             <dl className="m-0 flex flex-col gap-4">
               {catatan.map(([label, nilai]) => (
                 <div key={label} className="flex flex-col gap-0.5">
@@ -235,7 +232,7 @@ function DetailKontrak() {
             </dl>
           </KartuBagian>
 
-          <KartuBagian id="riwayat" judul="Riwayat" ikon="riwayat">
+          <KartuBagian id="riwayat" judul="Riwayat">
             <RiwayatKontrak daftar={riwayatKontrak} pesanKosong="Belum ada perubahan sejak kontrak dicatat." />
           </KartuBagian>
         </div>

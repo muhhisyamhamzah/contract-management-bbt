@@ -61,11 +61,11 @@ function DialogKonfirmasi({
         event.preventDefault()
         onBatal()
       }}
-      className={`m-auto w-[calc(100%-32px)] rounded-[20px] border-none bg-white p-6 text-teks shadow-toast backdrop:bg-galaxy-900/55 ${
+      className={`m-auto w-[calc(100%-32px)] rounded-3xl border-none bg-white p-6 text-teks shadow-toast backdrop:bg-galaxy-900/55 ${
         lebar ? 'max-w-[520px]' : 'max-w-[420px]'
       }`}
     >
-      <h2 id={`${id}-judul`} className="m-0 text-[18px] text-judul">
+      <h2 id={`${id}-judul`} className="m-0 text-[20px] text-judul">
         {judul}
       </h2>
       {pesan && (
@@ -79,7 +79,7 @@ function DialogKonfirmasi({
           <button
             type="button"
             onClick={onBatal}
-            className="h-12 cursor-pointer rounded-[14px] border border-garis-input bg-white font-semibold text-judul"
+            className="h-12 cursor-pointer rounded-full border border-garis-input bg-white font-semibold text-judul"
           >
             {labelBatal}
           </button>
@@ -88,8 +88,8 @@ function DialogKonfirmasi({
           type="button"
           onClick={onKonfirmasi}
           disabled={konfirmasiNonaktif}
-          className={`h-12 cursor-pointer rounded-[14px] border-none font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50 ${
-            bahaya ? 'bg-hapus' : 'bg-linear-135 from-galaxy-900 to-galaxy-700'
+          className={`h-12 cursor-pointer rounded-full border-none font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50 ${
+            bahaya ? 'bg-hapus' : 'bg-galaxy-900 hover:bg-aksi'
           }`}
         >
           {labelKonfirmasi}

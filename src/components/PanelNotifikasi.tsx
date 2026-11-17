@@ -31,13 +31,13 @@ function PanelNotifikasi() {
         aria-expanded={terbuka}
         aria-controls="panel-notifikasi"
         onClick={() => setTerbuka(!terbuka)}
-        className="relative flex size-11 cursor-pointer items-center justify-center rounded-xl border-none bg-transparent text-white transition-[background-color,border-color,color] duration-150 hover:bg-white/10 motion-reduce:transition-none"
+        className="relative flex size-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-galaxy-900 transition-[background-color,border-color,color] duration-150 hover:bg-latar motion-reduce:transition-none"
       >
         <Ikon nama="pengingat" ukuran={22} />
         {belumDibaca.length > 0 && (
           <span
             aria-hidden="true"
-            className="absolute top-1.5 right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-galaxy-900 bg-hapus px-1 text-[10px] font-bold text-white"
+            className="absolute top-1.5 right-1.5 flex h-[18px] min-w-[18px] items-center justify-center rounded-full border-2 border-white bg-hapus px-1 text-[11px] font-bold text-white"
           >
             {belumDibaca.length > 9 ? '9+' : belumDibaca.length}
           </span>
@@ -49,7 +49,7 @@ function PanelNotifikasi() {
           id="panel-notifikasi"
           role="region"
           aria-label="Notifikasi"
-          className="absolute top-[calc(100%+8px)] -right-14 z-30 flex w-[min(380px,calc(100vw-24px))] flex-col overflow-hidden rounded-2xl border border-garis bg-white text-teks shadow-menu-tebal sm:right-0"
+          className="absolute top-[calc(100%+8px)] -right-14 z-30 flex w-[min(380px,calc(100vw-24px))] flex-col overflow-hidden rounded-[20px] border border-garis bg-white text-teks shadow-menu-tebal sm:right-0"
         >
           <div className="flex items-center justify-between gap-3 border-b border-garis-lembut px-4 py-2">
             <h2 className="m-0 text-[15px] text-judul">Notifikasi</h2>

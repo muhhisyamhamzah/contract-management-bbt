@@ -73,6 +73,7 @@ function DialogTambahAkun({ terbuka, onBatal, onSimpan }: Props) {
             <input
               {...props}
               type="email"
+              spellCheck={false}
               value={isi.email}
               onChange={(e) => setIsi({ ...isi, email: e.target.value })}
               placeholder="nama@banktanah.id"

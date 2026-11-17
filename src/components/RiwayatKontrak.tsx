@@ -46,7 +46,7 @@ function RiwayatKontrak({ daftar, pesanKosong = 'Belum ada perubahan yang tercat
                 {catatan.rincian}
               </span>
               <span className="text-[12px] text-teks-lembut">
-                {catatan.oleh} · {formatWaktu(catatan.waktu)}
+                {catatan.oleh}, {formatWaktu(catatan.waktu)}
               </span>
             </div>
           </li>

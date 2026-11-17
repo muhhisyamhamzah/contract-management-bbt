@@ -22,7 +22,7 @@ function EditorCriticalPoint({ daftar, ubah, galat }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {daftar.length === 0 && (
-        <p className="m-0 rounded-xl bg-latar px-4 py-4 text-teks-lembut">
+        <p className="m-0 rounded-2xl border border-dashed border-garis-input px-4 py-4 text-teks-lembut">
           Belum ada critical point. Tambahkan klausul berisiko dari PKS, terutama pasal pengakhiran kontrak dan denda.
         </p>
       )}
@@ -32,7 +32,7 @@ function EditorCriticalPoint({ daftar, ubah, galat }: Props) {
         const ringkasanKosong = Boolean(galat) && !butir.ringkasan.trim()
         const awalan = `cp-${butir.id}`
         return (
-          <fieldset key={butir.id} className="m-0 flex flex-col gap-3 rounded-xl border border-garis bg-latar p-4">
+          <fieldset key={butir.id} className="m-0 flex min-w-0 flex-col gap-3 border-0 border-t border-garis-lembut p-0 pt-4 first:border-t-0 first:pt-0">
             <legend className="sr-only">Critical point ke-{nomor}</legend>
             <div className="flex items-center justify-between gap-2">
               <span aria-hidden="true" className="text-[13px] font-bold text-judul">
@@ -42,7 +42,7 @@ function EditorCriticalPoint({ daftar, ubah, galat }: Props) {
               <button
                 type="button"
                 onClick={() => ubah(daftar.filter((b) => b.id !== butir.id))}
-                className="-my-1.5 flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xl border-none bg-transparent px-2 text-[13px] font-semibold text-hapus-teks hover:bg-hapus-latar"
+                className="-my-1.5 flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-none bg-transparent px-3 text-[13px] font-semibold text-hapus-teks hover:bg-hapus-latar"
               >
                 <Ikon nama="sampah" ukuran={15} />
                 Hapus<span className="sr-only"> critical point ke-{nomor}</span>

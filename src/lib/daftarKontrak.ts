@@ -41,9 +41,17 @@ function kunciBerakhir(kontrak: Kontrak, hariIni: Date): number {
   return hitungSisaHari(kontrak.tanggalBerakhir, hariIni)
 }
 
+/**
+ * Selisih dua kunci urutan yang aman untuk Infinity: kontrak selesai bernilai tak hingga, dan
+ * Infinity - Infinity = NaN membuat urutan sort tidak menentu. Nilai sama dianggap 0.
+ */
+function bandingkan(a: number, b: number): number {
+  return a === b ? 0 : a - b
+}
+
 /** Mengurutkan kontrak dari yang paling cepat habis. Daftar asli tidak diubah. */
 export function urutkanPalingCepatHabis(daftar: Kontrak[], hariIni: Date = new Date()): Kontrak[] {
-  return [...daftar].sort((a, b) => kunciBerakhir(a, hariIni) - kunciBerakhir(b, hariIni))
+  return [...daftar].sort((a, b) => bandingkan(kunciBerakhir(a, hariIni), kunciBerakhir(b, hariIni)))
 }
 
 /** Menyaring lalu mengurutkan daftar kontrak. Daftar asli tidak diubah. */
@@ -59,7 +67,7 @@ export function saringDanUrutkan(
     .filter((kontrak) => cocokKataKunci(kontrak, kataKunci))
 
   const pembanding: Record<Urutan, (a: Kontrak, b: Kontrak) => number> = {
-    berakhir: (a, b) => kunciBerakhir(a, hariIni) - kunciBerakhir(b, hariIni),
+    berakhir: (a, b) => bandingkan(kunciBerakhir(a, hariIni), kunciBerakhir(b, hariIni)),
     nilai: (a, b) => b.nilai - a.nilai,
     nama: (a, b) => a.nama.localeCompare(b.nama, 'id'),
   }

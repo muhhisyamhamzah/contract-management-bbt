@@ -1,4 +1,4 @@
-// Menu akun di kanan atas: lingkaran inisial dan nama. Diklik membuka info akun dan tombol Keluar.
+// Menu akun di kanan atas: lingkaran inisial. Diklik membuka nama, email, peran, dan tombol Keluar.
 // Menggantikan halaman Profil (keputusan 17 Nov 2026).
 
 import { useState } from 'react'
@@ -18,8 +18,6 @@ function MenuAkun() {
   const { terbuka, setTerbuka, wadah, tombol } = usePopover()
   const [konfirmasiKeluar, setKonfirmasiKeluar] = useState(false)
 
-  const namaDepan = pengguna.nama.split(' ')[0]
-
   return (
     <div ref={wadah} className="relative">
       <button
@@ -29,26 +27,21 @@ function MenuAkun() {
         aria-expanded={terbuka}
         aria-controls="panel-akun"
         onClick={() => setTerbuka(!terbuka)}
-        className="flex min-h-11 cursor-pointer items-center gap-2 rounded-xl border-none bg-transparent px-1.5 text-white transition-[background-color,border-color,color] duration-150 hover:bg-white/10 motion-reduce:transition-none"
+        className="flex min-h-11 cursor-pointer items-center gap-2 rounded-full border-none bg-transparent px-1 text-judul transition-[background-color,border-color,color] duration-150 hover:bg-latar motion-reduce:transition-none lg:pr-2"
       >
         <span
           aria-hidden="true"
-          className={`flex size-9 items-center justify-center rounded-full text-[13px] font-bold ${
-            pengguna.peran === 'admin' ? 'bg-white text-galaxy-900' : 'bg-tombol-emas text-galaxy-900'
-          }`}
+          className="flex size-10 items-center justify-center rounded-full bg-lembut text-[13px] font-bold text-galaxy-900"
         >
           {inisial(pengguna.nama)}
         </span>
-        <span aria-hidden="true" className="hidden text-[14px] font-medium sm:block">
-          {namaDepan}
-        </span>
-        <Ikon nama="bawah" ukuran={16} className="hidden text-teks-header sm:block" />
+        <Ikon nama="bawah" ukuran={16} className="hidden text-teks-lembut lg:block" />
       </button>
 
       {terbuka && (
         <div
           id="panel-akun"
-          className="absolute top-[calc(100%+8px)] right-0 z-30 flex w-[280px] flex-col rounded-2xl border border-garis bg-white p-1.5 text-teks shadow-menu-tebal"
+          className="absolute top-[calc(100%+8px)] right-0 z-30 flex w-[280px] flex-col rounded-[20px] border border-garis bg-white p-1.5 text-teks shadow-menu-tebal"
         >
           <div className="flex flex-col gap-0.5 px-3 pt-2.5 pb-3">
             <span className="font-bold text-judul">{pengguna.nama}</span>
@@ -66,7 +59,7 @@ function MenuAkun() {
               setTerbuka(false)
               setKonfirmasiKeluar(true)
             }}
-            className="flex h-11 cursor-pointer items-center gap-2.5 rounded-xl border-none bg-white px-3 text-left font-semibold text-judul hover:bg-latar"
+            className="flex h-11 cursor-pointer items-center gap-2.5 rounded-full border-none bg-white px-3 text-left font-semibold text-judul hover:bg-latar"
           >
             <Ikon nama="keluar" ukuran={18} />
             Keluar

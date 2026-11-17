@@ -9,6 +9,7 @@ import { useRef, useState, type FormEvent } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import Ikon from '../components/Ikon'
 import IsianForm from '../components/IsianForm'
+import Mozaik from '../components/Mozaik'
 import { akunContoh, SANDI_CONTOH } from '../data/akunContoh'
 import { MAKS_PERCOBAAN_MASUK, useData, type HasilMasuk } from '../lib/data'
 import { KELAS_ISIAN, KELAS_TOMBOL_UTAMA } from '../lib/tataLetak'
@@ -74,47 +75,26 @@ function Masuk() {
   }
 
   return (
-    <div className="relative flex min-h-dvh overflow-hidden bg-linear-150 from-galaxy-900 via-galaxy-900 to-galaxy-700 text-white">
-      {/* Hiasan latar (sama dengan header) */}
-      <div aria-hidden="true" className="pointer-events-none absolute inset-0">
-        <div className="absolute -top-40 right-[10%] size-[480px] rounded-full bg-aksen/30 blur-3xl" />
-        <div className="absolute -bottom-40 -left-24 size-[420px] rounded-full bg-aksi/60 blur-3xl" />
-        <div className="absolute -top-24 right-[14%] size-80 rounded-full border border-white/10" />
-        <div className="absolute -top-48 right-[8%] size-[520px] rounded-full border border-white/[0.06]" />
-        <div className="absolute inset-y-0 right-0 w-1/2 bg-[radial-gradient(rgb(255_255_255/0.08)_1px,transparent_1.5px)] bg-size-[14px_14px] [mask-image:linear-gradient(to_left,black,transparent)]" />
-      </div>
+    <div className="relative flex min-h-dvh flex-col bg-latar">
+      <Mozaik pendek />
 
-      <main className="relative z-10 mx-auto grid w-full max-w-[1080px] items-center gap-10 px-5 py-10 md:grid-cols-[1fr_440px] md:gap-16 md:py-16">
-        {/* Penjelasan singkat aplikasi */}
-        <div className="permukaan-gelap flex flex-col gap-5">
-          <p className="m-0 text-[13px] font-semibold tracking-[0.08em] text-tombol-emas uppercase">Badan Bank Tanah</p>
-          <h1 className="m-0 text-[30px] leading-[1.15] font-bold md:text-[44px]">Contract Management</h1>
-          <p className="m-0 max-w-[460px] text-[16px] leading-relaxed text-teks-header">
-            Pantau semua kontrak PKS di satu tempat, dan dapatkan pengingat 3, 2, dan 1 bulan sebelum kontrak habis.
+      <main className="relative z-10 mx-auto flex w-full max-w-[460px] flex-1 flex-col px-5 pt-[120px] pb-10 md:pt-[170px]">
+        {/* Logo dan judul: logo duduk langsung di latar terang, warnanya tidak diubah */}
+        <div className="flex flex-col items-center text-center">
+          <img src="/logo-bbt.png" alt="Badan Bank Tanah" width={1160} height={464} fetchPriority="high" className="block h-12 w-auto md:h-14" />
+          <h1 className="m-0 mt-6 text-[32px] leading-[1.05] font-extrabold tracking-[-0.035em] text-judul md:text-[40px]">
+            Contract Management
+          </h1>
+          <p className="m-0 mt-3 text-[15px] text-teks-lembut">
+            Badan Bank Tanah. Masuk dengan email kantor Anda.
           </p>
-          <ul className="m-0 hidden list-none flex-col gap-3 p-0 md:flex">
-            {[
-              'Kontrak yang hampir habis langsung terlihat di Beranda',
-              'Klausul berisiko (pengakhiran, denda) tercatat per kontrak',
-              'Setiap perubahan tercatat: siapa, kapan, apa yang berubah',
-            ].map((teks) => (
-              <li key={teks} className="flex items-center gap-3 text-[15px]">
-                <span className="flex size-7 flex-none items-center justify-center rounded-full bg-white/10 text-tombol-emas">
-                  <Ikon nama="centang" ukuran={16} tebal={2.5} />
-                </span>
-                {teks}
-              </li>
-            ))}
-          </ul>
         </div>
 
         {/* Kartu masuk */}
-        <div className="rounded-[24px] bg-white p-7 text-teks shadow-toast md:p-9">
-          <img src="/logo-bbt.png" alt="Badan Bank Tanah" className="block h-12 w-auto" />
-          <h2 className="m-0 mt-6 text-[24px] text-judul">Masuk ke akun</h2>
-          <p className="m-0 mt-1 text-teks-lembut">Gunakan email kantor dan kata sandi Anda.</p>
+        <div className="mt-8 rounded-[20px] border border-garis bg-white p-6 text-teks md:rounded-3xl md:p-8">
+          <h2 className="m-0 text-[20px] text-judul">Masuk ke akun</h2>
 
-          <form noValidate onSubmit={kirim} className="mt-6 flex flex-col gap-4">
+          <form noValidate onSubmit={kirim} className="mt-5 flex flex-col gap-4">
             {galatMasuk && (
               <div role="alert" className="flex gap-2.5 rounded-xl bg-hapus-latar px-3.5 py-3 text-[13px] font-semibold text-hapus-teks">
                 <Ikon nama="peringatan" ukuran={18} className="flex-none" />
@@ -130,6 +110,7 @@ function Masuk() {
                     {...props}
                     ref={isianEmail}
                     type="email"
+                    spellCheck={false}
                     autoComplete="username"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
@@ -158,7 +139,7 @@ function Masuk() {
                     aria-label={lihatSandi ? 'Sembunyikan kata sandi' : 'Tampilkan kata sandi'}
                     aria-pressed={lihatSandi}
                     onClick={() => setLihatSandi(!lihatSandi)}
-                    className="absolute top-1/2 right-0.5 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-xl border-none bg-transparent text-teks-lembut hover:text-judul"
+                    className="absolute top-1/2 right-0.5 flex size-11 -translate-y-1/2 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut hover:text-judul"
                   >
                     <Ikon nama={lihatSandi ? 'mataTutup' : 'mata'} ukuran={18} />
                   </button>
@@ -166,7 +147,7 @@ function Masuk() {
               )}
             </IsianForm>
 
-            <button type="submit" className={`${KELAS_TOMBOL_UTAMA} mt-2 h-12 w-full`}>
+            <button type="submit" className={`${KELAS_TOMBOL_UTAMA} mt-2 w-full`}>
               Masuk
             </button>
 
@@ -183,10 +164,11 @@ function Masuk() {
           </form>
 
           {/* Khusus purwarupa: akun contoh supaya demo cepat. */}
-          <div className="mt-4 rounded-2xl border border-dashed border-garis-input bg-latar p-4">
-            <p className="m-0 text-[12px] font-semibold text-teks-lembut">
-              Akun contoh (purwarupa) · kata sandi <span className="font-mono text-judul">{SANDI_CONTOH}</span> · dikunci
-              setelah {MAKS_PERCOBAAN_MASUK} kali salah
+          <div className="mt-5 rounded-2xl border border-dashed border-garis-input bg-latar p-4">
+            <p className="m-0 text-[12px] text-teks-lembut">
+              <span className="font-semibold text-judul">Akun contoh untuk purwarupa.</span> Kata sandi{' '}
+              <span className="font-semibold text-judul">{SANDI_CONTOH}</span>. Akun dikunci sementara setelah{' '}
+              {MAKS_PERCOBAAN_MASUK} kali salah.
             </p>
             <div className="mt-2 grid grid-cols-2 gap-2">
               {AKUN_DEMO.map((a) => (
@@ -199,7 +181,7 @@ function Masuk() {
                     setGalatKolom({})
                     setGalatMasuk('')
                   }}
-                  className="flex min-h-11 cursor-pointer flex-col items-start rounded-xl border border-garis bg-white px-3 py-2 text-left hover:border-garis-input"
+                  className="flex min-h-11 cursor-pointer flex-col items-start rounded-xl border border-garis bg-white px-3 py-2 text-left transition-[border-color] duration-150 hover:border-garis-input motion-reduce:transition-none"
                 >
                   <span className="text-[13px] font-semibold text-judul">{a.nama}</span>
                   <span className="text-[12px] text-teks-lembut">{a.peran === 'admin' ? 'Admin IT' : a.jabatan}</span>

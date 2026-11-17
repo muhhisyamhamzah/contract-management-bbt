@@ -21,7 +21,7 @@ function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
       <span
         aria-hidden="true"
         className={`flex size-11 flex-none items-center justify-center rounded-full text-[14px] font-bold ${
-          admin ? 'bg-galaxy-900 text-tombol-emas' : 'bg-lembut text-aksi'
+          admin ? 'bg-galaxy-900 text-logo-emas' : 'bg-lembut text-aksi'
         }`}
       >
         {inisial(akun.nama)}
@@ -31,9 +31,8 @@ function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
           {akun.nama}
           {diriSendiri && <span className="font-normal text-teks-lembut"> (Anda)</span>}
         </span>
-        <span className="truncate text-[13px] text-teks-lembut">
-          {akun.jabatan} · {akun.email}
-        </span>
+        <span className="text-[13px] text-teks-lembut">{akun.jabatan}</span>
+        <span className="text-[13px] break-all text-teks-lembut">{akun.email}</span>
       </span>
 
       <span className="flex flex-none items-center gap-2 max-sm:w-full max-sm:pl-15">
@@ -48,7 +47,7 @@ function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
         <button
           type="button"
           onClick={onResetSandi}
-          className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-xl border-none bg-transparent px-2.5 text-[13px] font-semibold text-aksi hover:bg-latar"
+          className="flex min-h-11 cursor-pointer items-center gap-1.5 rounded-full border-none bg-transparent px-3 text-[13px] font-semibold whitespace-nowrap text-aksi hover:bg-lembut"
         >
           <Ikon nama="kunci" ukuran={15} />
           Reset sandi<span className="sr-only"> {akun.nama}</span>
@@ -57,7 +56,7 @@ function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
           <MenuDropdown
             labelTombol={`Menu akun ${akun.nama}`}
             isiTombol={<Ikon nama="titikTiga" ukuran={20} />}
-            kelasTombol="flex size-11 cursor-pointer items-center justify-center rounded-xl border-none bg-transparent text-teks-lembut hover:bg-latar hover:text-judul"
+            kelasTombol="flex size-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut hover:bg-latar hover:text-judul"
             lebar={200}
             item={[
               akun.aktif

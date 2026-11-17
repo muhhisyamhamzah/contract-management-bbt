@@ -1,5 +1,5 @@
 // Kotak tanggal berbentuk kalender meja: pita berwarna berisi bulan, tanggal besar, nama hari.
-// Contoh: DES / 4 / Jumat. Warna pita mengikuti status kontrak (TAMPILAN_STATUS.kelasPita).
+// Contoh: Des / 4 / Jumat. Bulan ditulis huruf biasa (DESIGN.md: tanpa huruf kapital semua). Warna pita mengikuti status kontrak (TAMPILAN_STATUS.kelasPita).
 
 import { keTanggal } from '../lib/format'
 
@@ -19,11 +19,11 @@ function KotakKalender({ tanggal, kelasPita, besar = false }: Props) {
     <span
       role="img"
       aria-label={tgl.toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
-      className={`flex flex-none flex-col overflow-hidden rounded-xl border border-garis bg-white text-center shadow-kotak ${
-        besar ? 'w-[72px]' : 'w-[56px]'
+      className={`flex flex-none flex-col overflow-hidden rounded-xl border border-garis bg-white text-center ${
+        besar ? 'w-[72px]' : 'w-[54px]'
       }`}
     >
-      <span aria-hidden="true" className={`py-0.5 text-[10px] font-bold tracking-wide uppercase ${kelasPita}`}>
+      <span aria-hidden="true" className={`py-0.5 text-[11px] leading-[16px] font-bold ${kelasPita}`}>
         {tgl.toLocaleDateString('id-ID', { month: 'short' })}
       </span>
       <span
@@ -32,7 +32,7 @@ function KotakKalender({ tanggal, kelasPita, besar = false }: Props) {
       >
         {tgl.getDate()}
       </span>
-      <span aria-hidden="true" className="pt-0.5 pb-1.5 text-[10px] text-teks-lembut">
+      <span aria-hidden="true" className="pt-0.5 pb-1.5 text-[11px] text-teks-lembut">
         {tgl.toLocaleDateString('id-ID', { weekday: 'long' })}
       </span>
     </span>

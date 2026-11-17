@@ -1,15 +1,22 @@
 // Daftar alamat (route) website dan halaman yang ditampilkan di setiap alamat.
+//
+// Halaman Masuk dimuat langsung (halaman pertama). Halaman lain dimuat saat dibuka (React.lazy),
+// supaya file JavaScript awal lebih kecil. Penanda "Memuat halaman" ada di TataLetakWebsite (Suspense).
 
+import { lazy } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import RuteAdmin from './components/RuteAdmin'
 import TataLetakWebsite from './components/TataLetakWebsite'
-import Admin from './pages/Admin'
-import Beranda from './pages/Beranda'
-import DetailKontrak from './pages/DetailKontrak'
-import FormKontrak from './pages/FormKontrak'
-import Kontrak from './pages/Kontrak'
 import Masuk from './pages/Masuk'
-import Pengingat from './pages/Pengingat'
+
+const Admin = lazy(() => import('./pages/Admin'))
+const Beranda = lazy(() => import('./pages/Beranda'))
+const CriticalPoint = lazy(() => import('./pages/CriticalPoint'))
+const DetailKontrak = lazy(() => import('./pages/DetailKontrak'))
+const FormKontrak = lazy(() => import('./pages/FormKontrak'))
+const Kontrak = lazy(() => import('./pages/Kontrak'))
+const Rekap = lazy(() => import('./pages/Rekap'))
+const UbahData = lazy(() => import('./pages/UbahData'))
 
 function App() {
   return (
@@ -19,12 +26,18 @@ function App() {
       {/* Halaman yang hanya bisa dibuka setelah masuk */}
       <Route element={<TataLetakWebsite />}>
         <Route path="/" element={<Beranda />} />
-        {/* Filter status bisa dikirim lewat alamat, misalnya /kontrak?status=segera */}
+        {/* Kontrak dikelompokkan per tahap pengingat (gabungan Kontrak + Pengingat). Kata kunci lewat ?q= */}
         <Route path="/kontrak" element={<Kontrak />} />
         <Route path="/kontrak/:id" element={<DetailKontrak />} />
         <Route path="/kontrak/:id/ubah" element={<FormKontrak />} />
         <Route path="/tambah" element={<FormKontrak />} />
-        <Route path="/pengingat" element={<Pengingat />} />
+        <Route path="/critical-point" element={<CriticalPoint />} />
+        {/* Rekap: semua kontrak + dokumen. Filter status lewat alamat, misalnya /rekap?status=segera */}
+        <Route path="/rekap" element={<Rekap />} />
+        <Route path="/ubah-data" element={<UbahData />} />
+        <Route path="/ubah-data/:id" element={<UbahData />} />
+        {/* Halaman Pengingat sudah digabung ke Kontrak; alamat lama diarahkan supaya tautan tidak mati. */}
+        <Route path="/pengingat" element={<Navigate to="/kontrak" replace />} />
         <Route element={<RuteAdmin />}>
           <Route path="/admin" element={<Admin />} />
         </Route>

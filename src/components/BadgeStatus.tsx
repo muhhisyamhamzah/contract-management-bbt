@@ -1,4 +1,4 @@
-// Label kecil berbentuk pil dengan titik dan warna sesuai status kontrak.
+// Label kecil berbentuk pil dengan warna sesuai status kontrak (latar muda + teks gelap, minimal 5,4:1).
 // Contoh: "18 hari lagi" di daftar kontrak, atau "Segera habis" di Detail.
 
 import type { ReactNode } from 'react'
@@ -17,9 +17,8 @@ function BadgeStatus({ status, children, className = '' }: Props) {
 
   return (
     <span
-      className={`inline-flex flex-none items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold whitespace-nowrap ${tampilan.kelasBadge} ${className}`}
+      className={`inline-flex flex-none items-center gap-1.5 rounded-full px-3 py-1 text-[13px] font-bold whitespace-nowrap ${tampilan.kelasBadge} ${className}`}
     >
-      <span aria-hidden="true" className={`size-1.5 rounded-full ${tampilan.kelasBar}`} />
       {children ?? tampilan.label}
     </span>
   )

@@ -46,11 +46,11 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
         }}
         onDragLeave={() => setDiseret(false)}
         onDrop={saatLepas}
-        className={`flex flex-col gap-4 rounded-2xl border-2 border-dashed p-4 transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none sm:flex-row sm:items-center md:p-5 ${
-          pesanGalat ? 'border-hapus bg-hapus-latar/40' : diseret ? 'border-aksi bg-lembut' : 'border-aksen bg-lembut/50'
+        className={`flex flex-col gap-4 rounded-[20px] border-2 border-dashed p-4 transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none sm:flex-row sm:items-center md:p-5 ${
+          pesanGalat ? 'border-hapus bg-hapus-latar' : diseret ? 'border-aksi bg-lembut' : 'border-garis-input bg-latar'
         }`}
       >
-        <span aria-hidden="true" className="flex size-12 flex-none items-center justify-center rounded-xl bg-white text-aksi shadow-kotak">
+        <span aria-hidden="true" className="flex size-12 flex-none items-center justify-center rounded-full bg-white text-aksi">
           <Ikon nama={file ? 'centang' : 'unggah'} ukuran={22} tebal={file ? 2.5 : 2} />
         </span>
         <span className="flex min-w-0 flex-1 flex-col gap-0.5">
@@ -76,13 +76,13 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
             <button
               type="button"
               onClick={() => onPilih(null)}
-              className="h-11 cursor-pointer rounded-xl border border-garis-input bg-white px-3.5 font-semibold text-hapus-teks"
+              className="h-11 cursor-pointer rounded-full border border-garis-input bg-white px-4 font-semibold text-hapus-teks"
             >
               Batalkan
             </button>
           )}
           {/* Label berperan sebagai tombol: input file asli tersembunyi tapi tetap bisa difokus. */}
-          <label className="relative inline-flex h-11 cursor-pointer items-center rounded-xl border border-garis-input bg-white px-4 font-semibold text-judul focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-aksi hover:bg-latar">
+          <label className="relative inline-flex h-11 cursor-pointer items-center rounded-full border border-garis-input bg-white px-4 font-semibold text-judul focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-aksi hover:bg-latar">
             {file || namaLama ? 'Ganti file' : 'Pilih file'}
             <span className="sr-only"> PDF PKS</span>
             <input

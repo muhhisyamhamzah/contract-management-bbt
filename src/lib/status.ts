@@ -116,10 +116,51 @@ export function jadwalPengingat(tanggalBerakhir: string, hariIni: Date = new Dat
   })
 }
 
+/**
+ * Tahap waktu sebuah tanggal (tanggal akhir kontrak atau tanggal penting critical point),
+ * mengikuti tahap pengingat 3, 2, 1 bulan kalender:
+ * - `lewat`: tanggalnya sudah lewat
+ * - `h1`: pengingat 1 bulan sudah terkirim (berakhir dalam 1 bulan kalender)
+ * - `h2`: pengingat 2 bulan sudah terkirim
+ * - `h3`: pengingat 3 bulan sudah terkirim
+ * - `nanti`: lebih dari 3 bulan lagi, belum ada pengingat
+ */
+export type TahapWaktu = 'lewat' | 'h1' | 'h2' | 'h3' | 'nanti'
+
+/** Urutan tahap dari yang paling mendesak. Dipakai halaman Kontrak dan Critical point. */
+export const URUTAN_TAHAP: TahapWaktu[] = ['lewat', 'h1', 'h2', 'h3', 'nanti']
+
+export function hitungTahap(tanggal: string, hariIni: Date = new Date()): TahapWaktu {
+  if (hitungSisaHari(tanggal, hariIni) < 0) return 'lewat'
+  // Cek dari tahap terdekat (1 bulan) ke yang terjauh (3 bulan).
+  for (const bulan of [...TAHAP_PENGINGAT_BULAN].sort((a, b) => a - b)) {
+    if (hitungSisaHari(geserBulan(tanggal, -bulan), hariIni) <= 0) return `h${bulan}` as TahapWaktu
+  }
+  return 'nanti'
+}
+
+/** Judul tahap untuk halaman Kontrak. */
+export const JUDUL_TAHAP_KONTRAK: Record<TahapWaktu, { judul: string; keterangan: string }> = {
+  lewat: { judul: 'Sudah lewat', keterangan: 'Tanggal akhir sudah lewat. Perpanjang lewat adendum, atau tandai selesai.' },
+  h1: { judul: 'H-1 bulan', keterangan: 'Berakhir dalam 1 bulan. Pengingat 1 bulan sudah dikirim ke semua pengguna.' },
+  h2: { judul: 'H-2 bulan', keterangan: 'Berakhir dalam 1 sampai 2 bulan. Pengingat 2 bulan sudah dikirim.' },
+  h3: { judul: 'H-3 bulan', keterangan: 'Berakhir dalam 2 sampai 3 bulan. Pengingat 3 bulan sudah dikirim.' },
+  nanti: { judul: 'Berjalan', keterangan: 'Masih lebih dari 3 bulan. Belum ada pengingat.' },
+}
+
+/** Judul tahap untuk halaman Critical point (berdasarkan tanggal penting). */
+export const JUDUL_TAHAP_CRITICAL: Record<TahapWaktu, { judul: string; keterangan: string }> = {
+  lewat: { judul: 'Sudah lewat', keterangan: 'Tanggal penting sudah lewat. Periksa apakah denda atau sanksi berlaku.' },
+  h1: { judul: 'H-1 bulan', keterangan: 'Tanggal penting dalam 1 bulan. Pengingat 1 bulan sudah dikirim.' },
+  h2: { judul: 'H-2 bulan', keterangan: 'Tanggal penting dalam 1 sampai 2 bulan. Pengingat 2 bulan sudah dikirim.' },
+  h3: { judul: 'H-3 bulan', keterangan: 'Tanggal penting dalam 2 sampai 3 bulan. Pengingat 3 bulan sudah dikirim.' },
+  nanti: { judul: 'Lebih dari 3 bulan', keterangan: 'Tanggal penting masih jauh. Belum ada pengingat.' },
+}
+
 type TampilanStatus = {
   /** Teks yang tampil di layar. */
   label: string
-  /** Ikon status (kotak ikon di ringkasan Beranda). */
+  /** Ikon status. */
   ikon: NamaIkon
   /** Latar muda + teks gelap. Untuk badge dan kotak peringatan. */
   kelasBadge: string
@@ -127,10 +168,6 @@ type TampilanStatus = {
   kelasTeks: string
   /** Warna pekat untuk garis masa kontrak dan titik di badge. */
   kelasBar: string
-  /** Kotak ikon bergradasi warna logo + bayangan berwarna (gaya Beranda). */
-  kelasIkonGradasi: string
-  /** Hiasan lingkaran samar di pojok kotak ringkasan. */
-  kelasHiasan: string
   /** Pita bulan di kotak kalender. */
   kelasPita: string
 }
@@ -146,9 +183,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBadge: 'bg-berjalan-latar text-berjalan-teks',
     kelasTeks: 'text-berjalan-teks',
     kelasBar: 'bg-berjalan',
-    kelasIkonGradasi: 'from-berjalan to-logo-hijau shadow-logo-hijau/35',
-    kelasHiasan: 'bg-logo-hijau/10',
-    kelasPita: 'bg-latar-tab text-judul',
+    kelasPita: 'bg-lembut text-judul',
   },
   segera: {
     label: 'Segera habis',
@@ -156,8 +191,6 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBadge: 'bg-segera-latar text-segera-teks',
     kelasTeks: 'text-segera-teks',
     kelasBar: 'bg-segera',
-    kelasIkonGradasi: 'from-logo-emas to-logo-tanah shadow-logo-emas/40',
-    kelasHiasan: 'bg-logo-emas/12',
     kelasPita: 'bg-logo-emas text-galaxy-900',
   },
   lewat: {
@@ -166,8 +199,6 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBadge: 'bg-lewat-latar text-lewat-teks',
     kelasTeks: 'text-lewat-teks',
     kelasBar: 'bg-lewat',
-    kelasIkonGradasi: 'from-logo-tanah to-hapus shadow-logo-tanah/40',
-    kelasHiasan: 'bg-logo-tanah/10',
     // Teks navy, bukan putih: putih di atas oranye hanya 2,98:1 (lihat docs/ui-audit.md).
     kelasPita: 'bg-logo-tanah text-galaxy-900',
   },
@@ -177,9 +208,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBadge: 'bg-selesai-latar text-selesai-teks',
     kelasTeks: 'text-selesai-teks',
     kelasBar: 'bg-selesai',
-    kelasIkonGradasi: 'from-selesai to-selesai-teks shadow-selesai/45',
-    kelasHiasan: 'bg-selesai/15',
-    kelasPita: 'bg-latar-tab text-selesai-teks',
+    kelasPita: 'bg-selesai-latar text-selesai-teks',
   },
 }
 

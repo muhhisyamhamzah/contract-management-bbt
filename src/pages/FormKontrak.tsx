@@ -4,13 +4,16 @@
 // Alur (Flowchart 2): isi → periksa (kolom wajib, tanggal masuk akal, nomor PKS ganda, PDF) →
 // ringkasan sebagai konfirmasi → simpan → riwayat dicatat → buka Detail.
 // Kesalahan ditandai per kolom (pesan + aria-describedby), dan fokus pindah ke kolom pertama yang salah.
+//
+// `tertanam`: dipakai halaman Ubah data (/ubah-data/:id). Form tampil tanpa kepala halaman dan wadah sendiri,
+// Batal kembali ke /ubah-data, dan setelah simpan tetap di halaman Ubah data.
 
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import BagianForm from '../components/BagianForm'
 import DialogKonfirmasi from '../components/DialogKonfirmasi'
 import EditorCriticalPoint from '../components/EditorCriticalPoint'
-import HeaderGelombang from '../components/HeaderGelombang'
+import KepalaHalaman from '../components/KepalaHalaman'
 import Ikon from '../components/Ikon'
 import IsianForm from '../components/IsianForm'
 import KeadaanKosong from '../components/KeadaanKosong'
@@ -42,14 +45,20 @@ function idKolom(kolom: KolomForm, data: DataFormKontrak): string {
   return `isian-${kolom}`
 }
 
-function FormKontrak() {
+type Props = {
+  /** Form ditanam di halaman Ubah data (tanpa kepala halaman sendiri). */
+  tertanam?: boolean
+}
+
+function FormKontrak({ tertanam = false }: Props) {
   const { id } = useParams()
   const navigate = useNavigate()
   const tampilkanToast = useToast()
   const { kontrak: semua, simpanKontrak } = useData()
   const lama = id ? semua.find((k) => k.id === id) : undefined
   const modeUbah = Boolean(id)
-  const batal = useKembali(modeUbah && id ? `/kontrak/${id}` : '/')
+  const kembali = useKembali(modeUbah && id ? `/kontrak/${id}` : '/')
+  const batal = tertanam ? () => navigate('/ubah-data') : kembali
 
   const [data, setData] = useState<DataFormKontrak>(() => (lama ? dariKontrak(lama) : DATA_AWAL))
   // Kesalahan baru ditampilkan setelah pengguna mencoba menyimpan, lalu ikut diperbarui saat mengetik.
@@ -59,8 +68,8 @@ function FormKontrak() {
   if (modeUbah && !lama) {
     return (
       <>
-        <HeaderGelombang judul="Kontrak tidak ditemukan" />
-        <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-12`}>
+        <KepalaHalaman judul="Kontrak tidak ditemukan" />
+        <main id="konten" className={`${KELAS_WADAH}`}>
           <div className={KELAS_KOTAK}>
             <KeadaanKosong
               ikon="cari"
@@ -107,6 +116,7 @@ function FormKontrak() {
     simpanKontrak(keKontrak(data, idKontrak, lama), !lama)
     setKonfirmasi(false)
     tampilkanToast(modeUbah ? 'Perubahan kontrak tersimpan.' : 'Kontrak tersimpan.')
+    if (tertanam) return
     navigate(`/kontrak/${idKontrak}`, { replace: true })
   }
 
@@ -124,29 +134,11 @@ function FormKontrak() {
     ['PDF PKS', data.filePks?.nama ?? data.namaPksLama],
   ]
 
-  return (
+  const isiForm = (
     <>
-      <HeaderGelombang
-        atas={
-          modeUbah ? (
-            <button
-              type="button"
-              onClick={batal}
-              className="mb-1 -ml-2 inline-flex min-h-11 w-fit cursor-pointer items-center gap-1 rounded-xl border-none bg-transparent px-2 text-[14px] font-semibold text-white hover:bg-white/10"
-            >
-              <Ikon nama="kiri" ukuran={18} tebal={2.5} />
-              {lama?.nama}
-            </button>
-          ) : undefined
-        }
-        judul={modeUbah ? 'Ubah kontrak' : 'Tambah kontrak'}
-        keterangan="Isi sesuai dokumen PKS. Kolom bertanda * wajib diisi."
-      />
-
-      <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-14 pb-4`}>
         <form noValidate onSubmit={kirim} className={`${KELAS_KOTAK} p-5 md:p-10`}>
           {jumlahGalat > 0 && (
-            <div role="alert" className="mb-7 flex gap-3 rounded-xl bg-hapus-latar px-4 py-3.5 text-hapus-teks">
+            <div role="alert" className="mb-7 flex gap-3 rounded-2xl bg-hapus-latar px-4 py-3.5 text-hapus-teks">
               <Ikon nama="peringatan" ukuran={20} className="flex-none" />
               <span className="text-[14px]">
                 <strong>Ada {jumlahGalat} isian yang perlu diperbaiki.</strong> Kolom yang salah ditandai merah, lengkap
@@ -258,7 +250,7 @@ function FormKontrak() {
               </IsianForm>
             </div>
 
-            <div aria-live="polite" className="flex flex-col gap-2 rounded-xl bg-lembut px-4 py-3.5 text-[14px] text-aksi-tua sm:flex-row sm:items-center sm:gap-6">
+            <div aria-live="polite" className="flex flex-col gap-2 rounded-2xl bg-lembut px-4 py-3.5 text-[14px] text-aksi-tua sm:flex-row sm:items-center sm:gap-6">
               <span className="flex items-center gap-2">
                 <Ikon nama="pengingat" ukuran={18} className="flex-none" />
                 {tanggalSah ? (
@@ -346,7 +338,6 @@ function FormKontrak() {
             </button>
           </div>
         </form>
-      </main>
 
       <DialogKonfirmasi
         terbuka={konfirmasi}
@@ -358,7 +349,7 @@ function FormKontrak() {
         onKonfirmasi={simpan}
         onBatal={() => setKonfirmasi(false)}
       >
-        <dl className="m-0 flex flex-col rounded-xl bg-latar px-4 py-1">
+        <dl className="m-0 flex flex-col rounded-2xl bg-latar px-4 py-1">
           {ringkasan.map(([label, nilai]) => (
             <div key={label} className="flex justify-between gap-4 border-b border-garis-lembut py-2.5 last:border-b-0">
               <dt className="text-[13px] text-teks-lembut">{label}</dt>
@@ -367,6 +358,31 @@ function FormKontrak() {
           ))}
         </dl>
       </DialogKonfirmasi>
+    </>
+  )
+
+  if (tertanam) return isiForm
+
+  return (
+    <>
+      <KepalaHalaman
+        atas={
+          modeUbah ? (
+            <button
+              type="button"
+              onClick={batal}
+              className="mb-1 -ml-2 inline-flex min-h-11 w-fit cursor-pointer items-center gap-1 rounded-full border-none bg-transparent px-2 text-[14px] font-semibold text-aksi hover:bg-lembut"
+            >
+              <Ikon nama="kiri" ukuran={18} tebal={2.5} />
+              {lama?.nama}
+            </button>
+          ) : undefined
+        }
+        judul={modeUbah ? 'Ubah kontrak' : 'Tambah kontrak'}
+        keterangan="Isi sesuai dokumen PKS. Kolom bertanda * wajib diisi."
+      />
+
+      <main id="konten" className={`${KELAS_WADAH} pb-4`}>{isiForm}</main>
     </>
   )
 }

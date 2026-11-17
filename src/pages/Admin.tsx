@@ -6,12 +6,12 @@ import { useRef, useState, type KeyboardEvent } from 'react'
 import BarisAkun from '../components/BarisAkun'
 import DialogKonfirmasi from '../components/DialogKonfirmasi'
 import DialogTambahAkun from '../components/DialogTambahAkun'
-import HeaderGelombang from '../components/HeaderGelombang'
+import KepalaHalaman from '../components/KepalaHalaman'
 import Ikon from '../components/Ikon'
 import KartuSandiSementara from '../components/KartuSandiSementara'
 import RiwayatKontrak from '../components/RiwayatKontrak'
 import { useData, usePengguna } from '../lib/data'
-import { KELAS_KOTAK, KELAS_TOMBOL_EMAS, KELAS_WADAH } from '../lib/tataLetak'
+import { KELAS_KOTAK, KELAS_TOMBOL_UTAMA, KELAS_WADAH } from '../lib/tataLetak'
 import { useToast } from '../lib/toast'
 import type { Akun } from '../types/kontrak'
 
@@ -49,7 +49,7 @@ function Admin() {
 
   return (
     <>
-      <HeaderGelombang
+      <KepalaHalaman
         judul={tab === 'akun' ? 'Akun pengguna' : 'Riwayat perubahan'}
         keterangan={
           tab === 'akun'
@@ -57,15 +57,15 @@ function Admin() {
             : 'Semua tambah, ubah, hapus, tandai selesai, unggah PDF, dan perubahan akun.'
         }
         aksi={
-          <button type="button" onClick={() => setDialogTambah(true)} className={KELAS_TOMBOL_EMAS}>
+          <button type="button" onClick={() => setDialogTambah(true)} className={KELAS_TOMBOL_UTAMA}>
             <Ikon nama="tambah" ukuran={18} tebal={2.5} />
             Tambah akun
           </button>
         }
       />
 
-      <main id="konten" className={`${KELAS_WADAH} relative z-10 -mt-14 flex flex-col gap-5 pb-4`}>
-        <div role="tablist" aria-label="Bagian admin" className={`${KELAS_KOTAK} grid grid-cols-2 gap-1 p-1.5`}>
+      <main id="konten" className={`${KELAS_WADAH} flex flex-col gap-5 pb-4`}>
+        <div role="tablist" aria-label="Bagian admin" className="grid grid-cols-2 gap-1 rounded-full border border-garis bg-white p-1 md:w-[420px]">
           {DAFTAR_TAB.map((t, i) => {
             const aktif = tab === t.id
             return (
@@ -82,7 +82,7 @@ function Admin() {
                 tabIndex={aktif ? 0 : -1}
                 onClick={() => setTab(t.id)}
                 onKeyDown={(event) => pindahTabDenganPanah(event, i)}
-                className={`flex h-11 cursor-pointer items-center justify-center gap-2 rounded-xl border-none text-[14px] font-semibold transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none ${
+                className={`flex h-11 cursor-pointer items-center justify-center gap-2 rounded-full border-none text-[14px] font-semibold transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none ${
                   aktif ? 'bg-galaxy-900 text-white' : 'bg-transparent text-teks hover:bg-latar'
                 }`}
               >
@@ -93,7 +93,7 @@ function Admin() {
           })}
         </div>
 
-        <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className={`${KELAS_KOTAK} px-4 md:px-7`}>
+        <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className={`${KELAS_KOTAK} px-5 py-1 md:px-7`}>
           {tab === 'akun' ? (
             <ul className="m-0 list-none p-0">
               {akun.map((a) => (

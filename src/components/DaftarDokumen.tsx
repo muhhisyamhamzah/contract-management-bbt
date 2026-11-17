@@ -40,21 +40,19 @@ function DaftarDokumen({ daftar, onUnggah }: Props) {
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="m-0 grid list-none gap-3 p-0 md:grid-cols-2">
+      <ul className="m-0 list-none p-0">
         {daftar.map((dokumen) => (
-          <li key={dokumen.id}>
+          <li key={dokumen.id} className="border-b border-garis-lembut last:border-b-0">
             <button
               type="button"
               onClick={() => tampilkanToast(`Mengunduh ${dokumen.nama} (contoh)`)}
-              className="flex w-full cursor-pointer items-center gap-3.5 rounded-xl border border-garis bg-white p-3.5 text-left text-teks transition-[background-color,border-color,color] duration-150 hover:border-garis-input motion-reduce:transition-none"
+              className="-mx-3 flex w-[calc(100%+24px)] cursor-pointer items-center gap-3.5 rounded-2xl border-none bg-transparent px-3 py-3 text-left text-teks transition-[background-color] duration-150 hover:bg-latar motion-reduce:transition-none"
             >
-              <span aria-hidden="true" className="flex size-11 flex-none items-center justify-center rounded-xl bg-hapus-latar text-hapus-teks">
-                <Ikon nama="dokumen" ukuran={20} />
-              </span>
+              <Ikon nama="dokumen" ukuran={22} className="flex-none text-aksi" />
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="truncate font-semibold text-judul">{dokumen.nama}</span>
                 <span className="text-[12px] text-teks-lembut">
-                  {dokumen.jenis} · {formatUkuranFile(dokumen.ukuran)} · {formatTanggalSingkat(dokumen.tanggal)}
+                  {dokumen.jenis}, {formatUkuranFile(dokumen.ukuran)}, diunggah {formatTanggalSingkat(dokumen.tanggal)}
                 </span>
               </span>
               <Ikon nama="unduh" ukuran={18} className="flex-none text-aksi" />

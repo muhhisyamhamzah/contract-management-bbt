@@ -34,7 +34,7 @@ function JadwalPengingat({ kontrak }: Props) {
         >
           <div
             className={`h-full rounded-full ${
-              selesai ? 'bg-selesai' : status === 'lewat' ? 'bg-lewat' : 'bg-linear-to-r from-logo-emas to-logo-tanah'
+              selesai ? 'bg-selesai' : status === 'lewat' ? 'bg-lewat' : 'bg-segera'
             }`}
             style={{ width: `${progres}%` }}
           />
@@ -50,17 +50,17 @@ function JadwalPengingat({ kontrak }: Props) {
               style={{ left: `${persenPadaGaris(kontrak, keTanggal(tahap.tanggal))}%` }}
               className={`absolute top-1/2 size-4 -translate-x-1/2 -translate-y-1/2 rounded-full border-[3px] ${
                 tahap.terkirim ? 'border-white bg-galaxy-900' : 'border-galaxy-900 bg-white'
-              } shadow-kotak`}
+              }`}
             />
           ))}
       </div>
 
       {!selesai && (
-        <ol className="m-0 grid list-none gap-2 p-0 sm:grid-cols-3">
+        <ol className="m-0 grid list-none gap-x-6 gap-y-3 p-0 sm:grid-cols-3">
           {jadwal.map((tahap) => (
             <li
               key={tahap.bulan}
-              className="flex items-center gap-2.5 rounded-xl border border-garis bg-latar px-3 py-2.5"
+              className="flex items-center gap-2.5"
             >
               <span
                 aria-hidden="true"
@@ -71,7 +71,7 @@ function JadwalPengingat({ kontrak }: Props) {
               <span className="flex flex-col">
                 <span className="text-[13px] font-semibold text-judul">Pengingat {tahap.bulan} bulan</span>
                 <span className="text-[12px] text-teks-lembut">
-                  {formatTanggalSingkat(tahap.tanggal)} · {tahap.terkirim ? 'sudah terkirim' : 'terjadwal'}
+                  {formatTanggalSingkat(tahap.tanggal)}, {tahap.terkirim ? 'sudah terkirim' : 'terjadwal'}
                 </span>
               </span>
             </li>

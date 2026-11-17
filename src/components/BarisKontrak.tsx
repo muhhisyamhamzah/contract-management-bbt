@@ -1,5 +1,6 @@
 // Satu baris kontrak di daftar (Beranda, Kontrak, Pengingat): kotak kalender tanggal akhir,
-// nama, penyedia, nomor PKS, nilai, dan badge sisa waktu. Diklik untuk membuka detailnya.
+// nama, penyedia, nomor PKS, nilai, dan pil sisa waktu. Diklik untuk membuka detailnya.
+// Desktop: kolom sejajar. HP: kalender di kiri, info bertumpuk di kanan.
 
 import { Link } from 'react-router-dom'
 import { formatRupiahSingkat } from '../lib/format'
@@ -11,7 +12,7 @@ import KotakKalender from './KotakKalender'
 
 type Props = {
   kontrak: Kontrak
-  /** Tampilkan nomor PKS di bawah penyedia. */
+  /** Tampilkan juga nomor PKS di HP (di desktop selalu tampil sebagai kolom). */
   denganNomor?: boolean
 }
 
@@ -23,24 +24,20 @@ function BarisKontrak({ kontrak, denganNomor = false }: Props) {
     <li className="border-b border-garis-lembut last:border-b-0">
       <Link
         to={`/kontrak/${kontrak.id}`}
-        className="group -mx-2 flex items-center gap-4 rounded-xl px-2 py-4 text-teks no-underline transition-[background-color,border-color,color] duration-150 hover:bg-latar hover:text-teks motion-reduce:transition-none"
+        className="group -mx-3 flex items-center gap-4 rounded-2xl px-3 py-3.5 text-teks no-underline transition-[background-color] duration-150 hover:bg-latar hover:text-teks motion-reduce:transition-none"
       >
         <KotakKalender tanggal={kontrak.tanggalBerakhir} kelasPita={tampilan.kelasPita} />
 
-        <span className="flex min-w-0 flex-1 flex-col gap-1 md:flex-row md:items-center md:gap-6">
-          <span className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <span className="grid min-w-0 flex-1 gap-x-6 gap-y-1 md:grid-cols-[minmax(0,1fr)_150px_96px_128px] md:items-center">
+          <span className="flex min-w-0 flex-col gap-0.5">
             <span className="text-[15px] font-semibold text-judul">{kontrak.nama}</span>
-            <span className="truncate text-[13px] text-teks-lembut">
-              {kontrak.penyedia}
-              {denganNomor && <> · {kontrak.nomorPks}</>}
-            </span>
+            <span className="text-[13px] text-teks-lembut">{kontrak.penyedia}</span>
+            {denganNomor && <span className="text-[13px] text-teks-lembut md:hidden">{kontrak.nomorPks}</span>}
           </span>
-
-          <span className="flex flex-none items-center gap-3 md:gap-6">
-            <span className="text-[14px] font-semibold text-judul md:w-[92px] md:text-right">
-              {formatRupiahSingkat(kontrak.nilai)}
-            </span>
-            <span className="md:flex md:w-[128px] md:justify-end">
+          <span className="hidden text-[13px] text-teks-lembut md:block">{kontrak.nomorPks}</span>
+          <span className="flex items-center gap-3 md:contents">
+            <span className="text-[14px] font-semibold text-judul md:text-right">{formatRupiahSingkat(kontrak.nilai)}</span>
+            <span className="md:flex md:justify-end">
               <BadgeStatus status={status}>{teksSisaHari(kontrak)}</BadgeStatus>
             </span>
           </span>
