@@ -27,3 +27,6 @@ dist-ssr
 .env
 .env.*
 !.env.example
+
+# Berkas kerja skill impeccable (laporan, mode live)
+.impeccable/
