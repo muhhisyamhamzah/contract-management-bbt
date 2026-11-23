@@ -56,11 +56,11 @@ function BarisKontrak({ kontrak, nomor }: Props) {
           <span>{formatTanggalSingkat(kontrak.tanggalMulai)}</span>
           <span>sampai {formatTanggalSingkat(kontrak.tanggalBerakhir)}</span>
         </span>
-        <span className="col-start-1 row-start-2 text-[14px] font-bold text-judul xl:col-auto xl:row-auto xl:text-right">
+        <span className="col-start-1 row-start-2 text-[14px] font-bold text-judul xl:col-auto xl:row-auto xl:text-center">
           {formatRupiahSingkat(kontrak.nilai)}
         </span>
         {/* Status kontrak (sisa waktu): pil berwarna. */}
-        <span className="col-start-1 row-start-3 flex items-center pt-0.5 xl:col-auto xl:row-auto xl:pt-0">
+        <span className="col-start-1 row-start-3 flex items-center pt-0.5 xl:col-auto xl:row-auto xl:justify-center xl:pt-0">
           <BadgeStatus status={status}>{teksSisaHari(kontrak)}</BadgeStatus>
         </span>
         {/* Status adendum: teks dengan ikon, kolom sendiri. Label panjang boleh turun ke baris kedua. */}

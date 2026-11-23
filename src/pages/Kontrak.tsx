@@ -154,8 +154,8 @@ function Kontrak() {
                 <span>Kontrak</span>
                 <span>Nomor PKS</span>
                 <span>Masa kontrak</span>
-                <span className="text-right">Nilai</span>
-                <span>Status</span>
+                <span className="text-center">Nilai</span>
+                <span className="text-center">Status</span>
                 <span>Adendum</span>
                 <span>Dokumen</span>
                 <span />
