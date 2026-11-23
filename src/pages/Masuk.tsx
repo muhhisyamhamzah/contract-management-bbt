@@ -1,6 +1,8 @@
 // Halaman Masuk: email kantor + kata sandi, dengan pembatasan percobaan masuk.
 // Pesan gagal: akun tidak ditemukan, akun nonaktif, kata sandi salah, akun dikunci sementara.
-// Tidak ada "lupa kata sandi" otomatis: pengguna menghubungi admin IT.
+// Tidak ada "lupa kata sandi" otomatis. Panel "Lupa kata sandi?" menjelaskan dua jalan (Hisyam 18 Nov 2026):
+// - pengguna: admin IT membuat kata sandi sementara lewat menu Admin;
+// - admin: direset admin lain; kalau tidak ada admin lain, tim IT mengganti kata sandi langsung di database.
 //
 // Belum ada backend: akun memakai data contoh (src/data/akunContoh.ts). Kotak "Akun contoh"
 // di bawah form memudahkan demo, dan dibuang saat backend sudah ada.
@@ -12,16 +14,16 @@ import IsianForm from '../components/IsianForm'
 import Mozaik from '../components/Mozaik'
 import { akunContoh, SANDI_CONTOH } from '../data/akunContoh'
 import { MAKS_PERCOBAAN_MASUK, useData, type HasilMasuk } from '../lib/data'
+import { useJudulHalaman } from '../lib/judulHalaman'
 import { KELAS_ISIAN, KELAS_TOMBOL_UTAMA } from '../lib/tataLetak'
-import { useToast } from '../lib/toast'
 
 /** Pesan kesalahan masuk yang menjelaskan cara memperbaikinya. */
 function pesanGagal(hasil: Exclude<HasilMasuk, { berhasil: true }>): string {
   switch (hasil.alasan) {
     case 'tidak-ada':
-      return 'Email ini belum terdaftar. Periksa ejaannya, atau minta admin IT membuatkan akun.'
+      return 'Email ini belum terdaftar. Periksa ejaannya, atau minta admin membuatkan akun.'
     case 'nonaktif':
-      return 'Akun ini sedang dinonaktifkan. Hubungi admin IT untuk mengaktifkannya lagi.'
+      return 'Akun ini sedang dinonaktifkan. Hubungi admin untuk mengaktifkannya lagi.'
     case 'sandi':
       return `Kata sandi salah. Sisa ${hasil.sisaPercobaan} kali percobaan sebelum akun dikunci sementara.`
     case 'terkunci':
@@ -33,16 +35,18 @@ function pesanGagal(hasil: Exclude<HasilMasuk, { berhasil: true }>): string {
 const AKUN_DEMO = akunContoh.filter((a) => a.id === 'a2' || a.id === 'a5')
 
 function Masuk() {
+  useJudulHalaman('Masuk')
   const { pengguna, masuk } = useData()
   const navigate = useNavigate()
   const location = useLocation()
-  const tampilkanToast = useToast()
 
   const [email, setEmail] = useState('')
   const [sandi, setSandi] = useState('')
   const [lihatSandi, setLihatSandi] = useState(false)
   const [galatKolom, setGalatKolom] = useState<{ email?: string; sandi?: string }>({})
   const [galatMasuk, setGalatMasuk] = useState('')
+  // Panel bantuan lupa kata sandi (tetap terlihat, tidak hilang sendiri seperti toast).
+  const [bantuanSandi, setBantuanSandi] = useState(false)
   const isianEmail = useRef<HTMLInputElement>(null)
   const isianSandi = useRef<HTMLInputElement>(null)
 
@@ -151,16 +155,40 @@ function Masuk() {
               Masuk
             </button>
 
-            <p className="m-0 text-center text-[13px] text-teks-lembut">
-              Lupa kata sandi?{' '}
+            <div className="flex flex-col items-center gap-2">
               <button
                 type="button"
-                onClick={() => tampilkanToast('Hubungi admin IT untuk dibuatkan kata sandi sementara.')}
-                className="min-h-11 cursor-pointer border-none bg-transparent p-0 font-semibold text-aksi underline-offset-2 hover:underline"
+                aria-expanded={bantuanSandi}
+                aria-controls="bantuan-sandi"
+                onClick={() => setBantuanSandi(!bantuanSandi)}
+                className="inline-flex min-h-11 cursor-pointer items-center gap-1 border-none bg-transparent px-2 text-[13px] font-semibold text-aksi underline-offset-2 hover:underline"
               >
-                Hubungi admin IT
+                Lupa kata sandi?
+                <Ikon
+                  nama="bawah"
+                  ukuran={16}
+                  tebal={2.5}
+                  className={`transition-transform duration-150 motion-reduce:transition-none ${bantuanSandi ? 'rotate-180' : ''}`}
+                />
               </button>
-            </p>
+              {bantuanSandi && (
+                <dl id="bantuan-sandi" className="m-0 flex w-full flex-col gap-3 rounded-2xl bg-latar px-4 py-3.5 text-[13px]">
+                  <div className="flex flex-col gap-0.5">
+                    <dt className="font-semibold text-judul">Pengguna</dt>
+                    <dd className="m-0 text-teks-lembut">
+                      Hubungi admin. Admin membuatkan kata sandi sementara lewat menu Admin, lalu Anda masuk dengan kata sandi itu.
+                    </dd>
+                  </div>
+                  <div className="flex flex-col gap-0.5">
+                    <dt className="font-semibold text-judul">Admin</dt>
+                    <dd className="m-0 text-teks-lembut">
+                      Minta admin lain mereset kata sandi Anda. Kalau tidak ada admin lain, tim IT mengganti kata sandi langsung di
+                      database.
+                    </dd>
+                  </div>
+                </dl>
+              )}
+            </div>
           </form>
 
           {/* Khusus purwarupa: akun contoh supaya demo cepat. */}
@@ -184,7 +212,7 @@ function Masuk() {
                   className="flex min-h-11 cursor-pointer flex-col items-start rounded-xl border border-garis bg-white px-3 py-2 text-left transition-[border-color] duration-150 hover:border-garis-input motion-reduce:transition-none"
                 >
                   <span className="text-[13px] font-semibold text-judul">{a.nama}</span>
-                  <span className="text-[12px] text-teks-lembut">{a.peran === 'admin' ? 'Admin IT' : a.jabatan}</span>
+                  <span className="text-[12px] text-teks-lembut">{a.peran === 'admin' ? 'Admin' : a.jabatan}</span>
                 </button>
               ))}
             </div>

@@ -1,17 +1,24 @@
-// Halaman Admin (hanya admin IT): akun pengguna dan riwayat perubahan.
+// Halaman Admin (hanya admin): akun pengguna dan riwayat perubahan.
 // Admin bisa menambah akun, mereset kata sandi (kata sandi sementara tampil sekali), dan
 // menonaktifkan / mengaktifkan akun. Hapus kontrak permanen, jadi tidak ada tab arsip.
+// Akun yang keluar dinonaktifkan dulu dengan alasan (Hisyam 19 Nov 2026), lalu dilihat lewat filter "Nonaktif"
+// lengkap dengan alasan, kapan, dan oleh siapa. Akun nonaktif boleh dihapus permanen; akun aktif tidak.
+// Riwayat menyimpan nama sebagai teks, jadi jejak "siapa mengubah apa" tetap terbaca setelah akun dihapus.
 
 import { useRef, useState, type KeyboardEvent } from 'react'
 import BarisAkun from '../components/BarisAkun'
+import ChipFilter from '../components/ChipFilter'
 import DialogKonfirmasi from '../components/DialogKonfirmasi'
+import DialogEmailNotifikasi from '../components/DialogEmailNotifikasi'
 import DialogTambahAkun from '../components/DialogTambahAkun'
 import KepalaHalaman from '../components/KepalaHalaman'
 import Ikon from '../components/Ikon'
 import KartuSandiSementara from '../components/KartuSandiSementara'
 import RiwayatKontrak from '../components/RiwayatKontrak'
+import { ALASAN_NONAKTIF } from '../lib/akun'
 import { useData, usePengguna } from '../lib/data'
-import { KELAS_KOTAK, KELAS_TOMBOL_UTAMA, KELAS_WADAH } from '../lib/tataLetak'
+import { useJudulHalaman } from '../lib/judulHalaman'
+import { KELAS_ISIAN, KELAS_KOTAK, KELAS_TOMBOL_UTAMA, KELAS_WADAH } from '../lib/tataLetak'
 import { useToast } from '../lib/toast'
 import type { Akun } from '../types/kontrak'
 
@@ -22,21 +29,41 @@ const DAFTAR_TAB: { id: Tab; label: string }[] = [
   { id: 'riwayat', label: 'Riwayat perubahan' },
 ]
 
+type SaringAkun = 'semua' | 'aktif' | 'nonaktif'
+
+const DAFTAR_SARING: { id: SaringAkun; label: string }[] = [
+  { id: 'semua', label: 'Semua' },
+  { id: 'aktif', label: 'Aktif' },
+  { id: 'nonaktif', label: 'Nonaktif' },
+]
+
 type IsiKartuSandi = { nama: string; email: string; sandi: string; judul: string }
 
 function Admin() {
   const pengguna = usePengguna()
-  const { akun, riwayat, tambahAkun, resetSandi, ubahAktifAkun } = useData()
+  const { akun, riwayat, tambahAkun, resetSandi, ubahAktifAkun, hapusAkun } = useData()
   const tampilkanToast = useToast()
 
   const [tab, setTab] = useState<Tab>('akun')
+  useJudulHalaman(tab === 'akun' ? 'Admin, akun pengguna' : 'Admin, riwayat perubahan')
   const tombolTab = useRef<(HTMLButtonElement | null)[]>([])
   const [dialogTambah, setDialogTambah] = useState(false)
   const [targetReset, setTargetReset] = useState<Akun | null>(null)
   const [targetNonaktif, setTargetNonaktif] = useState<Akun | null>(null)
+  const [targetHapus, setTargetHapus] = useState<Akun | null>(null)
+  const [targetEmail, setTargetEmail] = useState<Akun | null>(null)
   const [kartuSandi, setKartuSandi] = useState<IsiKartuSandi | null>(null)
+  const [saring, setSaring] = useState<SaringAkun>('semua')
+  const [alasanNonaktif, setAlasanNonaktif] = useState('')
+  const [keteranganNonaktif, setKeteranganNonaktif] = useState('')
 
   const jumlahAktif = akun.filter((a) => a.aktif).length
+  const jumlahSaring: Record<SaringAkun, number> = {
+    semua: akun.length,
+    aktif: jumlahAktif,
+    nonaktif: akun.length - jumlahAktif,
+  }
+  const akunTampil = akun.filter((a) => saring === 'semua' || (saring === 'aktif' ? a.aktif : !a.aktif))
 
   /** Tombol panah kiri/kanan untuk berpindah tab (pola tab yang ramah keyboard). */
   function pindahTabDenganPanah(event: KeyboardEvent<HTMLButtonElement>, indeks: number) {
@@ -53,8 +80,8 @@ function Admin() {
         judul={tab === 'akun' ? 'Akun pengguna' : 'Riwayat perubahan'}
         keterangan={
           tab === 'akun'
-            ? `${jumlahAktif} akun aktif dari ${akun.length}. Tambah akun, reset kata sandi, atau nonaktifkan.`
-            : 'Semua tambah, ubah, hapus, tandai selesai, unggah PDF, dan perubahan akun.'
+            ? `${jumlahAktif} dari ${akun.length} akun aktif. Pegawai yang keluar atau pindah dinonaktifkan dulu dengan alasan; setelah itu akunnya bisa dihapus.`
+            : 'Setiap perubahan pada kontrak dan akun: siapa, kapan, dan apa yang diubah.'
         }
         aksi={
           <button type="button" onClick={() => setDialogTambah(true)} className={KELAS_TOMBOL_UTAMA}>
@@ -95,24 +122,48 @@ function Admin() {
 
         <div role="tabpanel" id={`panel-${tab}`} aria-labelledby={`tab-${tab}`} className={`${KELAS_KOTAK} px-5 py-1 md:px-7`}>
           {tab === 'akun' ? (
-            <ul className="m-0 list-none p-0">
-              {akun.map((a) => (
-                <BarisAkun
-                  key={a.id}
-                  akun={a}
-                  diriSendiri={a.id === pengguna.id}
-                  onResetSandi={() => setTargetReset(a)}
-                  onUbahAktif={() => {
-                    if (a.aktif) {
-                      setTargetNonaktif(a)
-                    } else {
-                      ubahAktifAkun(a.id, true)
-                      tampilkanToast(`Akun ${a.nama} aktif lagi.`)
-                    }
-                  }}
-                />
-              ))}
-            </ul>
+            <>
+              <div
+                role="group"
+                aria-label="Saring akun"
+                className="flex flex-wrap gap-x-2 border-b border-garis-lembut py-3"
+              >
+                {DAFTAR_SARING.map((s) => (
+                  <ChipFilter
+                    key={s.id}
+                    label={s.label}
+                    jumlah={jumlahSaring[s.id]}
+                    aktif={saring === s.id}
+                    onPilih={() => setSaring(s.id)}
+                  />
+                ))}
+              </div>
+              {akunTampil.length === 0 && (
+                <p className="m-0 py-6 text-teks-lembut">Tidak ada akun {saring === 'aktif' ? 'aktif' : 'nonaktif'}.</p>
+              )}
+              <ul className="m-0 list-none p-0">
+                {akunTampil.map((a) => (
+                  <BarisAkun
+                    key={a.id}
+                    akun={a}
+                    diriSendiri={a.id === pengguna.id}
+                    onResetSandi={() => setTargetReset(a)}
+                    onHapus={() => setTargetHapus(a)}
+                    onAturEmail={() => setTargetEmail(a)}
+                    onUbahAktif={() => {
+                      if (a.aktif) {
+                        setAlasanNonaktif('')
+                        setKeteranganNonaktif('')
+                        setTargetNonaktif(a)
+                      } else {
+                        ubahAktifAkun(a.id, true)
+                        tampilkanToast(`Akun ${a.nama} aktif lagi.`)
+                      }
+                    }}
+                  />
+                ))}
+              </ul>
+            </>
           ) : (
             <div className="pt-6">
               <RiwayatKontrak daftar={riwayat} />
@@ -121,6 +172,11 @@ function Admin() {
         </div>
       </main>
 
+      <DialogEmailNotifikasi
+        akun={targetEmail}
+        diriSendiri={targetEmail?.id === pengguna.id}
+        onTutup={() => setTargetEmail(null)}
+      />
       <DialogTambahAkun
         terbuka={dialogTambah}
         onBatal={() => setDialogTambah(false)}
@@ -156,14 +212,76 @@ function Admin() {
         }
         labelKonfirmasi="Nonaktifkan"
         bahaya
+        konfirmasiNonaktif={!alasanNonaktif}
         onKonfirmasi={() => {
-          if (targetNonaktif) {
-            ubahAktifAkun(targetNonaktif.id, false)
+          if (targetNonaktif && alasanNonaktif) {
+            ubahAktifAkun(targetNonaktif.id, false, { alasan: alasanNonaktif, keterangan: keteranganNonaktif.trim() })
             tampilkanToast(`Akun ${targetNonaktif.nama} dinonaktifkan.`)
           }
           setTargetNonaktif(null)
         }}
         onBatal={() => setTargetNonaktif(null)}
+      >
+        {/* Alasan wajib, supaya admin lain tahu kenapa akun ini keluar (filter Nonaktif dan riwayat). */}
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="isian-alasan-nonaktif" className="text-[13px] font-semibold text-judul">
+            Alasan <span className="text-hapus-teks">*</span>
+          </label>
+          <select
+            id="isian-alasan-nonaktif"
+            aria-describedby={alasanNonaktif ? undefined : 'petunjuk-alasan-nonaktif'}
+            value={alasanNonaktif}
+            onChange={(e) => setAlasanNonaktif(e.target.value)}
+            className={`${KELAS_ISIAN} h-12`}
+          >
+            <option value="" disabled>
+              Pilih alasan
+            </option>
+            {ALASAN_NONAKTIF.map((a) => (
+              <option key={a} value={a}>
+                {a}
+              </option>
+            ))}
+          </select>
+          {/* Tombol Nonaktifkan mati sampai alasan dipilih; petunjuk ini menjelaskan kenapa (impeccable clarify). */}
+          {!alasanNonaktif && (
+            <span id="petunjuk-alasan-nonaktif" className="text-[12px] text-teks-lembut">
+              Pilih alasan untuk melanjutkan.
+            </span>
+          )}
+        </div>
+        <div className="mt-3 flex flex-col gap-1.5">
+          <label htmlFor="isian-keterangan-nonaktif" className="text-[13px] font-semibold text-judul">
+            Keterangan
+          </label>
+          <textarea
+            id="isian-keterangan-nonaktif"
+            rows={2}
+            value={keteranganNonaktif}
+            onChange={(e) => setKeteranganNonaktif(e.target.value)}
+            className={`${KELAS_ISIAN} py-2.5`}
+          />
+        </div>
+      </DialogKonfirmasi>
+
+      <DialogKonfirmasi
+        terbuka={targetHapus !== null}
+        judul="Hapus akun ini?"
+        pesan={
+          targetHapus
+            ? `Akun ${targetHapus.nama} (${targetHapus.email}) dihapus permanen dan tidak bisa dipulihkan. Kalau orang ini kembali, buat akun baru. Nama ${targetHapus.nama} di riwayat perubahan tetap tercatat.`
+            : ''
+        }
+        labelKonfirmasi="Hapus permanen"
+        bahaya
+        onKonfirmasi={() => {
+          if (targetHapus) {
+            hapusAkun(targetHapus.id)
+            tampilkanToast(`Akun ${targetHapus.nama} dihapus.`)
+          }
+          setTargetHapus(null)
+        }}
+        onBatal={() => setTargetHapus(null)}
       />
 
       <KartuSandiSementara isi={kartuSandi} onTutup={() => setKartuSandi(null)} />

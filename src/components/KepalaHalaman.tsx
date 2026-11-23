@@ -2,7 +2,7 @@
 // Beranda menggambar judul tengahnya sendiri, jadi `judul` boleh kosong.
 // Latar mozaik digambar oleh TataLetakWebsite, jadi tampil di semua halaman.
 
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { KELAS_WADAH } from '../lib/tataLetak'
 import NavAtas from './NavAtas'
 
@@ -17,17 +17,27 @@ type Props = {
 }
 
 function KepalaHalaman({ judul, keterangan, atas, aksi }: Props) {
+  // Setelah halaman di-scroll, celah di sekitar navigasi diberi latar halaman, supaya isi halaman yang lewat
+  // di belakangnya tidak menyembul di atas pil navigasi. Di posisi paling atas tetap transparan (mozaik terlihat).
+  const [tergulir, setTergulir] = useState(false)
+  useEffect(() => {
+    const periksa = () => setTergulir(window.scrollY > 4)
+    periksa()
+    window.addEventListener('scroll', periksa, { passive: true })
+    return () => window.removeEventListener('scroll', periksa)
+  }, [])
+
   return (
     <>
       {/* Navigasi ikut turun saat halaman di-scroll (sticky). Sengaja di luar <header>
           supaya tidak terbatas tinggi header. */}
-      <div className={`${KELAS_WADAH} sticky top-0 z-30 pt-3 md:pt-4`}>
+      <div className={`${KELAS_WADAH} sticky top-0 z-30 pt-3 md:pt-4 ${tergulir ? 'bg-latar' : ''}`}>
         <NavAtas />
       </div>
 
       {judul && (
         <header
-          className={`${KELAS_WADAH} relative flex flex-none flex-col gap-4 pt-7 pb-5 md:flex-row md:items-end md:justify-between md:pt-10 md:pb-6`}
+          className={`${KELAS_WADAH} relative flex flex-none flex-col gap-4 pt-7 pb-5 md:flex-row md:items-end md:justify-between md:pt-21 md:pb-6`}
         >
           <div className="flex min-w-0 flex-col gap-1.5">
             {atas}

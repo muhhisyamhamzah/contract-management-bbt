@@ -39,13 +39,11 @@ function IsianForm({ id, label, wajib = false, petunjuk, galat, children, classN
     <div className={`flex min-w-0 flex-col gap-1.5 ${className}`}>
       <label htmlFor={id} className="text-[13px] font-semibold text-judul">
         {label}
-        {wajib ? (
+        {wajib && (
           <span className="text-hapus-teks" aria-hidden="true">
             {' '}
             *
           </span>
-        ) : (
-          <span className="font-normal text-teks-lembut"> (opsional)</span>
         )}
       </label>
       {children({ id, 'aria-invalid': Boolean(galat), 'aria-describedby': keterangan, 'aria-required': wajib || undefined })}

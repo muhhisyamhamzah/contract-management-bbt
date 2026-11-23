@@ -2,7 +2,7 @@
 
 /*
   Arah desain "Kavling" (lihat DESIGN.md dan design-system/contract-management-bbt/MASTER.md):
-  latar hampir putih, navigasi pil putih yang melayang, mozaik kotak warna BBT hanya di Beranda dan Masuk,
+  latar hampir putih, navigasi pil putih yang melayang, mozaik kotak warna BBT di bagian atas semua halaman,
   judul sans tebal dengan satu kata penekanan serif miring. Navy untuk judul dan tombol, emas dan tanah hanya aksen.
   Palet warna dan bayangan aplikasi: navy dan emas, dengan warna logo BBT sebagai aksen.
   Warna utama sengaja BUKAN hijau/teal supaya berbeda dari aplikasi Sismon.
@@ -17,7 +17,6 @@
 
   /* Warna utama: navy */
   --color-galaxy-900: #13254F;    /* navy tua: awal gradasi header, tombol + */
-  --color-galaxy-700: #2B4C9B;    /* navy: akhir gradasi header */
   --color-judul: #13254F;         /* sama dengan navy tua: judul bergaya kop (14,9:1 di putih) */
   --color-aksi: #2B4C9B;          /* tombol utama, tautan, menu aktif */
   --color-aksi-tua: #13254F;      /* teks di kotak biru muda, hover tautan */
@@ -52,16 +51,49 @@
   --color-hapus-latar: #FBE6E8;
   --color-hapus-teks: #9F2430;
 
-  /* Biru muda di tengah mozaik kavling (Beranda dan Masuk), di antara navy dan emas. Hanya untuk mozaik. */
+  /* Biru muda di tengah mozaik kavling, di antara navy dan emas. Hanya untuk mozaik. */
   --color-mozaik-biru: #8FA8E8;
 
   /* Warna logo BBT. Dipakai kecil (ikon status, aksen), bukan sebagai warna utama. */
-  --color-logo-hijau: #1C8B4C;
   --color-logo-emas: #F2B829;
   --color-logo-tanah: #E07B2C;
 
-  /* Kotak mozaik muncul berurutan saat Beranda/Masuk dibuka (dipakai dengan motion-safe:). Tanpa memantul. */
+  /* Mozaik: kotak muncul berurutan saat halaman dibuka (meletup, tanpa memantul), lalu setiap 9 detik ada
+     "gelombang" yang mengulang efek itu dari kiri atas (Hisyam 18 Nov 2026). Hanya transform dan opacity.
+     Optimasi 19 Nov 2026: gelombang tidak lagi berupa animasi 9 detik tanpa henti (yang membuat browser menghitung
+     ulang 160 kotak setiap frame walau kotaknya diam). Sekarang Mozaik.tsx memicu satu gelombang sekali jalan
+     (1,1 detik per kotak) lewat pengatur waktu, dan hanya 5 baris teratas yang ikut. Di antara gelombang tidak ada
+     animasi yang berjalan. Dua nama (a/b) dipakai bergantian supaya browser mengulang animasinya.
+     Aturan lain tetap: bisa dimatikan lewat "Animasi latar" di menu akun (WCAG 2.2.2), halaman Masuk 3 gelombang
+     lalu diam, dan mati total saat mode kurangi gerak (motion-safe:). */
   --animate-meletup: meletup 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+  --animate-gelombang-a: gelombang-a 1.1s ease-in-out both;
+  --animate-gelombang-b: gelombang-b 1.1s ease-in-out both;
+
+  /* Satu gelombang: meredup dan mengecil sebentar, lalu kembali. Isi a dan b sama persis. */
+  @keyframes gelombang-a {
+    0%,
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    42% {
+      opacity: 0.25;
+      transform: translateY(6px) scale(0.9);
+    }
+  }
+
+  @keyframes gelombang-b {
+    0%,
+    100% {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    42% {
+      opacity: 0.25;
+      transform: translateY(6px) scale(0.9);
+    }
+  }
 
   @keyframes meletup {
     0% {
@@ -92,6 +124,13 @@
     font-size: 14px;
     /* Referensi memakai jarak baris bawaan browser, bukan 1.5 bawaan Tailwind. */
     line-height: normal;
+    /* Teks panjang tanpa spasi dari pengguna (nama file, nomor PKS, alamat web di ketentuan) dipatah kalau tidak
+       muat, supaya halaman tidak melebar ke samping (impeccable harden, 19 Nov 2026: nama file panjang di riwayat
+       membuat Detail di HP melebar sampai 1014px).
+       break-word, BUKAN anywhere (impeccable polish): anywhere ikut memperkecil lebar minimum elemen, sehingga pil
+       dan sel tabel menyempit dan memotong kata biasa ("Nonak-tif", "adendu-m"). break-word hanya mematah kata
+       yang memang tidak muat di barisnya. */
+    overflow-wrap: break-word;
   }
 
   /* Tailwind menghapus huruf tebal bawaan judul; referensi mengandalkannya. */
@@ -116,6 +155,11 @@
   a,
   button {
     -webkit-tap-highlight-color: transparent;
+  }
+
+  /* Judul yang menerima fokus dari "Lewati ke konten" bukan kontrol, jadi tanpa garis fokus. */
+  h1[tabindex='-1']:focus {
+    outline: none;
   }
 
   ::selection {

@@ -1,5 +1,5 @@
 // Rekap jumlah kontrak per status di Beranda, berupa pil yang bisa diklik (arah "Kavling", DESIGN.md).
-// Setiap pil membuka halaman Rekap yang sudah difilter, misalnya /rekap?status=lewat.
+// Setiap pil membuka daftar Kontrak yang sudah difilter, misalnya /kontrak?status=lewat.
 
 import { Link } from 'react-router-dom'
 import { TAMPILAN_STATUS } from '../lib/status'
@@ -10,15 +10,26 @@ const URUTAN: StatusKontrak[] = ['lewat', 'segera', 'berjalan', 'selesai']
 
 type Props = {
   jumlah: Record<StatusKontrak, number>
+  /** Jumlah semua kontrak (Hisyam 19 Nov 2026), tampil paling depan dan membuka daftar tanpa filter. */
+  total: number
 }
 
-function RingkasanStatus({ jumlah }: Props) {
+function RingkasanStatus({ jumlah, total }: Props) {
   return (
     <ul aria-label="Jumlah kontrak per status" className="m-0 flex list-none flex-wrap justify-center gap-2 p-0">
+      <li>
+        <Link
+          to="/kontrak"
+          className="flex min-h-11 items-center gap-2 rounded-full border border-galaxy-900 bg-white px-4 text-[14px] font-semibold text-judul no-underline transition-[background-color] duration-150 hover:bg-lembut hover:text-judul motion-reduce:transition-none"
+        >
+          <span className="text-[16px] font-bold">{total}</span>
+          Total kontrak
+        </Link>
+      </li>
       {URUTAN.map((status) => (
         <li key={status}>
           <Link
-            to={`/rekap?status=${status}`}
+            to={`/kontrak?status=${status}`}
             className="flex min-h-11 items-center gap-2 rounded-full border border-garis bg-white px-4 text-[14px] text-teks no-underline transition-[border-color] duration-150 hover:border-garis-input hover:text-teks motion-reduce:transition-none"
           >
             <span aria-hidden="true" className={`size-2.5 rounded-[3px] ${TAMPILAN_STATUS[status].kelasBar}`} />

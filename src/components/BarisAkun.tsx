@@ -1,6 +1,9 @@
 // Satu baris di daftar akun (halaman Admin): inisial, nama, jabatan, email, status, Reset sandi, dan menu.
+// Akun nonaktif menampilkan kapan, oleh siapa, dan alasannya dinonaktifkan (Hisyam 19 Nov 2026).
+// Menu akun nonaktif: Aktifkan akun atau Hapus akun (permanen). Akun aktif harus dinonaktifkan dulu.
 
-import { inisial } from '../lib/format'
+import { alamatPengingat } from '../lib/akun'
+import { formatWaktu, inisial } from '../lib/format'
 import type { Akun } from '../types/kontrak'
 import MenuDropdown from './MenuDropdown'
 import Ikon from './Ikon'
@@ -11,9 +14,12 @@ type Props = {
   diriSendiri: boolean
   onResetSandi: () => void
   onUbahAktif: () => void
+  /** Hanya dipanggil untuk akun nonaktif. */
+  onHapus: () => void
+  onAturEmail: () => void
 }
 
-function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
+function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif, onHapus, onAturEmail }: Props) {
   const admin = akun.peran === 'admin'
 
   return (
@@ -33,6 +39,25 @@ function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
         </span>
         <span className="text-[13px] text-teks-lembut">{akun.jabatan}</span>
         <span className="text-[13px] break-all text-teks-lembut">{akun.email}</span>
+        {akun.aktif && (
+          <span className="flex items-start gap-1.5 text-[13px] text-teks-lembut">
+            <Ikon nama="email" ukuran={14} className="mt-0.5 flex-none" />
+            <span className="break-all">
+              Pengingat ke {akun.emailNotifikasi ? alamatPengingat(akun) : 'email kantor'}
+            </span>
+          </span>
+        )}
+        {!akun.aktif && akun.nonaktif && (
+          <span className="mt-1.5 flex flex-col gap-0.5 rounded-xl bg-latar px-3 py-2 text-[13px]">
+            <span className="text-teks">
+              <span className="font-semibold text-judul">Alasan:</span> {akun.nonaktif.alasan}
+              {akun.nonaktif.keterangan && <> ({akun.nonaktif.keterangan})</>}
+            </span>
+            <span className="text-teks-lembut">
+              Dinonaktifkan {formatWaktu(akun.nonaktif.waktu)} oleh {akun.nonaktif.oleh}
+            </span>
+          </span>
+        )}
       </span>
 
       <span className="flex flex-none items-center gap-2 max-sm:w-full max-sm:pl-15">
@@ -52,19 +77,25 @@ function BarisAkun({ akun, diriSendiri, onResetSandi, onUbahAktif }: Props) {
           <Ikon nama="kunci" ukuran={15} />
           Reset sandi<span className="sr-only"> {akun.nama}</span>
         </button>
-        {!diriSendiri && (
-          <MenuDropdown
+        <MenuDropdown
             labelTombol={`Menu akun ${akun.nama}`}
             isiTombol={<Ikon nama="titikTiga" ukuran={20} />}
             kelasTombol="flex size-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut hover:bg-latar hover:text-judul"
             lebar={200}
-            item={[
-              akun.aktif
-                ? { label: 'Nonaktifkan akun', bahaya: true, onPilih: onUbahAktif }
-                : { label: 'Aktifkan akun', onPilih: onUbahAktif },
-            ]}
+            item={
+              diriSendiri
+                ? [{ label: 'Atur email pengingat', onPilih: onAturEmail }]
+                : akun.aktif
+                ? [
+                    { label: 'Atur email pengingat', onPilih: onAturEmail },
+                    { label: 'Nonaktifkan akun', bahaya: true, onPilih: onUbahAktif },
+                  ]
+                : [
+                    { label: 'Aktifkan akun', onPilih: onUbahAktif },
+                    { label: 'Hapus akun', bahaya: true, onPilih: onHapus },
+                  ]
+            }
           />
-        )}
       </span>
     </li>
   )

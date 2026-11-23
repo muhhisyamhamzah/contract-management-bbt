@@ -1,9 +1,9 @@
-// Menyusun daftar notifikasi (panel lonceng) dari jadwal pengingat kontrak dan critical point.
+// Menyusun daftar notifikasi (panel lonceng) dari jadwal pengingat kontrak.
 // Belum ada backend: notifikasi dihitung dari data, bukan dikirim server.
 
 import type { Kontrak, Notifikasi } from '../types/kontrak'
 import { formatTanggal } from './format'
-import { hitungSisaHari, hitungStatus, jadwalPengingat, LABEL_CRITICAL_POINT } from './status'
+import { hitungSisaHari, hitungStatus, jadwalPengingat } from './status'
 
 /** Berapa hari ke belakang notifikasi masih ditampilkan di panel. */
 const BATAS_HARI_NOTIFIKASI = 120
@@ -12,48 +12,40 @@ const BATAS_HARI_NOTIFIKASI = 120
 export function susunNotifikasi(daftar: Kontrak[], hariIni: Date = new Date()): Notifikasi[] {
   const hasil: Notifikasi[] = []
 
+  // Satu notifikasi per kontrak, yaitu tahap terbaru (18 Nov 2026). Pengingat 3 bulan sudah tidak berarti
+  // kalau pengingat 1 bulan sudah keluar, jadi tidak ikut ditumpuk. Angka di lonceng pun sama dengan
+  // jumlah kontrak yang perlu diurus, bukan jumlah semua pengingat yang pernah dikirim.
+  // Id tetap per tahap, jadi tahap baru muncul lagi sebagai "belum dibaca".
   for (const kontrak of daftar) {
     if (hitungStatus(kontrak, hariIni) === 'selesai') continue
-
-    // Pengingat bertahap 3, 2, 1 bulan sebelum habis.
-    for (const tahap of jadwalPengingat(kontrak.tanggalBerakhir, hariIni)) {
-      if (!tahap.terkirim) continue
-      hasil.push({
-        id: `${kontrak.id}-tahap-${tahap.bulan}`,
-        judul: `Pengingat ${tahap.bulan} bulan`,
-        isi: `"${kontrak.nama}" habis ${formatTanggal(kontrak.tanggalBerakhir)}.`,
-        tanggal: tahap.tanggal,
-        kontrakId: kontrak.id,
-        jenis: 'pengingat',
-      })
-    }
 
     // Kontrak yang sudah lewat tapi belum ditutup.
     if (hitungSisaHari(kontrak.tanggalBerakhir, hariIni) < 0) {
       hasil.push({
-        id: `${kontrak.id}-lewat`,
+        id: `${kontrak.id}-lewat-${kontrak.tanggalBerakhir}`,
         judul: 'Kontrak sudah lewat',
         isi: `"${kontrak.nama}" belum diperpanjang atau ditandai selesai.`,
         tanggal: kontrak.tanggalBerakhir,
         kontrakId: kontrak.id,
         jenis: 'lewat',
       })
+      continue
     }
 
-    // Critical point yang punya tanggal penting: jadwalnya sama dengan kontrak.
-    for (const butir of kontrak.criticalPoint) {
-      if (butir.status === 'selesai' || !butir.tanggalPenting) continue
-      for (const tahap of jadwalPengingat(butir.tanggalPenting, hariIni)) {
-        if (!tahap.terkirim) continue
-        hasil.push({
-          id: `${butir.id}-tahap-${tahap.bulan}`,
-          judul: `Critical point: ${LABEL_CRITICAL_POINT[butir.jenis]}`,
-          isi: `${butir.pasal} "${kontrak.nama}" jatuh pada ${formatTanggal(butir.tanggalPenting)}.`,
-          tanggal: tahap.tanggal,
-          kontrakId: kontrak.id,
-          jenis: 'critical',
-        })
-      }
+    // Pengingat bertahap 3, 2, 1 bulan sebelum habis: ambil tahap terakhir yang sudah terkirim.
+    const terbaru = jadwalPengingat(kontrak.tanggalBerakhir, hariIni)
+      .filter((tahap) => tahap.terkirim)
+      .at(-1)
+    if (terbaru) {
+      hasil.push({
+        // Tanggal akhir ikut di id: setelah adendum, pengingat jadwal baru dihitung sebagai notifikasi baru.
+        id: `${kontrak.id}-tahap-${terbaru.bulan}-${kontrak.tanggalBerakhir}`,
+        judul: `Pengingat ${terbaru.bulan} bulan`,
+        isi: `"${kontrak.nama}" habis ${formatTanggal(kontrak.tanggalBerakhir)}.`,
+        tanggal: terbaru.tanggal,
+        kontrakId: kontrak.id,
+        jenis: 'pengingat',
+      })
     }
   }
 

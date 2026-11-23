@@ -15,7 +15,7 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 
 - Kolom Jenis kontrak, Unit pemilik, dan pilihan pengingat per kontrak DIHAPUS.
 - Pengingat 3, 2, 1 bulan dihitung per bulan kalender (bukan per 30 hari).
-- Halaman Profil diganti menu akun di navigasi atas.
+- Halaman Profil diganti menu akun di navigasi atas. (Dibatalkan 21 Nov 2026: Profil kembali ada, lihat di bawah.)
 - Hapus kontrak langsung permanen, tanpa arsip. Penghapusan tetap dicatat di riwayat perubahan.
 - Logo BBT menjadi merek utama di navigasi atas (menggantikan ikon dokumen emas di desain v4). Layar pembuka dihapus.
 - Arah visual "Kavling" dipilih (Hisyam, 17 Nov 2026), dari referensi gaya Hisyam. Acuan: `DESIGN.md` dan
@@ -23,11 +23,55 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 - Font: Public Sans (isi dan judul) + Source Serif 4 miring untuk SATU kata penekanan per judul.
   Menggantikan Plus Jakarta Sans.
 
+## Keputusan tambahan (Hisyam, 18 Nov 2026)
+
+- Critical point DIHAPUS (halaman, butir, dan pengingatnya). Diganti "Ketentuan kontrak": 4 kolom teks tetap
+  (Pengakhiran kontrak, Denda, Jaminan kontrak, Keterangan), semuanya boleh kosong.
+- Kolom Monitoring, Catatan, dan Keterangan lama DIHAPUS (Keterangan pindah ke Ketentuan kontrak).
+- Kolom baru "Perpanjangan kontrak" (Belum diproses / Sedang diproses / Sudah diperpanjang / Tidak diperpanjang),
+  hanya di form ubah, paling atas, berupa pilihan ke bawah. Status adendum yang tampil dihitung dari isian ini.
+- Perpanjangan lewat adendum dicatat di kontrak yang sama (BUKAN kontrak baru) lewat halaman Catat adendum.
+- Semua jenis file boleh diunggah (bukan hanya PDF). Sebutan "File PKS", bukan "PDF PKS". PKS lama tetap tersimpan.
+- Menu Rekap dan Ubah data digabung ke Kontrak. Navigasi: Beranda, Kontrak, Admin.
+- Peran ditulis "Admin" (bukan "Admin IT") di semua tampilan dan flowchart. Tim IT tetap pemegang peran ini.
+- (19 Nov 2026) Akun yang keluar dinonaktifkan dulu; hanya akun NONAKTIF yang boleh dihapus permanen (dengan
+  konfirmasi, dicatat di riwayat). Riwayat menyimpan nama sebagai teks, jadi tetap terbaca. Menonaktifkan wajib
+  memilih alasan (`ALASAN_NONAKTIF` di `src/lib/akun.ts`, [ASUMSI] daftar usulan) + keterangan. Akun yang keluar
+  dilihat di Admin, filter "Nonaktif", dengan alasan, waktu, dan siapa yang menonaktifkan.
+- (19 Nov 2026) Beranda menampilkan pil "Total kontrak" di depan pil status.
+- Mozaik kavling tampil di semua halaman dan bergerak (gelombang setiap 9 detik, 3 kali, lalu diam).
+- Tanpa placeholder contoh dan tanpa tulisan "(opsional)" di form.
+
+## Keputusan tambahan (atasan lewat Hisyam, 20 Nov 2026)
+
+- Data per versi dokumen: setiap PKS dan adendum menyimpan data kontrak saat dokumen itu berlaku (`Dokumen.versi`,
+  `src/lib/versiKontrak.ts`). Membuka dokumen lama di Detail menampilkan dua sisi, "Saat <dokumen>" dan "Terbaru",
+  untuk Data kontrak dan Ketentuan kontrak (`TabelBanding`), dan Riwayat dibagi "Sampai <dokumen> berlaku" /
+  "Sesudahnya". BAST dan dokumen lain mengikuti versi yang berlaku pada tanggal unggahnya.
+  Versi dicatat saat Catat adendum, unggah PKS/adendum di Detail, dan ganti PKS di form ubah.
+- Unduh Excel (.xlsx) tanpa library: tombol "Unduh Excel" di halaman Kontrak dan menu ⋮ Detail. Pilihan: kontrak ini
+  (dari Detail), semua kontrak, atau pilih sendiri (centang). Lembar "Kontrak" (dengan total nilai lewat rumus SUM) dan
+  "Dokumen". Kode: `src/lib/excel.ts` (format file), `src/lib/rekapExcel.ts` (isi). [ASUMSI] Susunan kolom sementara,
+  diganti mengikuti template Excel atasan.
+- Pengingat juga dikirim ke email. Masuk tetap dengan email kantor; tiap akun boleh punya "Email pengingat" pribadi
+  (Gmail, `Akun.emailNotifikasi`), kosong = email kantor. Diatur pemilik akun (menu akun) atau admin (Tambah akun,
+  menu ⋮ di daftar akun); perubahan dicatat di riwayat. Langsung aktif TANPA izin (beda dengan Web Push).
+  Purwarupa hanya menyimpan alamat; pengiriman dibuat di backend (layanan email/SMTP belum dipilih).
+
+## Keputusan tambahan (Hisyam, 21 Nov 2026)
+
+- Halaman Profil KEMBALI ADA (`/profil`, `src/pages/Profil.tsx`), isinya meniru Profil Sismon: kepala identitas,
+  Data diri (nama dan jabatan bisa diubah sendiri; email kantor dan peran hanya oleh admin), Keamanan akun
+  (kata sandi saat ini, kata sandi baru minimal 8 karakter `MIN_PANJANG_SANDI`, ulangi), Email pengingat, dan Keluar.
+  Dibuka dari menu akun ("Profil dan kata sandi"); menu akun tetap ada. Ubah profil dan ganti sandi dicatat di riwayat.
+- "Lihat contoh email" di Profil menampilkan email pengingat yang akan diterima (tujuan, subjek, daftar kontrak
+  sama dengan lonceng). Purwarupa tidak mengirim email.
+
 ## Ruang lingkup
 
 - HANYA contract management. Jangan menambah fitur General Affair (kendaraan, ruang meeting, ATK, inventaris).
 - Alur persetujuan (workflow) DITUNDA. Jangan dibuat, tapi jaga struktur status supaya bisa ditambah nanti.
-- Data diisi manual. Tidak ada fitur membaca PDF otomatis.
+- Data diisi manual. Tidak ada fitur membaca isi file PKS otomatis.
 - Data contoh selalu fiktif dan memakai kata "Contoh". JANGAN memakai isi PKS asli
   (nama penyedia, nomor, pasal) di data contoh, repo, atau screenshot.
 
@@ -36,17 +80,19 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 - Dua peran: `pengguna` dan `admin`.
 - `pengguna` (tim pengadaan, kepala divisi umum): melihat, menambah, mengubah, menghapus SEMUA kontrak,
   dan menerima pengingat. Tidak ada pembatasan per bagian.
-- `admin` (tim IT): semua hak pengguna, ditambah kelola akun (tambah, nonaktifkan, reset kata sandi)
+- `admin` (tim IT): semua hak pengguna, ditambah kelola akun (tambah, nonaktifkan, hapus akun nonaktif, reset kata sandi)
   dan melihat riwayat perubahan.
 - Login wajib: email kantor + kata sandi, dengan pembatasan percobaan masuk (pola Sismon).
   Tidak ada "lupa kata sandi" otomatis: admin membuat kata sandi sementara.
+  Admin yang lupa kata sandi (Hisyam 18 Nov 2026): direset admin lain; kalau tidak ada admin lain,
+  tim IT mengganti kata sandi langsung di database. Halaman Masuk menjelaskan kedua jalan ini di panel "Lupa kata sandi?".
 
 ## Stack
 
 - Frontend: React + Vite + TypeScript, Tailwind CSS v4 lewat `@tailwindcss/vite` (tanpa `tailwind.config`),
   `react-router-dom`.
 - Backend (belum dibuat, pola Sismon): FastAPI + SQLAlchemy + Alembic + PostgreSQL (Neon).
-- File PDF: Cloudflare R2, akses lewat tautan bertanda tangan.
+- File kontrak (PKS, adendum, BAST): Cloudflare R2, akses lewat tautan bertanda tangan.
 - Login: JWT + pembatasan percobaan masuk. Notifikasi: di dalam website + Web Push.
 - Riwayat perubahan: tabel log audit.
 - Jangan menambah library baru tanpa bertanya dulu.
@@ -62,8 +108,15 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
   ikon garis dari `src/components/Ikon.tsx`, satu tombol utama per layar.
 - TIDAK ADA sidebar. Navigasi berupa pil putih yang melayang di atas, di semua halaman
   (logo di kiri, menu, lonceng, akun, tombol Tambah kontrak). Header navy bergelombang DIHAPUS.
-- Mozaik kavling (kotak warna BBT yang memudar ke putih) dan judul besar rata tengah HANYA di Beranda dan Masuk.
-  Halaman kerja memakai judul rata kiri dan panel padat.
+- Mozaik kavling (kotak warna BBT yang memudar ke putih) tampil di atas semua halaman (18 Nov 2026), dengan
+  gelombang setiap 9 detik. Setelah masuk gelombang terus, bisa dimatikan lewat sakelar "Animasi latar" di menu akun
+  (WCAG 2.2.2); halaman Masuk 3 gelombang lalu diam; mati saat mode kurangi gerak.
+  Gelombang dipicu pengatur waktu di `src/components/Mozaik.tsx` (sekali jalan, 5 baris teratas, berhenti saat tab
+  tidak dilihat), BUKAN animasi CSS tanpa henti: yang terakhir membebani browser ±10% terus-menerus (diukur 19 Nov 2026).
+  Warna kotak di belakang teks dibatasi per warna (`PUTIH_MINIMAL` di `src/components/Mozaik.tsx`) supaya teks
+  tetap minimal 4,5:1. Di desktop mozaik turun 20px, jadi judul halaman mulai di `md:pt-21` (Beranda `md:pt-28`)
+  dan tidak pernah berada di atas baris kotak pekat.
+  Judul besar rata tengah HANYA di Beranda dan Masuk. Halaman kerja memakai judul rata kiri dan panel padat.
 - Larangan "ciri AI" (lingkaran blur, kaca buram, gradasi, emoji, eyebrow, kartu berbayangan seragam, dll.):
   lihat `DESIGN.md` bagian Do's and Don'ts.
 - Logo BBT (`/logo-bbt.png`) adalah merek utama di navigasi atas dan di halaman Masuk.
@@ -91,12 +144,12 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 - Judul `h1`–`h3` sudah tebal (700) dari `src/index.css`; `h1` dan `h2` berjarak huruf rapat (-0.02em).
 - Warna, bayangan, dan animasi didaftarkan di `src/index.css` lewat `@theme`. Pakai class dari token itu,
   JANGAN menulis kode hex di komponen. Warna baru ditambahkan sebagai token dengan nama yang jelas.
-  - `galaxy-900`, `galaxy-700`: navy tua dan navy (tombol utama, judul, mozaik)
+  - `galaxy-900`: navy tua (tombol utama, judul, mozaik). `galaxy-700` dihapus 19 Nov 2026 (tidak terpakai)
   - `judul`, `teks`, `teks-lembut`: warna teks
   - `aksi`, `aksi-tua`: tombol, tautan, menu aktif
   - `lembut`, `latar`: sorotan dan latar; `mozaik-biru`: HANYA warna tengah mozaik
   - `garis`: pembatas dekoratif; `garis-input`: tepi kotak isian (minimal 3:1 terhadap latarnya); `garis-lembut`: pembatas baris
-  - `logo-hijau`, `logo-emas`, `logo-tanah`: HANYA aksen kecil
+  - `logo-emas`, `logo-tanah`: HANYA aksen kecil. `logo-hijau` dihapus 19 Nov 2026 (tidak terpakai; tambahkan lagi kalau perlu)
   - `berjalan`, `segera`, `lewat`, `selesai` + `<status>-latar` / `<status>-teks`: warna status.
     Jangan pakai opacity seperti `bg-segera/15`.
   - `hapus`, `hapus-latar`, `hapus-teks`: HANYA aksi menghapus dan pesan kesalahan
@@ -121,17 +174,21 @@ Kolom [DIKONFIRMASI] dari atasan. Semua definisi tipe ada di `src/types/kontrak.
 | Awal kontrak | wajib |
 | Akhir kontrak | wajib, harus setelah awal kontrak |
 | Periode | [ASUMSI] dihitung dari awal dan akhir, tidak diisi |
-| Nilai kontrak | wajib, rupiah angka bulat. [ASUMSI] nominal = nilai |
-| Critical point | 0 sampai banyak butir, lihat di bawah |
-| Monitoring, Catatan, Keterangan | teks. [TERBUKA] artinya belum jelas, jangan diberi aturan khusus |
+| Nilai kontrak | wajib, rupiah angka bulat, paling banyak 15 digit (`MAKS_DIGIT_NILAI`, sampai Rp 999 triliun). [ASUMSI] nominal = nilai |
+| Ketentuan kontrak | 4 kolom teks: Pengakhiran kontrak, Denda, Jaminan kontrak, Keterangan. Boleh kosong |
+| Perpanjangan kontrak | Belum diproses / Sedang diproses / Sudah diperpanjang / Tidak diperpanjang. Kontrak baru selalu Belum diproses |
 
 - Tidak ada kolom Jenis kontrak, Unit pemilik, atau pilihan pengingat per kontrak.
-- [TERBUKA] Termin pembayaran: tunggu arti kolom Monitoring dari atasan. Jangan ditambah ke tipe atau form baru.
-- Setiap kontrak wajib punya file PDF PKS. Dokumen tambahan (adendum, BAST) boleh menyusul.
-  [ASUMSI] Hanya PDF, maksimal 10 MB per file.
-- Critical point = klausul berisiko di PKS (terutama pengakhiran kontrak dan denda). Tiap butir:
-  jenis (Pengakhiran kontrak / Denda / Lainnya), rujukan pasal, ringkasan, tanggal penting (opsional),
-  status (Aktif / Selesai), keterangan penanganan saat ditandai selesai.
+- [TERBUKA] Termin pembayaran. Jangan ditambah ke tipe atau form sebelum ada keputusan atasan.
+- Setiap kontrak wajib punya file PKS (semua jenis file). Dokumen tambahan (adendum, BAST) boleh menyusul.
+  Dokumen ditampilkan bernomor dari yang paling lama. [ASUMSI] Belum ada batas ukuran di layar; backend perlu batasnya.
+- Status adendum (`STATUS_PERPANJANGAN` di `src/lib/status.ts`): Belum diproses → "Menunggu keputusan" [ASUMSI],
+  Sedang diproses → "Proses melakukan adendum", Sudah diperpanjang → "Sudah dilakukan adendum",
+  Tidak diperpanjang → "Tidak diperpanjang". Di daftar, pil ini hanya tampil kalau kontrak segera habis/lewat
+  atau statusnya bukan Belum diproses (`tampilkanStatusAdendum`). Detail selalu menampilkannya.
+- Catat adendum (`/kontrak/:id/adendum`): file adendum, tanggal adendum, akhir kontrak baru (harus setelah akhir
+  sekarang), nilai kontrak. Sekali simpan: dokumen bertambah, akhir dan nilai diganti, perpanjangan menjadi
+  Sudah diperpanjang, pengingat pindah, riwayat dicatat. Adendum yang tidak memperpanjang cukup diunggah di Detail.
 - [ASUMSI] Impor Excel untuk data awal: tunggu template dari atasan, jangan dibuat dulu.
 
 ## Status kontrak dan pengingat
@@ -150,42 +207,47 @@ Status dihitung dari tanggal akhir, tidak diisi manual:
   [ASUMSI] Kalau tanggalnya tidak ada di bulan itu (misalnya 31), pakai hari terakhir bulan tersebut.
 - Tiap tahap dikirim sekali per kontrak (dicatat supaya tidak berulang). Pengingat berhenti kalau
   kontrak selesai atau dihapus.
-- [ASUMSI] Pengingat critical point hanya untuk butir yang punya tanggal penting, dengan jadwal yang sama.
-- Kanal: notifikasi di dalam website + Web Push. Belum ada email atau WhatsApp.
+- Lonceng menampilkan satu notifikasi per kontrak (tahap terbaru), jadi angkanya sama dengan kontrak yang perlu diurus.
+- Kanal: notifikasi di dalam website + Web Push + email (email pengingat pribadi atau email kantor, tanpa izin). Belum ada WhatsApp.
 
 ## Hapus dan riwayat
 
 - Hapus kontrak langsung permanen (tidak ada arsip), selalu dengan dialog konfirmasi yang
   menyebut nama kontrak dan bahwa tindakan ini tidak bisa dibatalkan.
-- Setiap tambah, ubah, hapus, tandai selesai, unggah PDF, dan perubahan akun dicatat:
+- Setiap tambah, ubah, hapus, tandai selesai, unggah file, catat adendum, dan perubahan akun dicatat:
   siapa, kapan, apa yang berubah. Catatan penghapusan menyimpan nama dan nomor PKS kontrak yang dihapus.
 
 ## Halaman
 
-Navigasi atas: logo BBT + nama aplikasi, Beranda, Kontrak, Pengingat (dengan jumlah),
-Admin (hanya admin), lonceng notifikasi, dan menu akun.
+Navigasi atas: logo BBT + nama aplikasi, Beranda, Kontrak (dengan jumlah yang perlu perhatian),
+Admin (hanya admin), lonceng notifikasi, menu akun, dan tombol Tambah kontrak (kecuali di halaman form).
+Alamat lama `/pengingat`, `/rekap`, `/ubah-data`, `/critical-point` diarahkan ke halaman barunya.
 
 1. **Masuk**: logo BBT, email kantor + kata sandi. Pesan gagal: akun tidak ditemukan/nonaktif,
    kata sandi salah, akun dikunci sementara.
 2. **Beranda**: judul rata tengah, kotak cari pil, rekap jumlah per status berupa pil (tautan ke daftar terfilter),
    panel "Agenda kontrak" (sudah lewat + habis dalam 90 hari, dengan kotak kalender), tombol Tambah kontrak.
-3. **Daftar kontrak**: cari (nama, penyedia, nomor PKS), filter status, urutkan. Ada tampilan daftar kosong
-   dan hasil pencarian kosong.
-4. **Detail kontrak**: data kontrak, critical point, dokumen PDF, jadwal pengingat, monitoring dan catatan,
-   tombol Ubah dan Tandai selesai (dengan keterangan), menu hapus dengan konfirmasi.
-5. **Tambah / ubah kontrak**: SATU halaman form, PDF wajib, ringkasan sebagai konfirmasi sebelum simpan.
-6. **Pengingat**: sudah lewat, lalu habis dalam 90 hari.
+3. **Kontrak** (gabungan Kontrak, Pengingat, Rekap): satu tabel semua kontrak. Cari (nama, penyedia, nomor PKS),
+   filter status, urutkan (lewat alamat `?q=&status=&urut=`). Ada tampilan daftar kosong dan hasil pencarian kosong.
+4. **Detail kontrak**: data kontrak (termasuk status dan jumlah adendum, jadwal pengingat), ketentuan kontrak,
+   riwayat, dropdown dokumen bernomor + unggah + pratinjau. Tombol Ubah, Catat adendum, Tandai selesai
+   (dengan keterangan), menu hapus dengan konfirmasi.
+5. **Tambah / ubah kontrak**: SATU halaman form, file PKS wajib, ringkasan sebagai konfirmasi sebelum simpan.
+   Form ubah punya bagian Perpanjangan kontrak paling atas.
+6. **Catat adendum**: form perpanjangan (lihat "Data kontrak"), dengan tabel sebelum dan sesudah.
 7. **Admin** (hanya admin): akun pengguna dan riwayat perubahan. Kartu kata sandi sementara
    setelah membuat akun atau mereset sandi.
 
-Menu akun (klik avatar di kanan atas): nama, email kantor, peran, dan tombol Keluar (dengan konfirmasi).
-Tidak ada halaman Profil terpisah.
+8. **Profil** (`/profil`): data diri, email pengingat + contoh email, ganti kata sandi, keluar (21 Nov 2026).
+
+Menu akun (klik avatar di kanan atas): nama, email kantor, peran, tautan "Profil dan kata sandi", email pengingat,
+sakelar animasi latar, dan tombol Keluar (dengan konfirmasi).
 
 Keadaan yang wajib ada:
 - Isian salah ditandai merah, dengan pesan per kolom yang menjelaskan cara memperbaiki
   (dihubungkan lewat `aria-describedby`, fokus pindah ke kolom pertama yang salah).
-- Nomor PKS ganda ditolak. PDF ditolak kalau bukan PDF atau terlalu besar.
-- Konfirmasi untuk: simpan, tandai selesai, hapus, nonaktifkan akun.
+- Nomor PKS ganda ditolak. Akhir kontrak di Catat adendum ditolak kalau tidak setelah akhir kontrak sekarang.
+- Konfirmasi untuk: simpan, simpan adendum, tandai selesai, hapus, nonaktifkan akun.
 - Pesan berhasil sama dengan nama tombolnya ("Simpan kontrak" menghasilkan "Kontrak tersimpan").
 - Panel notifikasi saat lonceng diklik.
 
@@ -197,7 +259,9 @@ src/
   components/   satu komponen satu file
   data/         data contoh (fiktif, berkata "Contoh")
   lib/          status.ts (status, batas hari, tahap pengingat, warna), format.ts (rupiah, tanggal),
-                daftarKontrak.ts (saring, urut), formKontrak.ts (validasi), navigasi.ts, toast.ts
+                daftarKontrak.ts (saring, urut), formKontrak.ts (validasi), navigasi.ts, toast.ts,
+                versiKontrak.ts (data per versi dokumen), excel.ts + rekapExcel.ts (unduh Excel),
+                akun.ts (alasan nonaktif, email pengingat)
   types/        kontrak.ts (semua tipe)
 ```
 
@@ -225,9 +289,9 @@ src/
 
 ## Masih ditanyakan ke atasan
 
-- Batas ukuran PDF.
-- Arti kolom Monitoring, Catatan, dan Keterangan (termasuk apakah termin pembayaran masuk Monitoring).
-- Patokan tanggal pengingat critical point.
+- Batas ukuran file.
+- Nama status untuk "Belum diproses" (sementara "Menunggu keputusan").
+- Termin pembayaran perlu dicatat atau tidak.
 - Template Excel rekap kontrak yang sekarang dipakai.
 - Nama resmi aplikasi.
 - (Opsional) Konfirmasi bahwa hapus permanen tanpa arsip bisa diterima.

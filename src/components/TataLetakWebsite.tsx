@@ -13,7 +13,7 @@ function TataLetakWebsite() {
   const { pengguna } = useData()
   const location = useLocation()
 
-  // Pindah halaman: mulai dari atas, atau langsung ke bagian yang dituju (misalnya #critical-point).
+  // Pindah halaman: mulai dari atas, atau langsung ke bagian yang dituju (misalnya #ketentuan).
   useEffect(() => {
     if (location.hash) {
       document.getElementById(location.hash.slice(1))?.scrollIntoView({ block: 'start' })
@@ -31,8 +31,18 @@ function TataLetakWebsite() {
     <div className="relative flex min-h-dvh flex-col bg-latar">
       {/* Latar mozaik kavling di semua halaman (60% atas layar, lalu memudar). */}
       <Mozaik />
+      {/* Melompat ke judul halaman (h1), bukan ke <main>: judul dan tombol utama (misalnya Tandai selesai,
+          Tambah akun) berada di kepala halaman, di atas <main>, jadi dulu ikut terlewati (impeccable harden,
+          19 Nov 2026). Tanpa JavaScript, href="#konten" tetap jadi cadangan. */}
       <a
         href="#konten"
+        onClick={(event) => {
+          const judul = document.querySelector<HTMLElement>('h1')
+          if (!judul) return
+          event.preventDefault()
+          judul.setAttribute('tabindex', '-1')
+          judul.focus()
+        }}
         className="sr-only z-50 rounded-full bg-white px-4 py-3 font-semibold text-aksi shadow-menu focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
       >
         Lewati ke konten

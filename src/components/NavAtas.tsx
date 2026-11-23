@@ -1,13 +1,14 @@
 // Navigasi atas: pil putih yang ikut turun saat di-scroll (arah "Kavling", DESIGN.md).
-// Isi: logo BBT + nama aplikasi, menu (Beranda, Kontrak, Critical point, Rekap, Ubah data, Admin khusus admin),
+// Isi: logo BBT + nama aplikasi, menu (Beranda, Kontrak, Admin khusus admin),
 // lonceng notifikasi, menu akun, dan tombol "Tambah kontrak" (desktop, kecuali di halaman form).
 // Logo duduk langsung di atas putih, warnanya tidak diubah.
-// Di desktop satu baris. Di HP: logo dan ikon di atas, menu di bawah dalam grid 3 kolom (tanpa scroll ke samping).
+// Menu Rekap dan Ubah data digabung ke Kontrak (18 Nov 2026): satu daftar kontrak, mengubah data lewat halaman Detail.
+// Di desktop satu baris. Di HP: logo dan ikon di atas, menu di bawah dalam satu baris (tanpa scroll ke samping).
 // Tidak ada sidebar (supaya berbeda dari Sismon).
 
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { usePengguna, useData } from '../lib/data'
-import { hitungStatus, hitungTahap, perluPerhatian } from '../lib/status'
+import { perluPerhatian } from '../lib/status'
 import { KELAS_TOMBOL_UTAMA } from '../lib/tataLetak'
 import Ikon from './Ikon'
 import MenuAkun from './MenuAkun'
@@ -34,9 +35,12 @@ function Jumlah({ angka }: { angka: number }) {
   )
 }
 
-/** Halaman yang sudah berupa form tidak menampilkan tombol Tambah kontrak (satu tombol utama per layar). */
+/**
+ * Halaman form (Tambah kontrak, Ubah kontrak, Catat adendum) tidak menampilkan tombol Tambah kontrak
+ * (satu tombol utama per layar).
+ */
 function halamanForm(path: string): boolean {
-  return path === '/tambah' || path.endsWith('/ubah') || path.startsWith('/ubah-data')
+  return path === '/tambah' || path.endsWith('/ubah') || path.endsWith('/adendum')
 }
 
 function NavAtas() {
@@ -45,34 +49,16 @@ function NavAtas() {
   const { pathname } = useLocation()
 
   const jumlahKontrak = kontrak.filter((k) => perluPerhatian(k)).length
-  // Critical point aktif yang tanggal pentingnya sudah lewat atau sudah masuk tahap pengingat (3 bulan).
-  const jumlahCritical = kontrak
-    .filter((k) => hitungStatus(k) !== 'selesai')
-    .flatMap((k) => k.criticalPoint)
-    .filter((b) => b.status === 'aktif' && b.tanggalPenting && hitungTahap(b.tanggalPenting) !== 'nanti').length
 
   const menu = (
     <>
       <NavLink to="/" end className={kelasMenu}>
         Beranda
       </NavLink>
-      <NavLink to="/kontrak" end className={kelasMenu} aria-label={`Kontrak, ${jumlahKontrak} perlu perhatian`}>
+      {/* Tanpa `end`: menu Kontrak tetap tersorot di halaman Detail, Ubah, dan Catat adendum. */}
+      <NavLink to="/kontrak" className={kelasMenu} aria-label={`Kontrak, ${jumlahKontrak} perlu perhatian`}>
         Kontrak
         <Jumlah angka={jumlahKontrak} />
-      </NavLink>
-      <NavLink
-        to="/critical-point"
-        className={kelasMenu}
-        aria-label={`Critical point, ${jumlahCritical} perlu perhatian`}
-      >
-        Critical point
-        <Jumlah angka={jumlahCritical} />
-      </NavLink>
-      <NavLink to="/rekap" className={kelasMenu}>
-        Rekap
-      </NavLink>
-      <NavLink to="/ubah-data" className={kelasMenu}>
-        Ubah data
       </NavLink>
       {pengguna.peran === 'admin' && (
         <NavLink to="/admin" className={kelasMenu}>
@@ -116,8 +102,8 @@ function NavAtas() {
         </div>
       </div>
 
-      {/* Menu di HP (grid 3 kolom) dan tablet/laptop kecil (satu baris kedua), di dalam pil */}
-      <div className="mt-1 grid grid-cols-3 gap-1 md:grid-cols-6 xl:hidden">{menu}</div>
+      {/* Menu di HP dan tablet/laptop kecil: satu baris kedua di dalam pil, lebar kolom sama (2 atau 3 menu) */}
+      <div className="mt-1 grid auto-cols-fr grid-flow-col gap-1 xl:hidden">{menu}</div>
     </nav>
   )
 }

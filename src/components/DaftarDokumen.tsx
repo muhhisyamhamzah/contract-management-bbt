@@ -1,11 +1,13 @@
-// Daftar dokumen PDF di Detail kontrak, dengan tombol unggah.
-// File diperiksa dulu: hanya PDF, maksimal 10 MB. Belum ada backend: yang disimpan hanya nama dan ukurannya,
-// dan mengunduh hanya memunculkan toast "(contoh)".
+// Dokumen kontrak di Detail: daftar pilihan (dropdown) bernomor dari dokumen paling lama ke paling baru,
+// misalnya 1. PKS awal, 2. Adendum 1, ... 6. Adendum 5 (Hisyam 18 Nov 2026), ditambah tombol unggah.
+// Memilih dokumen menampilkannya di pratinjau. PKS lama tidak pernah dihapus, jadi riwayatnya tetap ada.
+// Semua jenis file boleh diunggah. Belum ada backend: file yang diunggah di sesi ini disimpan
+// sebagai alamat sementara browser (bisa dipratinjau dan diunduh); dokumen contoh tidak punya file.
 
-import { useId, useRef, useState } from 'react'
-import { formatTanggalSingkat, formatUkuranFile, hariIniTeks } from '../lib/format'
-import { periksaPdf } from '../lib/formKontrak'
-import { KELAS_TAUTAN_AKSI } from '../lib/tataLetak'
+import { useId, useRef } from 'react'
+import { urutkanDokumen } from '../lib/daftarKontrak'
+import { formatTanggalSingkat, hariIniTeks } from '../lib/format'
+import { KELAS_ISIAN, KELAS_TAUTAN_AKSI } from '../lib/tataLetak'
 import { useToast } from '../lib/toast'
 import type { Dokumen, JenisDokumen } from '../types/kontrak'
 import Ikon from './Ikon'
@@ -13,6 +15,16 @@ import Ikon from './Ikon'
 type Props = {
   daftar: Dokumen[]
   onUnggah: (dokumen: Dokumen) => void
+  /** Dipanggil saat dokumen lain dipilih untuk dipratinjau. */
+  onPilih: (id: string) => void
+  /** Dokumen yang sedang dipratinjau. */
+  terpilihId?: string
+}
+
+/** Sebutan dokumen di daftar: PKS pertama = "PKS awal", PKS berikutnya = "PKS pengganti". */
+function sebutan(dokumen: Dokumen, sudahAdaPks: boolean): string {
+  if (dokumen.jenis === 'PKS utama') return sudahAdaPks ? 'PKS pengganti' : 'PKS awal'
+  return dokumen.jenis
 }
 
 /** Menebak jenis dokumen dari nama file. Nanti diganti pilihan jenis saat backend ada. */
@@ -23,51 +35,55 @@ function tebakJenis(nama: string): JenisDokumen {
   return 'Lainnya'
 }
 
-function DaftarDokumen({ daftar, onUnggah }: Props) {
+function DaftarDokumen({ daftar, onUnggah, onPilih, terpilihId }: Props) {
   const tampilkanToast = useToast()
+  const urut = urutkanDokumen(daftar)
   const masukanFile = useRef<HTMLInputElement>(null)
-  const [galat, setGalat] = useState('')
   const id = useId()
 
   function pilihFile(file: File | undefined) {
     if (!file) return
-    const pesan = periksaPdf(file)
-    setGalat(pesan)
-    if (pesan) return
-    onUnggah({ id: `d-${Date.now()}`, nama: file.name, jenis: tebakJenis(file.name), ukuran: file.size, tanggal: hariIniTeks() })
+    onUnggah({
+      id: `d-${Date.now()}`,
+      nama: file.name,
+      jenis: tebakJenis(file.name),
+      ukuran: file.size,
+      tanggal: hariIniTeks(),
+      url: URL.createObjectURL(file),
+    })
     tampilkanToast(`${file.name} terunggah.`)
   }
 
   return (
     <div className="flex flex-col gap-3">
-      <ul className="m-0 list-none p-0">
-        {daftar.map((dokumen) => (
-          <li key={dokumen.id} className="border-b border-garis-lembut last:border-b-0">
-            <button
-              type="button"
-              onClick={() => tampilkanToast(`Mengunduh ${dokumen.nama} (contoh)`)}
-              className="-mx-3 flex w-[calc(100%+24px)] cursor-pointer items-center gap-3.5 rounded-2xl border-none bg-transparent px-3 py-3 text-left text-teks transition-[background-color] duration-150 hover:bg-latar motion-reduce:transition-none"
-            >
-              <Ikon nama="dokumen" ukuran={22} className="flex-none text-aksi" />
-              <span className="flex min-w-0 flex-1 flex-col gap-0.5">
-                <span className="truncate font-semibold text-judul">{dokumen.nama}</span>
-                <span className="text-[12px] text-teks-lembut">
-                  {dokumen.jenis}, {formatUkuranFile(dokumen.ukuran)}, diunggah {formatTanggalSingkat(dokumen.tanggal)}
-                </span>
-              </span>
-              <Ikon nama="unduh" ukuran={18} className="flex-none text-aksi" />
-              <span className="sr-only">Unduh</span>
-            </button>
-          </li>
-        ))}
-      </ul>
+      {urut.length > 0 && (
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor={`${id}-pilih`} className="text-[13px] font-semibold text-judul">
+            Dokumen kontrak <span className="font-normal text-teks-lembut">({urut.length} file, urut dari yang paling lama)</span>
+          </label>
+          <select
+            id={`${id}-pilih`}
+            value={terpilihId}
+            onChange={(e) => onPilih(e.target.value)}
+            className={`${KELAS_ISIAN} h-12 font-semibold`}
+          >
+            {urut.map((dokumen, i) => {
+              const sudahAdaPks = urut.slice(0, i).some((d) => d.jenis === 'PKS utama')
+              return (
+                <option key={dokumen.id} value={dokumen.id}>
+                  {i + 1}. {dokumen.nama} ({sebutan(dokumen, sudahAdaPks)}, {formatTanggalSingkat(dokumen.tanggal)})
+                </option>
+              )
+            })}
+          </select>
+        </div>
+      )}
 
       <div>
         <input
           ref={masukanFile}
           id={id}
           type="file"
-          accept="application/pdf,.pdf"
           className="sr-only"
           tabIndex={-1}
           aria-hidden="true"
@@ -77,17 +93,9 @@ function DaftarDokumen({ daftar, onUnggah }: Props) {
           }}
         />
         <button type="button" onClick={() => masukanFile.current?.click()} className={KELAS_TAUTAN_AKSI}>
-          <Ikon nama="unggah" ukuran={16} tebal={2.5} /> Unggah PDF tambahan (adendum, BAST)
+          <Ikon nama="unggah" ukuran={16} tebal={2.5} /> Unggah file tambahan (adendum, BAST)
         </button>
-        <span className="ml-1 text-[12px] text-teks-lembut">Hanya PDF, maksimal 10 MB</span>
       </div>
-
-      {galat && (
-        <p role="alert" className="m-0 flex items-start gap-2 rounded-xl bg-hapus-latar px-3.5 py-3 text-[13px] font-semibold text-hapus-teks">
-          <Ikon nama="peringatan" ukuran={16} className="mt-px flex-none" />
-          {galat}
-        </p>
-      )}
     </div>
   )
 }

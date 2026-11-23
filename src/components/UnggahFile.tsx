@@ -1,31 +1,30 @@
-// Kotak unggah PDF PKS di form: bisa ditarik-lepas (drag and drop) atau pilih lewat tombol.
-// File diperiksa: hanya PDF, maksimal 10 MB. Kalau ditolak, pesannya tampil di bawah kotak.
+// Kotak unggah file di form (PKS atau adendum): bisa ditarik-lepas (drag and drop) atau pilih lewat tombol.
+// Semua jenis file boleh (Hisyam 18 Nov 2026), tanpa batasan jenis di layar.
 
 import { useState, type DragEvent } from 'react'
 import { formatUkuranFile } from '../lib/format'
-import { periksaPdf, type FileDipilih } from '../lib/formKontrak'
+import type { FileDipilih } from '../lib/formKontrak'
 import Ikon from './Ikon'
 
 type Props = {
-  /** id tombol "Pilih file", supaya fokus bisa dipindah ke sini saat PDF belum ada. */
+  /** id tombol "Pilih file", supaya fokus bisa dipindah ke sini saat file PKS belum ada. */
   id: string
   file: FileDipilih | null
-  /** Nama PDF yang sudah tersimpan (form ubah). */
+  /** Nama file PKS yang sudah tersimpan (form ubah). */
   namaLama: string
   onPilih: (file: FileDipilih | null) => void
-  /** Pesan kesalahan dari pemeriksaan form (misalnya PDF belum diunggah). */
+  /** Pesan kesalahan dari pemeriksaan form (misalnya file PKS belum diunggah). */
   galat?: string
+  /** Nama file untuk pembaca layar, misalnya "PKS" atau "adendum" ("Pilih file PKS"). */
+  labelFile?: string
 }
 
-function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
-  const [galatFile, setGalatFile] = useState('')
+function UnggahFile({ id, file, namaLama, onPilih, galat, labelFile = 'PKS' }: Props) {
   const [diseret, setDiseret] = useState(false)
 
   function terima(berkas: File | undefined) {
     if (!berkas) return
-    const pesan = periksaPdf(berkas)
-    setGalatFile(pesan)
-    if (!pesan) onPilih({ nama: berkas.name, ukuran: berkas.size })
+    onPilih({ nama: berkas.name, ukuran: berkas.size, url: URL.createObjectURL(berkas) })
   }
 
   function saatLepas(event: DragEvent) {
@@ -34,7 +33,7 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
     terima(event.dataTransfer.files[0])
   }
 
-  const pesanGalat = galatFile || galat
+  const pesanGalat = galat
   const idGalat = `${id}-galat`
 
   return (
@@ -57,7 +56,7 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
           {file ? (
             <>
               <span className="truncate font-semibold text-judul">{file.nama}</span>
-              <span className="text-[13px] text-teks-lembut">{formatUkuranFile(file.ukuran)} · siap disimpan</span>
+              <span className="text-[13px] text-teks-lembut">{formatUkuranFile(file.ukuran)}, siap disimpan</span>
             </>
           ) : namaLama ? (
             <>
@@ -67,7 +66,6 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
           ) : (
             <>
               <span className="font-semibold text-judul">Tarik file ke sini atau pilih file</span>
-              <span className="text-[13px] text-teks-lembut">Hanya PDF, maksimal 10 MB</span>
             </>
           )}
         </span>
@@ -84,11 +82,10 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
           {/* Label berperan sebagai tombol: input file asli tersembunyi tapi tetap bisa difokus. */}
           <label className="relative inline-flex h-11 cursor-pointer items-center rounded-full border border-garis-input bg-white px-4 font-semibold text-judul focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-aksi hover:bg-latar">
             {file || namaLama ? 'Ganti file' : 'Pilih file'}
-            <span className="sr-only"> PDF PKS</span>
+            <span className="sr-only"> {labelFile}</span>
             <input
               id={id}
               type="file"
-              accept="application/pdf,.pdf"
               aria-invalid={Boolean(pesanGalat)}
               aria-describedby={pesanGalat ? idGalat : undefined}
               onChange={(e) => {
@@ -102,7 +99,7 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
       </div>
 
       {pesanGalat && (
-        <span id={idGalat} role={galatFile ? 'alert' : undefined} className="flex items-start gap-1.5 text-[13px] font-semibold text-hapus-teks">
+        <span id={idGalat} className="flex items-start gap-1.5 text-[13px] font-semibold text-hapus-teks">
           <Ikon nama="info" ukuran={16} className="mt-px flex-none" />
           {pesanGalat}
         </span>
@@ -111,4 +108,4 @@ function UnggahPdf({ id, file, namaLama, onPilih, galat }: Props) {
   )
 }
 
-export default UnggahPdf
+export default UnggahFile

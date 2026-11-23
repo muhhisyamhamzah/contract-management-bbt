@@ -1,7 +1,7 @@
 // Logika daftar kontrak: menyaring (status + kata kunci) dan mengurutkan.
 // Dipisah dari komponen supaya mudah diuji dan dipakai ulang.
 
-import type { Kontrak, StatusKontrak } from '../types/kontrak'
+import type { Dokumen, Kontrak, StatusKontrak } from '../types/kontrak'
 import { hitungSisaHari, hitungStatus } from './status'
 
 /** Filter status di halaman Kontrak. "semua" berarti tanpa filter. */
@@ -72,4 +72,12 @@ export function saringDanUrutkan(
     nama: (a, b) => a.nama.localeCompare(b.nama, 'id'),
   }
   return [...hasil].sort(pembanding[urutan])
+}
+
+/**
+ * Dokumen kontrak urut dari yang paling lama (PKS awal) ke yang paling baru (adendum terakhir).
+ * Dipakai untuk daftar dokumen bernomor 1, 2, 3, ... di Detail kontrak.
+ */
+export function urutkanDokumen(dokumen: Dokumen[]): Dokumen[] {
+  return dokumen.toSorted((a, b) => a.tanggal.localeCompare(b.tanggal))
 }

@@ -1,24 +1,27 @@
 // Halaman Tambah kontrak (/tambah) dan Ubah kontrak (/kontrak/:id/ubah): SATU halaman form, 4 bagian.
-// 1 Data kontrak, 2 Waktu dan nilai, 3 Critical point dan catatan, 4 PDF PKS (wajib).
+// 1 Data kontrak, 2 Waktu dan nilai, 3 Ketentuan kontrak (4 kolom), 4 File PKS (wajib).
+// Form ubah: ditambah bagian "Perpanjangan kontrak" paling atas (pilihan ke bawah), jadi bagian lain bergeser satu nomor.
+// Mengunggah PKS baru di form ubah TIDAK menghapus PKS lama: semuanya tetap ada di riwayat dokumen.
 //
-// Alur (Flowchart 2): isi → periksa (kolom wajib, tanggal masuk akal, nomor PKS ganda, PDF) →
+// Alur (Flowchart 2): isi → periksa (kolom wajib, tanggal masuk akal, nomor PKS ganda, file PKS) →
 // ringkasan sebagai konfirmasi → simpan → riwayat dicatat → buka Detail.
 // Kesalahan ditandai per kolom (pesan + aria-describedby), dan fokus pindah ke kolom pertama yang salah.
-//
-// `tertanam`: dipakai halaman Ubah data (/ubah-data/:id). Form tampil tanpa kepala halaman dan wadah sendiri,
-// Batal kembali ke /ubah-data, dan setelah simpan tetap di halaman Ubah data.
+// Perpanjangan lewat adendum sebaiknya dicatat di halaman Catat adendum (/kontrak/:id/adendum), supaya file,
+// tanggal akhir, dan status berubah bersama. Form ini mengingatkan hal itu saat "Sudah diperpanjang" dipilih.
 
 import { useState, type FormEvent } from 'react'
+import type { KetentuanKontrak } from '../types/kontrak'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import BagianForm from '../components/BagianForm'
 import DialogKonfirmasi from '../components/DialogKonfirmasi'
-import EditorCriticalPoint from '../components/EditorCriticalPoint'
 import KepalaHalaman from '../components/KepalaHalaman'
 import Ikon from '../components/Ikon'
 import IsianForm from '../components/IsianForm'
 import KeadaanKosong from '../components/KeadaanKosong'
-import UnggahPdf from '../components/UnggahPdf'
+import UnggahFile from '../components/UnggahFile'
+import PilihanPerpanjangan from '../components/PilihanPerpanjangan'
 import { useData } from '../lib/data'
+import { useJudulHalaman } from '../lib/judulHalaman'
 import { formatPeriode, formatRupiah, formatTanggal, formatTanggalSingkat } from '../lib/format'
 import {
   DATA_AWAL,
@@ -29,28 +32,13 @@ import {
   periksaForm,
   URUTAN_KOLOM,
   type DataFormKontrak,
-  type KolomForm,
 } from '../lib/formKontrak'
 import { useKembali } from '../lib/navigasi'
-import { jadwalPengingat } from '../lib/status'
+import { jadwalPengingat, LABEL_KETENTUAN, LABEL_PERPANJANGAN, STATUS_PERPANJANGAN } from '../lib/status'
 import { KELAS_ISIAN, KELAS_KOTAK, KELAS_TOMBOL_KEDUA, KELAS_TOMBOL_UTAMA, KELAS_WADAH } from '../lib/tataLetak'
 import { useToast } from '../lib/toast'
 
-/** id elemen yang difokus saat kolom itu salah. */
-function idKolom(kolom: KolomForm, data: DataFormKontrak): string {
-  if (kolom === 'criticalPoint') {
-    const kosong = data.criticalPoint.find((b) => !b.ringkasan.trim())
-    return kosong ? `cp-${kosong.id}-ringkasan` : 'critical-point'
-  }
-  return `isian-${kolom}`
-}
-
-type Props = {
-  /** Form ditanam di halaman Ubah data (tanpa kepala halaman sendiri). */
-  tertanam?: boolean
-}
-
-function FormKontrak({ tertanam = false }: Props) {
+function FormKontrak() {
   const { id } = useParams()
   const navigate = useNavigate()
   const tampilkanToast = useToast()
@@ -58,7 +46,8 @@ function FormKontrak({ tertanam = false }: Props) {
   const lama = id ? semua.find((k) => k.id === id) : undefined
   const modeUbah = Boolean(id)
   const kembali = useKembali(modeUbah && id ? `/kontrak/${id}` : '/')
-  const batal = tertanam ? () => navigate('/ubah-data') : kembali
+  useJudulHalaman(modeUbah ? (lama ? `Ubah kontrak, ${lama.nama}` : 'Kontrak tidak ditemukan') : 'Tambah kontrak')
+  const batal = kembali
 
   const [data, setData] = useState<DataFormKontrak>(() => (lama ? dariKontrak(lama) : DATA_AWAL))
   // Kesalahan baru ditampilkan setelah pengguna mencoba menyimpan, lalu ikut diperbarui saat mengetik.
@@ -102,7 +91,7 @@ function FormKontrak({ tertanam = false }: Props) {
     if (pertama) {
       // Tunggu satu frame supaya pesan kesalahan sudah tergambar sebelum fokus pindah.
       requestAnimationFrame(() => {
-        const el = document.getElementById(idKolom(pertama, data))
+        const el = document.getElementById(`isian-${pertama}`)
         el?.focus()
         el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
       })
@@ -116,13 +105,15 @@ function FormKontrak({ tertanam = false }: Props) {
     simpanKontrak(keKontrak(data, idKontrak, lama), !lama)
     setKonfirmasi(false)
     tampilkanToast(modeUbah ? 'Perubahan kontrak tersimpan.' : 'Kontrak tersimpan.')
-    if (tertanam) return
     navigate(`/kontrak/${idKontrak}`, { replace: true })
   }
 
   const tanggalSah = data.tanggalMulai && data.tanggalBerakhir && data.tanggalBerakhir > data.tanggalMulai
   const jadwal = data.tanggalBerakhir ? jadwalPengingat(data.tanggalBerakhir) : []
 
+  /** Di form ubah, bagian Perpanjangan kontrak menjadi nomor 1, jadi nomor bagian lain bergeser satu. */
+  const geser = modeUbah ? 1 : 0
+  const jumlahKetentuan = Object.values(data.ketentuan).filter((isi) => isi.trim()).length
   const ringkasan: [string, string][] = [
     ['Nama kontrak', data.nama],
     ['Penyedia', data.penyedia],
@@ -130,8 +121,11 @@ function FormKontrak({ tertanam = false }: Props) {
     ['Tanggal PKS', data.tanggalPks ? formatTanggal(data.tanggalPks) : '-'],
     ['Masa kontrak', tanggalSah ? `${formatTanggalSingkat(data.tanggalMulai)} sampai ${formatTanggalSingkat(data.tanggalBerakhir)}` : '-'],
     ['Nilai kontrak', data.nilai ? formatRupiah(Number(data.nilai)) : '-'],
-    ['Critical point', data.criticalPoint.length > 0 ? `${data.criticalPoint.length} butir` : 'Tidak ada'],
-    ['PDF PKS', data.filePks?.nama ?? data.namaPksLama],
+    ['Ketentuan kontrak', jumlahKetentuan > 0 ? `${jumlahKetentuan} dari 4 kolom diisi` : 'Belum diisi'],
+    ...(modeUbah
+      ? [['Perpanjangan kontrak', `${LABEL_PERPANJANGAN[data.perpanjangan]} (${STATUS_PERPANJANGAN[data.perpanjangan].label})`] as [string, string]]
+      : []),
+    ['File PKS', data.filePks?.nama ?? data.namaPksLama],
   ]
 
   const isiForm = (
@@ -147,7 +141,29 @@ function FormKontrak({ tertanam = false }: Props) {
             </div>
           )}
 
-          <BagianForm nomor={1} judul="Data kontrak">
+          {/* Perpanjangan kontrak hanya saat mengubah, dan diletakkan paling atas (Hisyam 18 Nov 2026).
+              Kontrak baru selalu "Belum diproses". */}
+          {modeUbah && (
+            <BagianForm nomor={1} id="perpanjangan" judul="Perpanjangan kontrak">
+              <PilihanPerpanjangan nilai={data.perpanjangan} onUbah={(nilai) => ubah('perpanjangan', nilai)} />
+              {/* Status "sudah diperpanjang" tanpa tanggal akhir baru membuat data bertentangan
+                  (misalnya "Sudah dilakukan adendum" tapi "Habis 18 hari lagi"). Arahkan ke Catat adendum. */}
+              {lama && data.perpanjangan === 'diperpanjang' && data.tanggalBerakhir === lama.tanggalBerakhir && (
+                <p role="status" className="m-0 flex items-start gap-2.5 rounded-2xl bg-lembut px-4 py-3 text-[14px] text-aksi-tua">
+                  <Ikon nama="info" ukuran={18} className="mt-px flex-none" />
+                  <span>
+                    Akhir kontrak belum berubah. Kalau ada adendum perpanjangan,{' '}
+                    <Link to={`/kontrak/${lama.id}/adendum`} className="font-semibold">
+                      catat lewat Catat adendum
+                    </Link>{' '}
+                    supaya file, akhir kontrak, dan pengingat ikut diperbarui.
+                  </span>
+                </p>
+              )}
+            </BagianForm>
+          )}
+
+          <BagianForm nomor={geser + 1} judul="Data kontrak">
             <IsianForm id="isian-nama" label="Nama kontrak" wajib galat={galat.nama}>
               {(props) => (
                 <input
@@ -205,7 +221,7 @@ function FormKontrak({ tertanam = false }: Props) {
             </div>
           </BagianForm>
 
-          <BagianForm nomor={2} judul="Waktu dan nilai">
+          <BagianForm nomor={geser + 2} judul="Waktu dan nilai">
             <div className="grid gap-5 md:grid-cols-3">
               <IsianForm id="isian-tanggalMulai" label="Awal kontrak" wajib galat={galat.tanggalMulai}>
                 {(props) => (
@@ -270,56 +286,30 @@ function FormKontrak({ tertanam = false }: Props) {
           </BagianForm>
 
           <BagianForm
-            nomor={3}
-            id="critical-point"
-            judul="Critical point dan catatan"
-            keterangan="Klausul berisiko di PKS, terutama pengakhiran kontrak dan denda. Boleh lebih dari satu, boleh juga kosong."
+            nomor={geser + 3}
+            id="ketentuan"
+            judul="Ketentuan kontrak"
           >
-            <EditorCriticalPoint
-              daftar={data.criticalPoint}
-              ubah={(daftar) => ubah('criticalPoint', daftar)}
-              galat={galat.criticalPoint}
-            />
-            <div className="grid gap-5 md:grid-cols-3">
-              <IsianForm id="isian-monitoring" label="Monitoring">
-                {(props) => (
-                  <textarea
-                    {...props}
-                    rows={3}
-                    value={data.monitoring}
-                    onChange={(e) => ubah('monitoring', e.target.value)}
-                    placeholder="Contoh: Uji coba 80%"
-                    className={`${KELAS_ISIAN} py-2.5`}
-                  />
-                )}
-              </IsianForm>
-              <IsianForm id="isian-catatan" label="Catatan">
-                {(props) => (
-                  <textarea
-                    {...props}
-                    rows={3}
-                    value={data.catatan}
-                    onChange={(e) => ubah('catatan', e.target.value)}
-                    className={`${KELAS_ISIAN} py-2.5`}
-                  />
-                )}
-              </IsianForm>
-              <IsianForm id="isian-keterangan" label="Keterangan">
-                {(props) => (
-                  <textarea
-                    {...props}
-                    rows={3}
-                    value={data.keterangan}
-                    onChange={(e) => ubah('keterangan', e.target.value)}
-                    className={`${KELAS_ISIAN} py-2.5`}
-                  />
-                )}
-              </IsianForm>
+            {/* Empat kolom bertumpuk ke bawah, lebar penuh dan sama, di semua halaman (Hisyam 18 Nov 2026). */}
+            <div className="grid gap-4">
+              {(Object.keys(LABEL_KETENTUAN) as (keyof KetentuanKontrak)[]).map((kolom) => (
+                <IsianForm key={kolom} id={`isian-ketentuan-${kolom}`} label={LABEL_KETENTUAN[kolom]}>
+                  {(props) => (
+                    <textarea
+                      {...props}
+                      rows={4}
+                      value={data.ketentuan[kolom]}
+                      onChange={(e) => ubah('ketentuan', { ...data.ketentuan, [kolom]: e.target.value })}
+                      className={`${KELAS_ISIAN} py-2.5`}
+                    />
+                  )}
+                </IsianForm>
+              ))}
             </div>
           </BagianForm>
 
-          <BagianForm nomor={4} judul="PDF PKS *" keterangan="Wajib sebagai bukti kontrak. Adendum dan BAST bisa diunggah nanti di halaman detail.">
-            <UnggahPdf
+          <BagianForm nomor={geser + 4} judul="File PKS *" keterangan="Kalau PKS berganti, unggah yang baru. PKS lama tetap tersimpan di daftar dokumen.">
+            <UnggahFile
               id="isian-filePks"
               file={data.filePks}
               namaLama={data.namaPksLama}
@@ -360,8 +350,6 @@ function FormKontrak({ tertanam = false }: Props) {
       </DialogKonfirmasi>
     </>
   )
-
-  if (tertanam) return isiForm
 
   return (
     <>

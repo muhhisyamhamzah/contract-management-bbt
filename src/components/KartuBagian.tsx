@@ -1,5 +1,5 @@
 // Panel putih dengan judul, dipakai untuk bagian-bagian di Detail kontrak.
-// Contoh: "Data kontrak", "Critical point", "Dokumen PDF".
+// Contoh: "Data kontrak", "Ketentuan kontrak", "Dokumen".
 // Judul tanpa kotak ikon (DESIGN.md: tanpa kotak ikon berwarna di depan setiap judul). Isi dipisah garis, bukan kartu kecil.
 
 import type { ReactNode } from 'react'

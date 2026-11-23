@@ -2,7 +2,7 @@
 // serta label, ikon, dan warna tiap status.
 
 import type { NamaIkon } from '../components/Ikon'
-import type { Kontrak, StatusKontrak } from '../types/kontrak'
+import type { KetentuanKontrak, Kontrak, Perpanjangan, StatusKontrak } from '../types/kontrak'
 import { geserBulan, keTanggal } from './format'
 
 /** Kontrak dianggap "segera habis" kalau berakhir dalam sekian hari ini. [DIKONFIRMASI] 90 hari. */
@@ -116,47 +116,6 @@ export function jadwalPengingat(tanggalBerakhir: string, hariIni: Date = new Dat
   })
 }
 
-/**
- * Tahap waktu sebuah tanggal (tanggal akhir kontrak atau tanggal penting critical point),
- * mengikuti tahap pengingat 3, 2, 1 bulan kalender:
- * - `lewat`: tanggalnya sudah lewat
- * - `h1`: pengingat 1 bulan sudah terkirim (berakhir dalam 1 bulan kalender)
- * - `h2`: pengingat 2 bulan sudah terkirim
- * - `h3`: pengingat 3 bulan sudah terkirim
- * - `nanti`: lebih dari 3 bulan lagi, belum ada pengingat
- */
-export type TahapWaktu = 'lewat' | 'h1' | 'h2' | 'h3' | 'nanti'
-
-/** Urutan tahap dari yang paling mendesak. Dipakai halaman Kontrak dan Critical point. */
-export const URUTAN_TAHAP: TahapWaktu[] = ['lewat', 'h1', 'h2', 'h3', 'nanti']
-
-export function hitungTahap(tanggal: string, hariIni: Date = new Date()): TahapWaktu {
-  if (hitungSisaHari(tanggal, hariIni) < 0) return 'lewat'
-  // Cek dari tahap terdekat (1 bulan) ke yang terjauh (3 bulan).
-  for (const bulan of [...TAHAP_PENGINGAT_BULAN].sort((a, b) => a - b)) {
-    if (hitungSisaHari(geserBulan(tanggal, -bulan), hariIni) <= 0) return `h${bulan}` as TahapWaktu
-  }
-  return 'nanti'
-}
-
-/** Judul tahap untuk halaman Kontrak. */
-export const JUDUL_TAHAP_KONTRAK: Record<TahapWaktu, { judul: string; keterangan: string }> = {
-  lewat: { judul: 'Sudah lewat', keterangan: 'Tanggal akhir sudah lewat. Perpanjang lewat adendum, atau tandai selesai.' },
-  h1: { judul: 'H-1 bulan', keterangan: 'Berakhir dalam 1 bulan. Pengingat 1 bulan sudah dikirim ke semua pengguna.' },
-  h2: { judul: 'H-2 bulan', keterangan: 'Berakhir dalam 1 sampai 2 bulan. Pengingat 2 bulan sudah dikirim.' },
-  h3: { judul: 'H-3 bulan', keterangan: 'Berakhir dalam 2 sampai 3 bulan. Pengingat 3 bulan sudah dikirim.' },
-  nanti: { judul: 'Berjalan', keterangan: 'Masih lebih dari 3 bulan. Belum ada pengingat.' },
-}
-
-/** Judul tahap untuk halaman Critical point (berdasarkan tanggal penting). */
-export const JUDUL_TAHAP_CRITICAL: Record<TahapWaktu, { judul: string; keterangan: string }> = {
-  lewat: { judul: 'Sudah lewat', keterangan: 'Tanggal penting sudah lewat. Periksa apakah denda atau sanksi berlaku.' },
-  h1: { judul: 'H-1 bulan', keterangan: 'Tanggal penting dalam 1 bulan. Pengingat 1 bulan sudah dikirim.' },
-  h2: { judul: 'H-2 bulan', keterangan: 'Tanggal penting dalam 1 sampai 2 bulan. Pengingat 2 bulan sudah dikirim.' },
-  h3: { judul: 'H-3 bulan', keterangan: 'Tanggal penting dalam 2 sampai 3 bulan. Pengingat 3 bulan sudah dikirim.' },
-  nanti: { judul: 'Lebih dari 3 bulan', keterangan: 'Tanggal penting masih jauh. Belum ada pengingat.' },
-}
-
 type TampilanStatus = {
   /** Teks yang tampil di layar. */
   label: string
@@ -212,9 +171,42 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
   },
 }
 
-/** Label jenis critical point. */
-export const LABEL_CRITICAL_POINT = {
+/** Label empat kolom ketentuan kontrak (dulu "critical point"), urut seperti di form dan Detail. */
+export const LABEL_KETENTUAN: Record<keyof KetentuanKontrak, string> = {
   pengakhiran: 'Pengakhiran kontrak',
   denda: 'Denda',
-  lainnya: 'Lainnya',
-} as const
+  jaminan: 'Jaminan kontrak',
+  keterangan: 'Keterangan',
+}
+
+/** Pilihan isian "Perpanjangan kontrak" di form, urut seperti tampil di daftar pilihan. */
+export const LABEL_PERPANJANGAN: Record<Perpanjangan, string> = {
+  belum: 'Belum diproses',
+  proses: 'Sedang diproses',
+  diperpanjang: 'Sudah diperpanjang',
+  tidak: 'Tidak diperpanjang',
+}
+
+/**
+ * Status kontrak yang tampil, dihitung dari isian perpanjangan (Hisyam 18 Nov 2026).
+ * [ASUMSI] Nama untuk "Belum diproses" belum diputuskan; sementara "Menunggu keputusan".
+ * Cukup ganti teks di sini kalau nama resminya sudah ada.
+ * Kelas warna diambil dari warna status yang sudah ada (latar muda + teks gelap, kontras minimal 5,4:1).
+ */
+/**
+ * Apakah status adendum perlu ditampilkan di daftar (Beranda, Kontrak).
+ * "Menunggu keputusan" hanya berarti untuk kontrak yang sudah dekat atau lewat tanggal akhirnya;
+ * untuk kontrak yang masih lama berjalan, pil itu hanya menambah ramai. Halaman Detail selalu menampilkannya.
+ */
+export function tampilkanStatusAdendum(kontrak: Kontrak, hariIni: Date = new Date()): boolean {
+  if (kontrak.perpanjangan !== 'belum') return true
+  const status = hitungStatus(kontrak, hariIni)
+  return status === 'segera' || status === 'lewat'
+}
+
+export const STATUS_PERPANJANGAN: Record<Perpanjangan, { label: string; kelas: string }> = {
+  belum: { label: 'Menunggu keputusan', kelas: 'bg-selesai-latar text-selesai-teks' },
+  proses: { label: 'Proses melakukan adendum', kelas: 'bg-segera-latar text-segera-teks' },
+  diperpanjang: { label: 'Sudah dilakukan adendum', kelas: 'bg-berjalan-latar text-berjalan-teks' },
+  tidak: { label: 'Tidak diperpanjang', kelas: 'bg-lewat-latar text-lewat-teks' },
+}

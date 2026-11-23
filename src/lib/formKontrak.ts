@@ -1,14 +1,13 @@
 // Data, validasi, dan konversi form Tambah / Ubah kontrak (satu halaman).
 // Dipisah dari tampilan supaya mudah diuji dan sama persis untuk form tambah dan ubah.
 
-import type { CriticalPoint, Dokumen, JenisCriticalPoint, Kontrak } from '../types/kontrak'
+import type { Dokumen, KetentuanKontrak, Kontrak, Perpanjangan } from '../types/kontrak'
+import { urutkanDokumen } from './daftarKontrak'
+import { ambilVersi, simpanVersiBerlaku } from './versiKontrak'
 import { hariIniTeks } from './format'
 
-/** Batas ukuran file PDF. [ASUMSI] 10 MB, menunggu konfirmasi atasan. */
-export const MAKS_UKURAN_PDF = 10 * 1024 * 1024
-
-/** File PDF yang dipilih di form (belum ada backend, jadi hanya nama dan ukurannya yang disimpan). */
-export type FileDipilih = { nama: string; ukuran: number }
+/** File PKS yang dipilih di form (semua jenis file boleh). `url` = alamat sementara browser untuk pratinjau (purwarupa). */
+export type FileDipilih = { nama: string; ukuran: number; url?: string }
 
 /** Isi form selama diketik. Angka disimpan sebagai teks supaya mudah diketik. */
 export type DataFormKontrak = {
@@ -23,13 +22,13 @@ export type DataFormKontrak = {
   tanggalBerakhir: string
   /** Nilai rupiah, hanya angka tanpa titik (misalnya "1200000000"). */
   nilai: string
-  criticalPoint: CriticalPoint[]
-  monitoring: string
-  catatan: string
-  keterangan: string
-  /** PDF PKS baru yang dipilih. Kosong kalau tidak memilih file baru. */
+  /** Empat kolom ketentuan kontrak, boleh kosong. */
+  ketentuan: KetentuanKontrak
+  /** Perpanjangan kontrak. Bawaan "Belum diproses". */
+  perpanjangan: Perpanjangan
+  /** File PKS baru yang dipilih. Kosong kalau tidak memilih file baru. */
   filePks: FileDipilih | null
-  /** Nama PDF PKS yang sudah tersimpan (form ubah). Kosong untuk kontrak baru. */
+  /** Nama file PKS yang sudah tersimpan (form ubah). Kosong untuk kontrak baru. */
   namaPksLama: string
 }
 
@@ -41,10 +40,8 @@ export const DATA_AWAL: DataFormKontrak = {
   tanggalMulai: '',
   tanggalBerakhir: '',
   nilai: '',
-  criticalPoint: [],
-  monitoring: '',
-  catatan: '',
-  keterangan: '',
+  ketentuan: { pengakhiran: '', denda: '', jaminan: '', keterangan: '' },
+  perpanjangan: 'belum',
   filePks: null,
   namaPksLama: '',
 }
@@ -58,7 +55,6 @@ export const URUTAN_KOLOM = [
   'tanggalMulai',
   'tanggalBerakhir',
   'nilai',
-  'criticalPoint',
   'filePks',
 ] as const
 
@@ -68,21 +64,20 @@ export type KolomForm = (typeof URUTAN_KOLOM)[number]
 export type GalatForm = Partial<Record<KolomForm, string>>
 
 /** Membuang semua karakter selain angka, misalnya "1.200.000" menjadi "1200000". */
+/**
+ * Paling banyak 15 digit (sampai Rp 999 triliun). Angka JavaScript hanya akurat sampai sekitar 9 kuadriliun,
+ * jadi salah ketik dengan terlalu banyak digit bisa tersimpan keliru tanpa peringatan (impeccable harden, 19 Nov 2026).
+ */
+export const MAKS_DIGIT_NILAI = 15
+
+/** Isian rupiah: hanya angka, tanpa nol di depan, paling banyak MAKS_DIGIT_NILAI digit. */
 export function hanyaAngka(teks: string): string {
-  return teks.replace(/\D/g, '')
+  return teks.replace(/\D/g, '').replace(/^0+(?=\d)/, '').slice(0, MAKS_DIGIT_NILAI)
 }
 
 /** Menampilkan angka dengan titik ribuan, misalnya "1200000" menjadi "1.200.000". */
 export function denganTitikRibuan(angka: string): string {
   return angka ? Number(angka).toLocaleString('id-ID') : ''
-}
-
-/** Memeriksa file PDF. Mengembalikan pesan kesalahan, atau teks kosong kalau sah. */
-export function periksaPdf(file: { name: string; type: string; size: number }): string {
-  const pdf = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf')
-  if (!pdf) return `"${file.name}" bukan file PDF. Pilih file berakhiran .pdf.`
-  if (file.size > MAKS_UKURAN_PDF) return `"${file.name}" lebih dari 10 MB. Perkecil file lalu pilih lagi.`
-  return ''
 }
 
 /** Normalisasi nomor PKS untuk membandingkan nomor ganda (abaikan spasi dan huruf besar/kecil). */
@@ -118,32 +113,15 @@ export function periksaForm(data: DataFormKontrak, daftar: Kontrak[], idSendiri?
 
   if (!data.nilai || Number(data.nilai) <= 0) galat.nilai = 'Isi nilai kontrak dalam rupiah, lebih dari 0.'
 
-  const butirKosong = data.criticalPoint.findIndex((b) => !b.ringkasan.trim())
-  if (butirKosong >= 0) {
-    galat.criticalPoint = `Critical point ke-${butirKosong + 1} belum punya ringkasan. Isi ringkasannya atau hapus butir itu.`
-  }
-
-  if (!data.filePks && !data.namaPksLama) galat.filePks = 'Unggah file PDF PKS sebagai bukti kontrak.'
+  if (!data.filePks && !data.namaPksLama) galat.filePks = 'Unggah file PKS sebagai bukti kontrak.'
 
   return galat
 }
 
-/** Membuat critical point kosong untuk form. */
-export function butirBaru(jenis: JenisCriticalPoint = 'pengakhiran'): CriticalPoint {
-  return {
-    id: `cp-${Date.now()}-${Math.round(Math.random() * 1000)}`,
-    jenis,
-    pasal: '',
-    ringkasan: '',
-    tanggalPenting: '',
-    status: 'aktif',
-    penanganan: '',
-  }
-}
-
 /** Mengisi form dari kontrak yang sudah ada (form ubah). */
 export function dariKontrak(kontrak: Kontrak): DataFormKontrak {
-  const pks = kontrak.dokumen.find((d) => d.jenis === 'PKS utama')
+  // PKS yang berlaku = PKS utama paling baru (PKS lama tetap tersimpan sebagai riwayat).
+  const pks = urutkanDokumen(kontrak.dokumen).findLast((d) => d.jenis === 'PKS utama')
   return {
     nama: kontrak.nama,
     penyedia: kontrak.penyedia,
@@ -152,10 +130,8 @@ export function dariKontrak(kontrak: Kontrak): DataFormKontrak {
     tanggalMulai: kontrak.tanggalMulai,
     tanggalBerakhir: kontrak.tanggalBerakhir,
     nilai: String(kontrak.nilai),
-    criticalPoint: kontrak.criticalPoint.map((b) => ({ ...b })),
-    monitoring: kontrak.monitoring,
-    catatan: kontrak.catatan,
-    keterangan: kontrak.keterangan,
+    ketentuan: { ...kontrak.ketentuan },
+    perpanjangan: kontrak.perpanjangan,
     filePks: null,
     namaPksLama: pks?.nama ?? '',
   }
@@ -163,7 +139,8 @@ export function dariKontrak(kontrak: Kontrak): DataFormKontrak {
 
 /** Mengubah isi form menjadi data kontrak. `lama` diisi saat mengubah kontrak yang sudah ada. */
 export function keKontrak(data: DataFormKontrak, id: string, lama?: Kontrak): Kontrak {
-  let dokumen: Dokumen[] = lama?.dokumen ?? []
+  // Kalau PKS berganti, versi yang sedang berlaku menyimpan datanya dulu (lihat src/lib/versiKontrak.ts).
+  let dokumen: Dokumen[] = lama ? (data.filePks ? simpanVersiBerlaku(lama) : lama.dokumen) : []
   if (data.filePks) {
     const pksBaru: Dokumen = {
       id: `${id}-pks-${Date.now()}`,
@@ -171,11 +148,13 @@ export function keKontrak(data: DataFormKontrak, id: string, lama?: Kontrak): Ko
       jenis: 'PKS utama',
       ukuran: data.filePks.ukuran,
       tanggal: hariIniTeks(),
+      url: data.filePks.url,
     }
-    dokumen = [pksBaru, ...dokumen.filter((d) => d.jenis !== 'PKS utama')]
+    // PKS lama TIDAK dihapus: tetap ada di daftar dokumen sebagai riwayat (PKS awal, adendum, PKS baru).
+    dokumen = [...dokumen, pksBaru]
   }
 
-  return {
+  const hasil: Kontrak = {
     id,
     nama: data.nama.trim(),
     penyedia: data.penyedia.trim(),
@@ -184,12 +163,21 @@ export function keKontrak(data: DataFormKontrak, id: string, lama?: Kontrak): Ko
     tanggalMulai: data.tanggalMulai,
     tanggalBerakhir: data.tanggalBerakhir,
     nilai: Number(data.nilai),
-    criticalPoint: data.criticalPoint.map((b) => ({ ...b, pasal: b.pasal.trim(), ringkasan: b.ringkasan.trim() })),
-    monitoring: data.monitoring.trim(),
-    catatan: data.catatan.trim(),
-    keterangan: data.keterangan.trim(),
+    ketentuan: {
+      pengakhiran: data.ketentuan.pengakhiran.trim(),
+      denda: data.ketentuan.denda.trim(),
+      jaminan: data.ketentuan.jaminan.trim(),
+      keterangan: data.ketentuan.keterangan.trim(),
+    },
+    perpanjangan: data.perpanjangan,
     dokumen,
     ditandaiSelesai: lama?.ditandaiSelesai ?? false,
     keteranganSelesai: lama?.keteranganSelesai ?? '',
   }
+  // PKS baru menyimpan data kontrak yang berlaku sejak PKS itu (versi).
+  if (data.filePks) {
+    const idPks = dokumen.at(-1)?.id
+    hasil.dokumen = dokumen.map((d) => (d.id === idPks ? { ...d, versi: ambilVersi(hasil) } : d))
+  }
+  return hasil
 }

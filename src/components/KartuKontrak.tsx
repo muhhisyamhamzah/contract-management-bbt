@@ -1,12 +1,13 @@
 // Kartu kontrak di Agenda Beranda (pilihan "A: kartu bergrid", disetujui Hisyam 17 Nov 2026):
 // kotak kalender tanggal akhir, angka sisa hari besar sebagai pusat perhatian, nama dan penyedia,
-// garis masa kontrak berwarna status, nomor PKS, dan nilai. Seluruh kartu adalah tautan ke Detail.
+// status adendum (dari perpanjangan kontrak), garis masa kontrak berwarna status, nomor PKS, dan nilai. Seluruh kartu adalah tautan ke Detail.
 
 import { Link } from 'react-router-dom'
 import { formatRupiahSingkat } from '../lib/format'
 import { hitungProgres, hitungSisaHari, hitungStatus, TAMPILAN_STATUS } from '../lib/status'
 import type { Kontrak } from '../types/kontrak'
 import KotakKalender from './KotakKalender'
+import PilPerpanjangan from './PilPerpanjangan'
 
 type Props = {
   kontrak: Kontrak
@@ -37,6 +38,11 @@ function KartuKontrak({ kontrak }: Props) {
         <span className="text-[13px] text-teks-lembut">{kontrak.penyedia}</span>
       </span>
 
+      {/* Status adendum dari isian perpanjangan kontrak (Hisyam 18 Nov 2026) */}
+      <span className="flex">
+        <PilPerpanjangan perpanjangan={kontrak.perpanjangan} />
+      </span>
+
       {/* Garis masa kontrak: berapa persen masa kontrak sudah dilalui */}
       <span
         role="img"
@@ -47,8 +53,9 @@ function KartuKontrak({ kontrak }: Props) {
       </span>
 
       <span className="mt-auto flex items-baseline justify-between gap-3">
-        <span className="text-[13px] text-teks-lembut">{kontrak.nomorPks}</span>
-        <span className="text-[15px] font-bold text-judul">{formatRupiahSingkat(kontrak.nilai)}</span>
+        {/* Nomor PKS yang mengalah kalau panjang; nilai rupiah tidak pernah terpatah (impeccable harden). */}
+        <span className="min-w-0 text-[13px] text-teks-lembut">{kontrak.nomorPks}</span>
+        <span className="flex-none text-[15px] font-bold whitespace-nowrap text-judul">{formatRupiahSingkat(kontrak.nilai)}</span>
       </span>
     </Link>
   )

@@ -12,10 +12,14 @@ import {
   LAMA_KUNCI_DETIK,
   MAKS_PERCOBAAN_MASUK,
   type HasilMasuk,
+  type IsiAdendum,
   type IsianAkunBaru,
+  type IsianProfil,
   type NilaiData,
 } from '../lib/data'
-import type { Akun, CatatanRiwayat, Dokumen, Kontrak } from '../types/kontrak'
+import { formatRupiah, formatTanggalSingkat } from '../lib/format'
+import { ambilVersi, dokumenBerversi, simpanVersiBerlaku } from '../lib/versiKontrak'
+import type { Akun, CatatanNonaktif, CatatanRiwayat, Dokumen, Kontrak } from '../types/kontrak'
 
 const KUNCI_SESI = 'cm-bbt-pengguna'
 
@@ -118,36 +122,26 @@ function PenyediaData({ children }: Props) {
     (id: string, keterangan: string) => {
       const target = kontrak.find((k) => k.id === id)
       if (!target) return
+      // Kontrak yang sudah diperpanjang tetap "Sudah diperpanjang"; selain itu ditutup = tidak diperpanjang.
+      const perpanjangan = target.perpanjangan === 'diperpanjang' ? 'diperpanjang' : 'tidak'
       setKontrak((lama) =>
-        lama.map((k) => (k.id === id ? { ...k, ditandaiSelesai: true, keteranganSelesai: keterangan } : k)),
+        lama.map((k) => (k.id === id ? { ...k, ditandaiSelesai: true, keteranganSelesai: keterangan, perpanjangan } : k)),
       )
-      catat({ aksi: 'selesai', rincian: `Menandai selesai "${target.nama}"`, kontrakId: id })
+      const berubah = perpanjangan !== target.perpanjangan ? ' Status adendum menjadi Tidak diperpanjang.' : ''
+      catat({ aksi: 'selesai', rincian: `Menandai selesai "${target.nama}". Keterangan: ${keterangan}.${berubah}`, kontrakId: id })
     },
     [kontrak, catat],
   )
 
-  const tandaiCriticalSelesai = useCallback(
-    (kontrakId: string, butirId: string, penanganan: string) => {
-      const target = kontrak.find((k) => k.id === kontrakId)
-      const butir = target?.criticalPoint.find((b) => b.id === butirId)
-      if (!target || !butir) return
+  const bukaKembaliKontrak = useCallback(
+    (id: string) => {
+      const target = kontrak.find((k) => k.id === id)
+      if (!target || !target.ditandaiSelesai) return
+      const perpanjangan = target.perpanjangan === 'tidak' ? 'belum' : target.perpanjangan
       setKontrak((lama) =>
-        lama.map((k) =>
-          k.id === kontrakId
-            ? {
-                ...k,
-                criticalPoint: k.criticalPoint.map((b) =>
-                  b.id === butirId ? { ...b, status: 'selesai', penanganan } : b,
-                ),
-              }
-            : k,
-        ),
+        lama.map((k) => (k.id === id ? { ...k, ditandaiSelesai: false, keteranganSelesai: '', perpanjangan } : k)),
       )
-      catat({
-        aksi: 'selesai',
-        rincian: `Menandai selesai critical point ${butir.pasal || ''} di "${target.nama}"`.replace('  ', ' '),
-        kontrakId,
-      })
+      catat({ aksi: 'ubah', rincian: `Membuka kembali kontrak "${target.nama}" yang sudah ditandai selesai`, kontrakId: id })
     },
     [kontrak, catat],
   )
@@ -156,8 +150,41 @@ function PenyediaData({ children }: Props) {
     (kontrakId: string, dokumen: Dokumen) => {
       const target = kontrak.find((k) => k.id === kontrakId)
       if (!target) return
-      setKontrak((lama) => lama.map((k) => (k.id === kontrakId ? { ...k, dokumen: [...k.dokumen, dokumen] } : k)))
+      setKontrak((lama) =>
+        lama.map((k) => {
+          if (k.id !== kontrakId) return k
+          // PKS atau adendum yang diunggah di Detail (tanpa perpanjangan) juga menjadi versi baru dengan data
+          // yang sama; versi sebelumnya menyimpan datanya dulu (src/lib/versiKontrak.ts).
+          if (!dokumenBerversi(dokumen)) return { ...k, dokumen: [...k.dokumen, dokumen] }
+          return { ...k, dokumen: [...simpanVersiBerlaku(k), { ...dokumen, versi: ambilVersi(k) }] }
+        }),
+      )
       catat({ aksi: 'unggah', rincian: `Mengunggah ${dokumen.nama} ke "${target.nama}"`, kontrakId })
+    },
+    [kontrak, catat],
+  )
+
+  const catatAdendum = useCallback(
+    (kontrakId: string, isi: IsiAdendum) => {
+      const target = kontrak.find((k) => k.id === kontrakId)
+      if (!target) return
+      setKontrak((lama) =>
+        lama.map((k) => {
+          if (k.id !== kontrakId) return k
+          // Versi sebelum adendum disimpan dulu, lalu adendum baru menyimpan data sesudahnya (src/lib/versiKontrak.ts).
+          const sesudah: Kontrak = { ...k, tanggalBerakhir: isi.tanggalBerakhir, nilai: isi.nilai, perpanjangan: 'diperpanjang' }
+          const dokumenAdendum = { ...isi.dokumen, id: `${kontrakId}-adendum-${Date.now()}`, versi: ambilVersi(sesudah) }
+          return { ...sesudah, dokumen: [...simpanVersiBerlaku(k), dokumenAdendum] }
+        }),
+      )
+      const ke = target.dokumen.filter((d) => d.jenis === 'Adendum').length + 1
+      const perubahanNilai =
+        isi.nilai !== target.nilai ? `, nilai ${formatRupiah(target.nilai)} menjadi ${formatRupiah(isi.nilai)}` : ''
+      catat({
+        aksi: 'ubah',
+        rincian: `Mencatat adendum ke-${ke} "${target.nama}": akhir kontrak ${formatTanggalSingkat(target.tanggalBerakhir)} menjadi ${formatTanggalSingkat(isi.tanggalBerakhir)}${perubahanNilai}`,
+        kontrakId,
+      })
     },
     [kontrak, catat],
   )
@@ -165,8 +192,8 @@ function PenyediaData({ children }: Props) {
   const tambahAkun = useCallback(
     (isi: IsianAkunBaru) => {
       const sandi = buatSandiSementara()
-      setAkun((lama) => [...lama, { ...isi, id: `a-${Date.now()}`, aktif: true, sandi }])
-      catat({ aksi: 'akun', rincian: `Membuat akun ${isi.nama} (${isi.peran === 'admin' ? 'Admin IT' : 'Pengguna'})` })
+      setAkun((lama) => [...lama, { ...isi, emailNotifikasi: isi.emailNotifikasi?.trim() || undefined, id: `a-${Date.now()}`, aktif: true, sandi }])
+      catat({ aksi: 'akun', rincian: `Membuat akun ${isi.nama} (${isi.peran === 'admin' ? 'Admin' : 'Pengguna'})` })
       return sandi
     },
     [catat],
@@ -184,12 +211,73 @@ function PenyediaData({ children }: Props) {
   )
 
   const ubahAktifAkun = useCallback(
-    (akunId: string, aktif: boolean) => {
+    (akunId: string, aktif: boolean, alasan?: Pick<CatatanNonaktif, 'alasan' | 'keterangan'>) => {
       const target = akun.find((a) => a.id === akunId)
-      setAkun((lama) => lama.map((a) => (a.id === akunId ? { ...a, aktif } : a)))
-      if (target) catat({ aksi: 'akun', rincian: `${aktif ? 'Mengaktifkan' : 'Menonaktifkan'} akun ${target.nama}` })
+      const nonaktif: CatatanNonaktif | undefined =
+        !aktif && alasan ? { ...alasan, waktu: new Date().toISOString(), oleh: namaPengguna } : undefined
+      setAkun((lama) => lama.map((a) => (a.id === akunId ? { ...a, aktif, nonaktif } : a)))
+      if (!target) return
+      if (aktif) {
+        catat({ aksi: 'akun', rincian: `Mengaktifkan akun ${target.nama}` })
+      } else {
+        const ket = alasan?.keterangan ? ` (${alasan.keterangan})` : ''
+        catat({ aksi: 'akun', rincian: `Menonaktifkan akun ${target.nama}. Alasan: ${alasan?.alasan ?? '-'}${ket}` })
+      }
+    },
+    [akun, catat, namaPengguna],
+  )
+
+  const hapusAkun = useCallback(
+    (akunId: string) => {
+      const target = akun.find((a) => a.id === akunId)
+      // Akun aktif tidak boleh dihapus langsung: harus dinonaktifkan dulu (dengan alasan).
+      if (!target || target.aktif) return
+      setAkun((lama) => lama.filter((a) => a.id !== akunId))
+      const alasan = target.nonaktif ? ` Alasan nonaktif: ${target.nonaktif.alasan}.` : ''
+      catat({ aksi: 'akun', rincian: `Menghapus akun ${target.nama} (${target.email}).${alasan}` })
     },
     [akun, catat],
+  )
+
+  const ubahEmailNotifikasi = useCallback(
+    (akunId: string, email: string) => {
+      const target = akun.find((a) => a.id === akunId)
+      const baru = email.trim() || undefined
+      setAkun((lama) => lama.map((a) => (a.id === akunId ? { ...a, emailNotifikasi: baru } : a)))
+      if (target)
+        catat({
+          aksi: 'akun',
+          rincian: baru
+            ? `Mengatur email pengingat ${target.nama} ke ${baru}`
+            : `Mengembalikan email pengingat ${target.nama} ke email kantor`,
+        })
+    },
+    [akun, catat],
+  )
+
+  const ubahProfil = useCallback(
+    (isi: IsianProfil) => {
+      if (!pengguna) return
+      const nama = isi.nama.trim()
+      const jabatan = isi.jabatan.trim()
+      setAkun((lama) => lama.map((a) => (a.id === pengguna.id ? { ...a, nama, jabatan } : a)))
+      const berubah = [
+        nama !== pengguna.nama && `nama "${pengguna.nama}" menjadi "${nama}"`,
+        jabatan !== pengguna.jabatan && `jabatan "${pengguna.jabatan}" menjadi "${jabatan}"`,
+      ].filter(Boolean)
+      if (berubah.length) catat({ aksi: 'akun', rincian: `Mengubah profil sendiri: ${berubah.join(', ')}` })
+    },
+    [pengguna, catat],
+  )
+
+  const gantiSandi = useCallback(
+    (sandiLama: string, sandiBaru: string) => {
+      if (!pengguna || pengguna.sandi !== sandiLama) return false
+      setAkun((lama) => lama.map((a) => (a.id === pengguna.id ? { ...a, sandi: sandiBaru } : a)))
+      catat({ aksi: 'akun', rincian: `Mengganti kata sandi akun ${pengguna.nama}` })
+      return true
+    },
+    [pengguna, catat],
   )
 
   const tandaiDibaca = useCallback((ids: string[]) => {
@@ -207,11 +295,16 @@ function PenyediaData({ children }: Props) {
       simpanKontrak,
       hapusKontrak,
       tandaiSelesai,
-      tandaiCriticalSelesai,
+      bukaKembaliKontrak,
       tambahDokumen,
+      catatAdendum,
       tambahAkun,
       resetSandi,
       ubahAktifAkun,
+      hapusAkun,
+      ubahEmailNotifikasi,
+      ubahProfil,
+      gantiSandi,
       notifikasiDibaca,
       tandaiDibaca,
     }),
@@ -225,11 +318,16 @@ function PenyediaData({ children }: Props) {
       simpanKontrak,
       hapusKontrak,
       tandaiSelesai,
-      tandaiCriticalSelesai,
+      bukaKembaliKontrak,
       tambahDokumen,
+      catatAdendum,
       tambahAkun,
       resetSandi,
       ubahAktifAkun,
+      hapusAkun,
+      ubahEmailNotifikasi,
+      ubahProfil,
+      gantiSandi,
       notifikasiDibaca,
       tandaiDibaca,
     ],

@@ -8,27 +8,27 @@
  */
 export type StatusKontrak = 'berjalan' | 'segera' | 'lewat' | 'selesai'
 
-/** Jenis klausul berisiko di PKS. */
-export type JenisCriticalPoint = 'pengakhiran' | 'denda' | 'lainnya'
-
-/** Satu klausul berisiko di PKS, misalnya pasal pengakhiran kontrak atau denda. */
-export type CriticalPoint = {
-  id: string
-  jenis: JenisCriticalPoint
-  /** Rujukan pasal, misalnya "Pasal 12". */
-  pasal: string
-  /** Ringkasan singkat yang ditulis pengguna. */
-  ringkasan: string
-  /** Tanggal penting (opsional), format YYYY-MM-DD. Kalau diisi, ikut diingatkan. */
-  tanggalPenting: string
-  status: 'aktif' | 'selesai'
-  /** Keterangan penanganan, diisi saat ditandai selesai. */
-  penanganan: string
+/**
+ * Ketentuan kontrak dari PKS (dulu "critical point", diubah Hisyam 18 Nov 2026).
+ * Empat kolom isian teks tetap, semuanya boleh kosong. Tidak ada tanggal dan pengingat.
+ */
+export type KetentuanKontrak = {
+  pengakhiran: string
+  denda: string
+  jaminan: string
+  /** Keterangan lain. Menggantikan kolom Monitoring, Catatan, dan Keterangan lama (dihapus 18 Nov 2026). */
+  keterangan: string
 }
+
+/**
+ * Perpanjangan kontrak, diisi pengguna (Hisyam 18 Nov 2026).
+ * Status kontrak yang tampil dihitung dari isian ini (lihat STATUS_PERPANJANGAN di src/lib/status.ts).
+ */
+export type Perpanjangan = 'belum' | 'proses' | 'diperpanjang' | 'tidak'
 
 export type JenisDokumen = 'PKS utama' | 'Adendum' | 'BAST' | 'Lainnya'
 
-/** Satu file PDF kontrak. */
+/** Satu file dokumen kontrak (PKS, adendum, BAST, dll.). Semua jenis file boleh. */
 export type Dokumen = {
   id: string
   nama: string
@@ -37,7 +37,24 @@ export type Dokumen = {
   ukuran: number
   /** Tanggal unggah, format YYYY-MM-DD. */
   tanggal: string
+  /**
+   * Alamat file untuk pratinjau dan unduh. Di purwarupa: alamat sementara browser (URL.createObjectURL)
+   * untuk file yang diunggah di sesi ini; dokumen contoh tidak punya file. Nanti: tautan bertanda tangan Cloudflare R2.
+   */
+  url?: string
+  /**
+   * Data kontrak saat dokumen ini berlaku (hanya PKS dan adendum). Dipakai halaman Detail untuk menampilkan
+   * data versi dokumen yang dibuka di samping data terbaru (permintaan atasan, 20 Nov 2026).
+   * Dokumen lain (BAST, lainnya) tidak punya versi sendiri: mengikuti versi yang berlaku pada tanggal unggahnya.
+   */
+  versi?: VersiKontrak
 }
+
+/** Isi data kontrak yang berlaku pada satu versi (PKS awal, PKS pengganti, atau adendum). */
+export type VersiKontrak = Pick<
+  Kontrak,
+  'nama' | 'penyedia' | 'nomorPks' | 'tanggalPks' | 'tanggalMulai' | 'tanggalBerakhir' | 'nilai' | 'ketentuan' | 'perpanjangan'
+>
 
 export type Kontrak = {
   id: string
@@ -55,12 +72,9 @@ export type Kontrak = {
   tanggalBerakhir: string
   /** Nilai kontrak dalam rupiah, angka bulat. */
   nilai: number
-  criticalPoint: CriticalPoint[]
-  /** [TERBUKA] Isinya progres pekerjaan atau status pembayaran. */
-  monitoring: string
-  catatan: string
-  /** [TERBUKA] Bedanya dengan catatan belum jelas. */
-  keterangan: string
+  ketentuan: KetentuanKontrak
+  /** Perpanjangan kontrak: belum diproses, sedang diproses, sudah diperpanjang, atau tidak diperpanjang. */
+  perpanjangan: Perpanjangan
   dokumen: Dokumen[]
   /** true kalau sudah ditandai selesai oleh pengguna. */
   ditandaiSelesai: boolean
@@ -74,6 +88,16 @@ export type Kontrak = {
 
 export type Peran = 'pengguna' | 'admin'
 
+/** Alasan dan jejak penonaktifan akun. */
+export type CatatanNonaktif = {
+  alasan: string
+  keterangan: string
+  /** Waktu dinonaktifkan, format ISO. */
+  waktu: string
+  /** Nama admin yang menonaktifkan. */
+  oleh: string
+}
+
 export type Akun = {
   id: string
   nama: string
@@ -84,6 +108,17 @@ export type Akun = {
   aktif: boolean
   /** HANYA untuk data contoh selama belum ada backend. Backend menyimpan hash. */
   sandi: string
+  /**
+   * Catatan saat akun dinonaktifkan (Hisyam 19 Nov 2026): alasan, keterangan, kapan (ISO), dan oleh siapa.
+   * Dikosongkan saat akun diaktifkan lagi; jejaknya tetap ada di riwayat perubahan.
+   */
+  nonaktif?: CatatanNonaktif
+  /**
+   * Email pribadi (misalnya Gmail) untuk menerima pengingat kontrak (permintaan atasan, 20 Nov 2026).
+   * Masuk ke website tetap dengan email kantor; email kantor menjadi "jembatan" ke email ini.
+   * Kosong: pengingat dikirim ke email kantor. Pengiriman otomatis tanpa perlu izin (beda dengan Web Push).
+   */
+  emailNotifikasi?: string
 }
 
 /** Satu baris riwayat perubahan: siapa, kapan, apa yang berubah. */
@@ -108,5 +143,5 @@ export type Notifikasi = {
   /** Tanggal pengingat, format YYYY-MM-DD. */
   tanggal: string
   kontrakId: string
-  jenis: 'pengingat' | 'lewat' | 'critical'
+  jenis: 'pengingat' | 'lewat'
 }

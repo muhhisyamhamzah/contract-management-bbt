@@ -1,8 +1,9 @@
 // Lonceng notifikasi di navigasi atas. Diklik membuka panel berisi pengingat yang sudah terkirim:
-// pengingat 3/2/1 bulan, kontrak yang sudah lewat, dan critical point.
+// pengingat 3/2/1 bulan dan kontrak yang sudah lewat. (Pengingat critical point dihapus 18 Nov 2026.)
 
 import { Link } from 'react-router-dom'
-import { useData } from '../lib/data'
+import { alamatPengingat } from '../lib/akun'
+import { useData, usePengguna } from '../lib/data'
 import { formatTanggalSingkat } from '../lib/format'
 import { susunNotifikasi } from '../lib/notifikasi'
 import { usePopover } from '../lib/popover'
@@ -12,12 +13,12 @@ import Ikon from './Ikon'
 const WARNA_TITIK = {
   pengingat: 'bg-segera',
   lewat: 'bg-lewat',
-  critical: 'bg-aksi',
 } as const
 
 function PanelNotifikasi() {
   const { kontrak, notifikasiDibaca, tandaiDibaca } = useData()
   const { terbuka, setTerbuka, wadah, tombol } = usePopover()
+  const pengguna = usePengguna()
 
   const semua = susunNotifikasi(kontrak)
   const belumDibaca = semua.filter((n) => !notifikasiDibaca.has(n.id))
@@ -101,6 +102,15 @@ function PanelNotifikasi() {
               })}
             </ul>
           )}
+          {/* Pengingat juga dikirim ke email (permintaan atasan, 20 Nov 2026). Diatur di menu akun. */}
+          <p className="m-0 flex items-start gap-2 border-t border-garis-lembut px-4 py-3 text-[12px] text-teks-lembut">
+            <Ikon nama="email" ukuran={14} className="mt-px flex-none" />
+            <span className="flex min-w-0 flex-col">
+              <span>Pengingat juga dikirim ke email:</span>
+              <span className="font-semibold break-all text-teks">{alamatPengingat(pengguna)}</span>
+              <span>Ubah lewat menu akun.</span>
+            </span>
+          </p>
         </div>
       )}
     </div>
