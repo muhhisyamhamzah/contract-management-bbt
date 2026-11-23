@@ -29,7 +29,7 @@ import { cariVersi } from '../lib/versiKontrak'
 import TabelBanding, { type BarisBanding } from '../components/TabelBanding'
 import type { KetentuanKontrak, VersiKontrak } from '../types/kontrak'
 import { urutkanDokumen } from '../lib/daftarKontrak'
-import PilPerpanjangan from '../components/PilPerpanjangan'
+import StatusAdendum from '../components/StatusAdendum'
 import {
   KELAS_ISIAN,
   KELAS_KOTAK,
@@ -87,7 +87,7 @@ function DetailKontrak() {
   // juga pada kontrak yang baru diperpanjang, sehingga tindakan yang sulit dibatalkan menjadi yang paling menonjol.
   // - berjalan: tidak ada tombol utama;
   // - segera habis / lewat: keputusan perpanjang (Catat adendum) atau Tandai selesai. Yang sudah diputuskan di
-  //   Perpanjangan kontrak menjadi tombol utama; kalau belum diputuskan, keduanya setara.
+  //   Status adendum menjadi tombol utama; kalau belum diputuskan, keduanya setara.
   const perluKeputusan = status === 'segera' || status === 'lewat'
   const tombolUtama: 'adendum' | 'selesai' | null = !perluKeputusan
     ? null
@@ -116,7 +116,7 @@ function DetailKontrak() {
     ['Nilai kontrak', formatRupiah(kontrak.nilai)],
     // Jumlah hari selalu ditulis (juga untuk kontrak yang masih lama), bukan hanya "Berjalan".
     ['Sisa kontrak', sudahSelesai ? 'Sudah selesai' : status === 'lewat' ? teksSisaHari(kontrak) : teksJarakHari(kontrak.tanggalBerakhir)],
-    ['Status adendum', <PilPerpanjangan perpanjangan={kontrak.perpanjangan} />],
+    ['Status adendum', <StatusAdendum perpanjangan={kontrak.perpanjangan} />],
     ['Jumlah adendum', jumlahAdendum > 0 ? `${jumlahAdendum} kali` : 'Belum ada'],
     ['Pengingat', sudahSelesai ? 'Berhenti' : pengingat.map((t) => formatTanggalSingkat(t.tanggal)).join(', ')],
   ]
@@ -472,7 +472,7 @@ function DetailKontrak() {
         terbuka={konfirmasiBuka}
         judul="Buka kembali kontrak ini?"
         pesan={`"${kontrak.nama}" aktif lagi dan pengingatnya berjalan kembali sesuai akhir kontrak ${formatTanggal(kontrak.tanggalBerakhir)}.${
-          kontrak.perpanjangan === 'tidak' ? ' Status adendum kembali menjadi "Menunggu keputusan".' : ''
+          kontrak.perpanjangan === 'tidak' ? ' Status adendum kembali menjadi "Belum diproses".' : ''
         } Langkah ini dicatat di riwayat.`}
         labelKonfirmasi="Buka kembali"
         onKonfirmasi={() => {

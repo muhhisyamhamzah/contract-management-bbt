@@ -121,7 +121,7 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
   Gelombang dipicu pengatur waktu di `src/components/Mozaik.tsx` (sekali jalan, 5 baris teratas, berhenti saat tab
   tidak dilihat), BUKAN animasi CSS tanpa henti: yang terakhir membebani browser ±10% terus-menerus (diukur 19 Nov 2026).
   Warna kotak di belakang teks dibatasi per warna (`PUTIH_MINIMAL` di `src/components/Mozaik.tsx`) supaya teks
-  tetap minimal 4,5:1. Di desktop mozaik turun 20px, jadi judul halaman mulai di `md:pt-21` (Beranda `md:pt-28`)
+  tetap minimal 4,5:1. Di desktop mozaik turun 20px, jadi judul halaman mulai di `md:pt-21` (Beranda juga, sejak 23 Nov 2026)
   dan tidak pernah berada di atas baris kotak pekat.
   Judul besar rata tengah HANYA di Beranda dan Masuk. Halaman kerja memakai judul rata kiri dan panel padat.
 - Larangan "ciri AI" (lingkaran blur, kaca buram, gradasi, emoji, eyebrow, kartu berbayangan seragam, dll.):

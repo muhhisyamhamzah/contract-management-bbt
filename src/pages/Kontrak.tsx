@@ -27,7 +27,7 @@ import {
   type Urutan,
 } from '../lib/daftarKontrak'
 import { hitungJumlahPerStatus, TAMPILAN_STATUS } from '../lib/status'
-import { KELAS_KOTAK, KELAS_TOMBOL_KEDUA, KELAS_WADAH } from '../lib/tataLetak'
+import { KELAS_KOLOM_TABEL_KONTRAK, KELAS_KOTAK, KELAS_TOMBOL_KEDUA, KELAS_WADAH } from '../lib/tataLetak'
 
 function Kontrak() {
   const [unduhExcel, setUnduhExcel] = useState(false)
@@ -148,14 +148,15 @@ function Kontrak() {
               {/* Judul kolom (desktop). Disembunyikan dari pembaca layar karena tiap baris sudah lengkap. */}
               <div
                 aria-hidden="true"
-                className="hidden min-h-11 items-center gap-x-4 border-b border-garis px-6 text-[12px] font-semibold text-teks-lembut lg:grid lg:grid-cols-[32px_minmax(0,2fr)_140px_180px_100px_200px_56px_24px]"
+                className={`hidden min-h-11 items-center gap-x-4 border-b border-garis px-6 text-[12px] font-semibold text-teks-lembut xl:grid ${KELAS_KOLOM_TABEL_KONTRAK}`}
               >
                 <span>No</span>
                 <span>Kontrak</span>
                 <span>Nomor PKS</span>
                 <span>Masa kontrak</span>
                 <span className="text-right">Nilai</span>
-                <span className="text-right">Status dan adendum</span>
+                <span>Status</span>
+                <span>Adendum</span>
                 <span>Dokumen</span>
                 <span />
               </div>

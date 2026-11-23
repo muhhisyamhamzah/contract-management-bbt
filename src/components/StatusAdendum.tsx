@@ -1,21 +1,27 @@
-// Pil "Status kontrak" yang dihitung dari isian perpanjangan kontrak
-// (Menunggu keputusan, Proses melakukan adendum, Sudah dilakukan adendum, Tidak diperpanjang).
-// Label dan warna diambil dari STATUS_PERPANJANGAN di src/lib/status.ts.
+// Status adendum yang dihitung dari isian perpanjangan kontrak
+// (Belum diproses, Sedang diproses, Sudah diperpanjang, Tidak diperpanjang).
+// Label, ikon, dan warna ikon diambil dari STATUS_PERPANJANGAN di src/lib/status.ts.
+//
+// Sengaja BUKAN pil (23 Nov 2026, dulu bernama PilPerpanjangan): berupa teks biasa dengan ikon kecil berwarna.
+// Pil hanya untuk status kontrak (BadgeStatus). Waktu keduanya sama-sama pil dan bertumpuk di satu kolom,
+// pengguna membacanya sebagai satu informasi walau warnanya sudah dibedakan.
 
 import { STATUS_PERPANJANGAN } from '../lib/status'
 import type { Perpanjangan } from '../types/kontrak'
+import Ikon from './Ikon'
 
 type Props = {
   perpanjangan: Perpanjangan
 }
 
-function PilPerpanjangan({ perpanjangan }: Props) {
-  const { label, kelas } = STATUS_PERPANJANGAN[perpanjangan]
+function StatusAdendum({ perpanjangan }: Props) {
+  const { label, ikon, kelasIkon } = STATUS_PERPANJANGAN[perpanjangan]
   return (
-    <span className={`inline-flex items-center rounded-full px-3 py-1 text-[13px] font-semibold whitespace-nowrap ${kelas}`}>
+    <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-teks">
+      <Ikon nama={ikon} ukuran={15} tebal={2.5} className={`flex-none ${kelasIkon}`} />
       {label}
     </span>
   )
 }
 
-export default PilPerpanjangan
+export default StatusAdendum

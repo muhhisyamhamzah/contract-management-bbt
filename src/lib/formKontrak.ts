@@ -24,7 +24,7 @@ export type DataFormKontrak = {
   nilai: string
   /** Empat kolom ketentuan kontrak, boleh kosong. */
   ketentuan: KetentuanKontrak
-  /** Perpanjangan kontrak. Bawaan "Belum diproses". */
+  /** Status adendum (dulu "Perpanjangan kontrak"). Bawaan "Belum diproses". */
   perpanjangan: Perpanjangan
   /** File PKS baru yang dipilih. Kosong kalau tidak memilih file baru. */
   filePks: FileDipilih | null

@@ -16,8 +16,8 @@ colors:
   garis-input: "#7D88A3"
   segera-teks: "#7A5700"
   segera-latar: "#FBF0D3"
-  lewat-teks: "#9E4113"
-  lewat-latar: "#FCE6DA"
+  lewat-teks: "#8C2410"
+  lewat-latar: "#F9DDD5"
   hapus: "#D93645"
 typography:
   display:
@@ -221,7 +221,7 @@ Latar hampir putih dengan navy sebagai suara utama. Emas dan tanah hanya muncul 
 - **Emas** (emas): pita kalender "Segera habis", bulatan jumlah pengingat, bagian tengah-kanan mozaik. Tidak pernah sebagai warna teks di atas putih.
 
 ### Tertiary
-- **Tanah** (tanah): pita kalender "Sudah lewat", ujung kanan mozaik. Teks di atasnya selalu navy tua.
+- **Tanah** (tanah): ujung kanan mozaik. (Sejak 23 Nov 2026 pita kalender "Sudah lewat" memakai merah bata `lewat` #B8361F dengan teks putih, supaya tidak mirip pita emas "Segera habis".)
 
 ### Neutral
 - **Latar** (latar): latar halaman, tempat mozaik memudar.
@@ -270,7 +270,8 @@ supaya kontras teks tetap lolos.
   lonceng, avatar, dan tombol pil "Tambah kontrak" (tidak tampil di halaman form).
 - Wadah konten maksimal 1280px supaya semua menu muat satu baris mulai 1280px. Di bawah itu menu pindah ke baris kedua di dalam pil.
 - **Mozaik:** di semua halaman, setinggi 60% layar (45% di HP), di belakang navigasi dan judul.
-- **Beranda:** pembuka rata tengah (tanggal, judul display, satu kalimat ringkasan, kotak cari pil, rekap status berupa pil),
+- **Beranda:** pembuka rata tengah (tanggal, judul display, kotak cari pil, rekap status berupa pil; kalimat ringkasan dihapus
+  23 Nov 2026 dan nilai rupiahnya pindah ke samping judul Agenda, supaya Agenda terlihat tanpa scroll di laptop 1366x768),
   lalu "Agenda kontrak" berupa kartu (3 kolom desktop), lalu critical point terdekat dalam garis masa per bulan dengan penanda "Hari ini".
 - **Kontrak dan Critical point:** kotak cari, pil lompat cepat, lalu tabel terpisah per tahap dengan judul dan satu kalimat penjelasan.
 - **Rekap:** tabel semua kontrak; baris dibuka di tempat untuk rincian dan PDF. **Ubah data:** daftar kontrak di kiri, form di kanan.
@@ -329,7 +330,8 @@ Dipudarkan ke latar dengan mask. Warna diambil dari token (`color-mix` dengan `v
 
 ### Kartu Kontrak (Signature Component)
 Kartu Agenda di Beranda: kotak kalender, angka sisa hari 44px berwarna status (pusat perhatian), nama dan penyedia,
-garis masa kontrak berwarna status, nomor PKS, dan nilai. Seluruh kartu adalah tautan ke Detail.
+status adendum, nomor PKS, dan nilai. Seluruh kartu adalah tautan ke Detail. (Garis masa kontrak dihapus 23 Nov 2026:
+tanpa label mudah dibaca sebagai sisa waktu, yang sudah ditunjukkan kalender dan angka.)
 
 ### Tabel Tahap (Signature Component)
 Dipakai halaman Kontrak dan Critical point: judul tahap (22px), satu kalimat penjelasan pengingat, lalu panel bergaris berisi baris
@@ -337,7 +339,7 @@ Dipakai halaman Kontrak dan Critical point: judul tahap (22px), satu kalimat pen
 
 ### Kotak Kalender (Signature Component)
 Kalender meja kecil 54px bersudut 12px: pita bulan di atas ("Nov", huruf biasa), tanggal besar navy tua di bawah.
-Pita emas untuk "Segera habis", tanah untuk "Sudah lewat". Teks pita selalu navy tua.
+Pita emas untuk "Segera habis" (teks navy tua), merah bata `lewat` untuk "Sudah lewat" (teks putih, 23 Nov 2026).
 
 ## Do's and Don'ts
 

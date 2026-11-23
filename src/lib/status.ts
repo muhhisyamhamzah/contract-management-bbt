@@ -51,26 +51,6 @@ export function perluPerhatian(kontrak: Kontrak, hariIni: Date = new Date()): bo
   return status === 'lewat' || status === 'segera'
 }
 
-/**
- * Persen masa kontrak yang sudah dilalui (0 sampai 100), untuk garis masa kontrak.
- * Kontrak yang sudah lewat atau selesai selalu 100.
- */
-export function hitungProgres(kontrak: Kontrak, hariIni: Date = new Date()): number {
-  const status = hitungStatus(kontrak, hariIni)
-  if (status === 'lewat' || status === 'selesai') return 100
-  return persenPadaGaris(kontrak, hariIni)
-}
-
-/** Posisi suatu tanggal pada garis masa kontrak, dalam persen 0 sampai 100. */
-export function persenPadaGaris(kontrak: Kontrak, tanggal: Date): number {
-  const mulai = keTanggal(kontrak.tanggalMulai)
-  const berakhir = keTanggal(kontrak.tanggalBerakhir)
-  const totalHari = selisihHari(mulai, berakhir)
-  if (totalHari <= 0) return 100
-  const persen = Math.round((selisihHari(mulai, tanggal) / totalHari) * 100)
-  return Math.min(100, Math.max(0, persen))
-}
-
 /** Teks sisa waktu, misalnya "18 hari lagi", "Lewat 8 hari", atau "Selesai". */
 export function teksSisaHari(kontrak: Kontrak, hariIni: Date = new Date()): string {
   const status = hitungStatus(kontrak, hariIni)
@@ -158,8 +138,8 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBadge: 'bg-lewat-latar text-lewat-teks',
     kelasTeks: 'text-lewat-teks',
     kelasBar: 'bg-lewat',
-    // Teks navy, bukan putih: putih di atas oranye hanya 2,98:1 (lihat docs/ui-audit.md).
-    kelasPita: 'bg-logo-tanah text-galaxy-900',
+    // Merah bata + teks putih (5,86:1), 23 Nov 2026. Dulu oranye tanah + teks navy, yang mirip pita emas "segera".
+    kelasPita: 'bg-lewat text-white',
   },
   selesai: {
     label: 'Selesai',
@@ -179,24 +159,10 @@ export const LABEL_KETENTUAN: Record<keyof KetentuanKontrak, string> = {
   keterangan: 'Keterangan',
 }
 
-/** Pilihan isian "Perpanjangan kontrak" di form, urut seperti tampil di daftar pilihan. */
-export const LABEL_PERPANJANGAN: Record<Perpanjangan, string> = {
-  belum: 'Belum diproses',
-  proses: 'Sedang diproses',
-  diperpanjang: 'Sudah diperpanjang',
-  tidak: 'Tidak diperpanjang',
-}
-
-/**
- * Status kontrak yang tampil, dihitung dari isian perpanjangan (Hisyam 18 Nov 2026).
- * [ASUMSI] Nama untuk "Belum diproses" belum diputuskan; sementara "Menunggu keputusan".
- * Cukup ganti teks di sini kalau nama resminya sudah ada.
- * Kelas warna diambil dari warna status yang sudah ada (latar muda + teks gelap, kontras minimal 5,4:1).
- */
 /**
  * Apakah status adendum perlu ditampilkan di daftar (Beranda, Kontrak).
- * "Menunggu keputusan" hanya berarti untuk kontrak yang sudah dekat atau lewat tanggal akhirnya;
- * untuk kontrak yang masih lama berjalan, pil itu hanya menambah ramai. Halaman Detail selalu menampilkannya.
+ * "Belum diproses" hanya berarti untuk kontrak yang sudah dekat atau lewat tanggal akhirnya;
+ * untuk kontrak yang masih lama berjalan, isian itu hanya menambah ramai. Halaman Detail selalu menampilkannya.
  */
 export function tampilkanStatusAdendum(kontrak: Kontrak, hariIni: Date = new Date()): boolean {
   if (kontrak.perpanjangan !== 'belum') return true
@@ -204,9 +170,21 @@ export function tampilkanStatusAdendum(kontrak: Kontrak, hariIni: Date = new Dat
   return status === 'segera' || status === 'lewat'
 }
 
-export const STATUS_PERPANJANGAN: Record<Perpanjangan, { label: string; kelas: string }> = {
-  belum: { label: 'Menunggu keputusan', kelas: 'bg-selesai-latar text-selesai-teks' },
-  proses: { label: 'Proses melakukan adendum', kelas: 'bg-segera-latar text-segera-teks' },
-  diperpanjang: { label: 'Sudah dilakukan adendum', kelas: 'bg-berjalan-latar text-berjalan-teks' },
-  tidak: { label: 'Tidak diperpanjang', kelas: 'bg-lewat-latar text-lewat-teks' },
+/**
+ * Status adendum: pilihan di form ubah DAN yang tampil di daftar, Detail, Catat adendum, dan Excel.
+ * Urutan di sini = urutan pilihan di form.
+ *
+ * SATU nama dan SATU set label (23 Nov 2026, [ASUMSI] menunggu persetujuan Hisyam). Dulu ada dua set:
+ * form "Belum diproses / Sedang diproses / Sudah diperpanjang" tapi tampilan "Menunggu keputusan /
+ * Proses melakukan adendum / Sudah dilakukan adendum", dan kolomnya disebut "Perpanjangan kontrak",
+ * "Status kontrak", atau "Status adendum". Sekarang di mana pun disebut "Status adendum" dengan label di bawah.
+ *
+ * Tampilan sengaja BEDA dari badge status kontrak: teks + ikon kecil berwarna (StatusAdendum.tsx), bukan pil
+ * berlatar warna. Warna hanya di ikon (minimal 3:1 di putih).
+ */
+export const STATUS_PERPANJANGAN: Record<Perpanjangan, { label: string; ikon: NamaIkon; kelasIkon: string }> = {
+  belum: { label: 'Belum diproses', ikon: 'info', kelasIkon: 'text-teks-lembut' },
+  proses: { label: 'Sedang diproses', ikon: 'pensil', kelasIkon: 'text-aksi' },
+  diperpanjang: { label: 'Sudah diperpanjang', ikon: 'centang', kelasIkon: 'text-berjalan-teks' },
+  tidak: { label: 'Tidak diperpanjang', ikon: 'tutup', kelasIkon: 'text-lewat-teks' },
 }

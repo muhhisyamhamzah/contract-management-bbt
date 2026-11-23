@@ -32,7 +32,9 @@
   /* Warna pekat tiap status (titik, progress bar, garis termin) */
   --color-berjalan: #1E9E6A;
   --color-segera: #E0A100;
-  --color-lewat: #E36A2E;
+  /* Sudah lewat: merah bata (23 Nov 2026), dulu oranye #E36A2E yang terlalu mirip kuning segera.
+     Sengaja lebih gelap dan lebih cokelat dari merah hapus #D93645. 5,86:1 di putih, jadi teks putih boleh di atasnya. */
+  --color-lewat: #B8361F;
   --color-selesai: #8291A8;       /* tanda status: 3,20:1 di putih (nilai lama 2,56:1) */
 
   /* Badge dan ikon status: latar muda + teks gelap */
@@ -40,8 +42,8 @@
   --color-berjalan-teks: #11734B;
   --color-segera-latar: #FBF0D3;
   --color-segera-teks: #7A5700;
-  --color-lewat-latar: #FCE6DA;
-  --color-lewat-teks: #9E4113;
+  --color-lewat-latar: #F9DDD5;   /* dulu #FCE6DA (hampir sama dengan latar segera) */
+  --color-lewat-teks: #8C2410;    /* 6,88:1 di lewat-latar, 8,84:1 di putih */
   --color-selesai-latar: #EEF1F5;
   --color-selesai-teks: #4B5568;
 

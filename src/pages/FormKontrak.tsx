@@ -34,7 +34,7 @@ import {
   type DataFormKontrak,
 } from '../lib/formKontrak'
 import { useKembali } from '../lib/navigasi'
-import { jadwalPengingat, LABEL_KETENTUAN, LABEL_PERPANJANGAN, STATUS_PERPANJANGAN } from '../lib/status'
+import { jadwalPengingat, LABEL_KETENTUAN, STATUS_PERPANJANGAN } from '../lib/status'
 import { KELAS_ISIAN, KELAS_KOTAK, KELAS_TOMBOL_KEDUA, KELAS_TOMBOL_UTAMA, KELAS_WADAH } from '../lib/tataLetak'
 import { useToast } from '../lib/toast'
 
@@ -111,7 +111,7 @@ function FormKontrak() {
   const tanggalSah = data.tanggalMulai && data.tanggalBerakhir && data.tanggalBerakhir > data.tanggalMulai
   const jadwal = data.tanggalBerakhir ? jadwalPengingat(data.tanggalBerakhir) : []
 
-  /** Di form ubah, bagian Perpanjangan kontrak menjadi nomor 1, jadi nomor bagian lain bergeser satu. */
+  /** Di form ubah, bagian Status adendum menjadi nomor 1, jadi nomor bagian lain bergeser satu. */
   const geser = modeUbah ? 1 : 0
   const jumlahKetentuan = Object.values(data.ketentuan).filter((isi) => isi.trim()).length
   const ringkasan: [string, string][] = [
@@ -123,7 +123,7 @@ function FormKontrak() {
     ['Nilai kontrak', data.nilai ? formatRupiah(Number(data.nilai)) : '-'],
     ['Ketentuan kontrak', jumlahKetentuan > 0 ? `${jumlahKetentuan} dari 4 kolom diisi` : 'Belum diisi'],
     ...(modeUbah
-      ? [['Perpanjangan kontrak', `${LABEL_PERPANJANGAN[data.perpanjangan]} (${STATUS_PERPANJANGAN[data.perpanjangan].label})`] as [string, string]]
+      ? [['Status adendum', STATUS_PERPANJANGAN[data.perpanjangan].label] as [string, string]]
       : []),
     ['File PKS', data.filePks?.nama ?? data.namaPksLama],
   ]
@@ -141,13 +141,13 @@ function FormKontrak() {
             </div>
           )}
 
-          {/* Perpanjangan kontrak hanya saat mengubah, dan diletakkan paling atas (Hisyam 18 Nov 2026).
+          {/* Status adendum (dulu "Perpanjangan kontrak") hanya saat mengubah, dan diletakkan paling atas (Hisyam 18 Nov 2026).
               Kontrak baru selalu "Belum diproses". */}
           {modeUbah && (
-            <BagianForm nomor={1} id="perpanjangan" judul="Perpanjangan kontrak">
+            <BagianForm nomor={1} id="perpanjangan" judul="Status adendum">
               <PilihanPerpanjangan nilai={data.perpanjangan} onUbah={(nilai) => ubah('perpanjangan', nilai)} />
               {/* Status "sudah diperpanjang" tanpa tanggal akhir baru membuat data bertentangan
-                  (misalnya "Sudah dilakukan adendum" tapi "Habis 18 hari lagi"). Arahkan ke Catat adendum. */}
+                  (misalnya "Sudah diperpanjang" tapi "Habis 18 hari lagi"). Arahkan ke Catat adendum. */}
               {lama && data.perpanjangan === 'diperpanjang' && data.tanggalBerakhir === lama.tanggalBerakhir && (
                 <p role="status" className="m-0 flex items-start gap-2.5 rounded-2xl bg-lembut px-4 py-3 text-[14px] text-aksi-tua">
                   <Ikon nama="info" ukuran={18} className="mt-px flex-none" />

@@ -57,7 +57,7 @@ export type NilaiData = {
   tandaiSelesai: (id: string, keterangan: string) => void
   /**
    * Membuka kembali kontrak yang sudah ditandai selesai (misalnya salah tutup). Pengingat berjalan lagi;
-   * status "Tidak diperpanjang" kembali menjadi "Menunggu keputusan". Dicatat di riwayat.
+   * status "Tidak diperpanjang" kembali menjadi "Belum diproses". Dicatat di riwayat.
    */
   bukaKembaliKontrak: (id: string) => void
   tambahDokumen: (kontrakId: string, dokumen: Dokumen) => void

@@ -2,6 +2,9 @@
 // Isi dari atas ke bawah: navigasi pil, judul rata tengah berupa kalimat tugas, kotak cari pil,
 // rekap status berupa pil, dan "Agenda kontrak" berupa kartu (sudah lewat + habis dalam 90 hari).
 // Bagian "Critical point terdekat" dihapus bersama pengingat critical point (Hisyam 18 Nov 2026).
+// Dipadatkan 23 Nov 2026 supaya Agenda kontrak mulai terlihat tanpa scroll di laptop 1366x768:
+// kalimat ringkasan di bawah judul dihapus (angkanya sudah ada di pil status), nilai rupiah pindah ke judul Agenda,
+// jarak atas sama dengan halaman kerja (md:pt-21), dan jarak antarbagian dikurangi.
 
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
@@ -51,9 +54,9 @@ function Beranda() {
     <>
       <KepalaHalaman />
 
-      <main id="konten" className={`${KELAS_WADAH} relative flex flex-col gap-12 pb-6 md:gap-16`}>
-        {/* Pembuka rata tengah. Jarak atas memberi ruang untuk mozaik yang memudar (teks tidak di atas mozaik). */}
-        <section aria-labelledby="judul-beranda" className="flex flex-col items-center pt-12 text-center md:pt-28">
+      <main id="konten" className={`${KELAS_WADAH} relative flex flex-col gap-10 pb-6`}>
+        {/* Pembuka rata tengah. Jarak atas sama dengan judul halaman kerja (md:pt-21): teks tidak di atas baris mozaik pekat. */}
+        <section aria-labelledby="judul-beranda" className="flex flex-col items-center pt-12 text-center md:pt-21">
           <p className="m-0 text-[14px] text-teks-lembut">{formatTanggalHariIni()}</p>
           <h1
             id="judul-beranda"
@@ -69,17 +72,11 @@ function Beranda() {
               </>
             )}
           </h1>
-          <p className="m-0 mt-4 max-w-[560px] text-[16px] text-balance text-teks-lembut">
-            {perhatian.length > 0
-              ? `${jumlah.lewat} sudah lewat tanggal akhir dan ${jumlah.segera} habis dalam ${BATAS_HARI_SEGERA} hari, senilai ${formatRupiahSingkat(nilaiPerhatian)}.`
-              : `Tidak ada kontrak yang sudah lewat atau habis dalam ${BATAS_HARI_SEGERA} hari.`}
-          </p>
-
           {/* Kotak cari pil: membuka daftar Kontrak dengan kata kunci */}
           <form
             role="search"
             onSubmit={cari}
-            className="mt-7 flex w-full max-w-[560px] items-center gap-2 rounded-full border border-garis-input bg-white py-1.5 pr-1.5 pl-5 shadow-pil focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-aksi"
+            className="mt-6 flex w-full max-w-[560px] items-center gap-2 rounded-full border border-garis-input bg-white py-1.5 pr-1.5 pl-5 shadow-pil focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-aksi"
           >
             <Ikon nama="cari" ukuran={20} className="flex-none text-teks-lembut" />
             <label htmlFor="cari-beranda" className="sr-only">
@@ -104,16 +101,24 @@ function Beranda() {
           {/* Di HP, tombol Tambah kontrak tidak muat di navigasi, jadi tampil di sini */}
           {tombolTambah('mt-4 md:hidden')}
 
-          <div className="mt-6">
+          <div className="mt-5">
             <RingkasanStatus jumlah={jumlah} total={kontrak.length} />
           </div>
         </section>
 
         <section aria-labelledby="judul-agenda" className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-baseline justify-between gap-2">
-            <h2 id="judul-agenda" className="m-0 text-[26px] text-judul">
-              Agenda <em className={KELAS_PENEKANAN}>kontrak</em>
-            </h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+              <h2 id="judul-agenda" className="m-0 text-[26px] text-judul">
+                Agenda <em className={KELAS_PENEKANAN}>kontrak</em>
+              </h2>
+              {/* Dulu di kalimat ringkasan di bawah judul Beranda. */}
+              {perhatian.length > 0 && (
+                <p className="m-0 text-[14px] text-teks-lembut">
+                  Sudah lewat dan habis dalam {BATAS_HARI_SEGERA} hari, senilai {formatRupiahSingkat(nilaiPerhatian)}
+                </p>
+              )}
+            </div>
             <Link to="/kontrak" className={KELAS_TAUTAN_AKSI}>
               Lihat kontrak
               <Ikon nama="kanan" ukuran={14} tebal={2.5} />
