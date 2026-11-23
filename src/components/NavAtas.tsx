@@ -1,6 +1,7 @@
 // Navigasi atas: pil putih yang ikut turun saat di-scroll (arah "Kavling", DESIGN.md).
 // Isi: logo BBT + nama aplikasi, menu (Beranda, Kontrak, Admin khusus admin),
-// lonceng notifikasi, menu akun, dan tombol "Tambah kontrak" (desktop, kecuali di halaman form).
+// Profil (23 Nov 2026: langsung ke halaman Profil, tanpa dropdown menu akun), lonceng notifikasi, avatar,
+// dan tombol "Tambah kontrak" (desktop, kecuali di halaman form).
 // Logo duduk langsung di atas putih, warnanya tidak diubah.
 // Menu Rekap dan Ubah data digabung ke Kontrak (18 Nov 2026): satu daftar kontrak, mengubah data lewat halaman Detail.
 // Di desktop satu baris. Di HP: logo dan ikon di atas, menu di bawah dalam satu baris (tanpa scroll ke samping).
@@ -8,10 +9,10 @@
 
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { usePengguna, useData } from '../lib/data'
+import { inisial } from '../lib/format'
 import { perluPerhatian } from '../lib/status'
 import { KELAS_TOMBOL_UTAMA } from '../lib/tataLetak'
 import Ikon from './Ikon'
-import MenuAkun from './MenuAkun'
 import PanelNotifikasi from './PanelNotifikasi'
 
 function kelasMenu({ isActive }: { isActive: boolean }) {
@@ -65,6 +66,9 @@ function NavAtas() {
           Admin
         </NavLink>
       )}
+      <NavLink to="/profil" className={kelasMenu}>
+        Profil
+      </NavLink>
     </>
   )
 
@@ -92,7 +96,19 @@ function NavAtas() {
 
         <div className="ml-auto flex flex-none items-center gap-0.5 md:gap-1 xl:ml-0">
           <PanelNotifikasi />
-          <MenuAkun />
+          {/* Avatar: jalan pintas ke Profil untuk mouse dan sentuh. Keyboard dan pembaca layar memakai menu "Profil",
+              jadi avatar tidak menjadi tautan ganda di urutan Tab. */}
+          <Link
+            to="/profil"
+            tabIndex={-1}
+            aria-hidden="true"
+            title={`Profil ${pengguna.nama}`}
+            className="flex size-11 items-center justify-center rounded-full no-underline"
+          >
+            <span className="flex size-10 items-center justify-center rounded-full bg-lembut text-[13px] font-bold text-galaxy-900 transition-[background-color] duration-150 hover:bg-garis motion-reduce:transition-none">
+              {inisial(pengguna.nama)}
+            </span>
+          </Link>
           {!halamanForm(pathname) && (
             <Link to="/tambah" className={`${KELAS_TOMBOL_UTAMA} ml-1.5 max-md:hidden`}>
               <Ikon nama="tambah" ukuran={18} tebal={2.5} />

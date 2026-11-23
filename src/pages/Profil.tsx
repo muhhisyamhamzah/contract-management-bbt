@@ -3,7 +3,7 @@
 // - Keamanan akun: ganti kata sandi (kata sandi saat ini, kata sandi baru minimal 8 karakter, ulangi).
 // - Email pengingat: alamat penerima pengingat + contoh email pengingat (uji isi sebelum backend ada).
 // - Keluar dari akun.
-// Dibuka dari menu akun (avatar kanan atas). Menu akun tetap ada untuk hal cepat (animasi latar, keluar).
+// Dibuka dari menu "Profil" di navigasi atas atau avatar (23 Nov 2026: dropdown menu akun dihapus).
 
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'

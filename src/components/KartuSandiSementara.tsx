@@ -29,7 +29,7 @@ function KartuSandiSementara({ isi, onTutup }: Props) {
       terbuka={isi !== null}
       judul={isi?.judul ?? ''}
       // Ganti kata sandi tersedia di halaman Profil (21 Nov 2026), jadi pemilik akun diminta menggantinya.
-      pesan="Sampaikan kata sandi ini langsung ke pemilik akun. Kata sandi hanya tampil sekali, di layar ini. Minta pemilik akun menggantinya di menu akun, Profil dan kata sandi, setelah masuk."
+      pesan="Sampaikan kata sandi ini langsung ke pemilik akun. Kata sandi hanya tampil sekali, di layar ini. Minta pemilik akun menggantinya di halaman Profil setelah masuk."
       labelKonfirmasi="Selesai"
       tanpaBatal
       onKonfirmasi={() => {

@@ -54,7 +54,7 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
   "Dokumen". Kode: `src/lib/excel.ts` (format file), `src/lib/rekapExcel.ts` (isi). [ASUMSI] Susunan kolom sementara,
   diganti mengikuti template Excel atasan.
 - Pengingat juga dikirim ke email. Masuk tetap dengan email kantor; tiap akun boleh punya "Email pengingat" pribadi
-  (Gmail, `Akun.emailNotifikasi`), kosong = email kantor. Diatur pemilik akun (menu akun) atau admin (Tambah akun,
+  (Gmail, `Akun.emailNotifikasi`), kosong = email kantor. Diatur pemilik akun (halaman Profil) atau admin (Tambah akun,
   menu ⋮ di daftar akun); perubahan dicatat di riwayat. Langsung aktif TANPA izin (beda dengan Web Push).
   Purwarupa hanya menyimpan alamat; pengiriman dibuat di backend (layanan email/SMTP belum dipilih).
 
@@ -63,7 +63,8 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 - Halaman Profil KEMBALI ADA (`/profil`, `src/pages/Profil.tsx`), isinya meniru Profil Sismon: kepala identitas,
   Data diri (nama dan jabatan bisa diubah sendiri; email kantor dan peran hanya oleh admin), Keamanan akun
   (kata sandi saat ini, kata sandi baru minimal 8 karakter `MIN_PANJANG_SANDI`, ulangi), Email pengingat, dan Keluar.
-  Dibuka dari menu akun ("Profil dan kata sandi"); menu akun tetap ada. Ubah profil dan ganti sandi dicatat di riwayat.
+  Dibuka dari menu "Profil" di navigasi atas (atau klik avatar). Dropdown menu akun DIHAPUS (23 Nov 2026): email pengingat
+  dan Keluar ada di halaman Profil. Ubah profil dan ganti sandi dicatat di riwayat.
 - "Lihat contoh email" di Profil menampilkan email pengingat yang akan diterima (tujuan, subjek, daftar kontrak
   sama dengan lonceng). Purwarupa tidak mengirim email.
 
@@ -109,8 +110,8 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
 - TIDAK ADA sidebar. Navigasi berupa pil putih yang melayang di atas, di semua halaman
   (logo di kiri, menu, lonceng, akun, tombol Tambah kontrak). Header navy bergelombang DIHAPUS.
 - Mozaik kavling (kotak warna BBT yang memudar ke putih) tampil di atas semua halaman (18 Nov 2026), dengan
-  gelombang setiap 9 detik. Setelah masuk gelombang terus, bisa dimatikan lewat sakelar "Animasi latar" di menu akun
-  (WCAG 2.2.2); halaman Masuk 3 gelombang lalu diam; mati saat mode kurangi gerak.
+  gelombang setiap 9 detik, terus-menerus di SEMUA halaman termasuk Masuk, tanpa sakelar (Hisyam 23 Nov 2026;
+  sakelar "Animasi latar" dihapus). Tetap mati saat mode kurangi gerak.
   Gelombang dipicu pengatur waktu di `src/components/Mozaik.tsx` (sekali jalan, 5 baris teratas, berhenti saat tab
   tidak dilihat), BUKAN animasi CSS tanpa henti: yang terakhir membebani browser ±10% terus-menerus (diukur 19 Nov 2026).
   Warna kotak di belakang teks dibatasi per warna (`PUTIH_MINIMAL` di `src/components/Mozaik.tsx`) supaya teks
@@ -220,7 +221,7 @@ Status dihitung dari tanggal akhir, tidak diisi manual:
 ## Halaman
 
 Navigasi atas: logo BBT + nama aplikasi, Beranda, Kontrak (dengan jumlah yang perlu perhatian),
-Admin (hanya admin), lonceng notifikasi, menu akun, dan tombol Tambah kontrak (kecuali di halaman form).
+Admin (hanya admin), Profil, lonceng notifikasi, avatar (ke Profil), dan tombol Tambah kontrak (kecuali di halaman form).
 Alamat lama `/pengingat`, `/rekap`, `/ubah-data`, `/critical-point` diarahkan ke halaman barunya.
 
 1. **Masuk**: logo BBT, email kantor + kata sandi. Pesan gagal: akun tidak ditemukan/nonaktif,
@@ -240,8 +241,8 @@ Alamat lama `/pengingat`, `/rekap`, `/ubah-data`, `/critical-point` diarahkan ke
 
 8. **Profil** (`/profil`): data diri, email pengingat + contoh email, ganti kata sandi, keluar (21 Nov 2026).
 
-Menu akun (klik avatar di kanan atas): nama, email kantor, peran, tautan "Profil dan kata sandi", email pengingat,
-sakelar animasi latar, dan tombol Keluar (dengan konfirmasi).
+Tidak ada dropdown menu akun lagi (23 Nov 2026). Menu "Profil" ada di navigasi atas; avatar juga membuka Profil.
+Keluar (dengan konfirmasi) ada di halaman Profil.
 
 Keadaan yang wajib ada:
 - Isian salah ditandai merah, dengan pesan per kolom yang menjelaskan cara memperbaiki

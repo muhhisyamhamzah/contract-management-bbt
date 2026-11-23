@@ -5,46 +5,33 @@
 // Polanya tetap (dihitung dari posisi, bukan acak), jadi tampilannya sama setiap kali dibuka.
 // Gerak (Hisyam 18 Nov 2026): kotak muncul berurutan saat dibuka, lalu setiap 9 detik ada "gelombang" yang
 // mengulang efek itu dari kiri atas ke kanan bawah.
-// - Setelah masuk: gelombang terus, bisa dimatikan lewat "Animasi latar" di menu akun (WCAG 2.2.2).
-// - Halaman Masuk (`pendek`): 3 gelombang lalu diam, karena di sana tidak ada menu akun untuk mematikannya.
-// Tidak bergerak sama sekali kalau perangkat memakai mode kurangi gerak.
+// Gelombang berjalan terus di SEMUA halaman, termasuk Masuk, tanpa sakelar (Hisyam 23 Nov 2026; sakelar
+// "Animasi latar" di menu akun dihapus). Tetap tidak bergerak sama sekali kalau perangkat memakai mode kurangi gerak.
 //
 // Optimasi (19 Nov 2026, impeccable optimize): gelombang dipicu pengatur waktu, sekali jalan, hanya 5 baris teratas.
 // Di antara gelombang tidak ada animasi yang berjalan, dan pengatur waktu berhenti saat tab tidak dilihat.
 // Sebelumnya: animasi 9 detik tanpa henti di 160 kotak, sekitar 10% kerja browser terus-menerus.
 
 import { memo, useEffect, useState } from 'react'
-import { useAnimasiLatar } from '../lib/animasiLatar'
 
-type Gerak = 'terus' | 'sebentar' | 'diam'
-
-/** Jarak antargelombang dan jumlah gelombang di halaman Masuk. */
+/** Jarak antargelombang, dan jeda sebelum gelombang pertama. */
 const SELANG_GELOMBANG_MS = 9000
 const GELOMBANG_PERTAMA_MS = 4000
-const MAKS_GELOMBANG_SEBENTAR = 3
 
 /** Hanya baris teratas yang ikut bergelombang; baris di bawahnya hampir putih, geraknya tidak terlihat. */
 const BARIS_BERGERAK = 5
 
 /**
  * Nomor gelombang yang sedang berjalan: 0 = baru muncul (belum ada gelombang), 1, 2, 3, ...
- * Bertambah setiap SELANG_GELOMBANG_MS selama gerak tidak 'diam', tab sedang dilihat, dan perangkat tidak
- * memakai mode kurangi gerak.
+ * Bertambah setiap SELANG_GELOMBANG_MS selama tab sedang dilihat dan perangkat tidak memakai mode kurangi gerak.
  */
-function useGelombang(gerak: Gerak): number {
+function useGelombang(): number {
   const [putaran, setPutaran] = useState(0)
   useEffect(() => {
-    if (gerak === 'diam' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    let jalan = 0
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     let selang: number | undefined
     const picu = () => {
-      if (document.hidden) return
-      if (gerak === 'sebentar' && jalan >= MAKS_GELOMBANG_SEBENTAR) {
-        window.clearInterval(selang)
-        return
-      }
-      jalan += 1
-      setPutaran((n) => n + 1)
+      if (!document.hidden) setPutaran((n) => n + 1)
     }
     const awal = window.setTimeout(() => {
       picu()
@@ -54,7 +41,7 @@ function useGelombang(gerak: Gerak): number {
       window.clearTimeout(awal)
       window.clearInterval(selang)
     }
-  }, [gerak])
+  }, [])
   return putaran
 }
 
@@ -111,28 +98,27 @@ function warnaKotak(x: number, y: number, kolom: number, barisPekat: number): st
   return `color-mix(in srgb, color-mix(in srgb, ${WARNA[kiri]} ${porsiKiri}%, ${WARNA[kanan]}) ${100 - pucat}%, white)`
 }
 
-type PropsKotak = { x: number; y: number; kolom: number; barisPekat: number; gerak: Gerak; putaran: number; kelas?: string }
+type PropsKotak = { x: number; y: number; kolom: number; barisPekat: number; putaran: number; kelas?: string }
 
 /** Class animasi satu kotak. Ditulis lengkap supaya Tailwind menemukannya. */
-function kelasAnimasi(gerak: Gerak, putaran: number, y: number): string {
-  if (gerak === 'diam') return ''
+function kelasAnimasi(putaran: number, y: number): string {
   // Sebelum gelombang pertama, dan untuk baris bawah: hanya efek muncul (sekali, lalu selesai).
   if (putaran === 0 || y >= BARIS_BERGERAK) return 'motion-safe:animate-meletup'
   // Nama a dan b bergantian: berganti nama membuat browser memutar ulang animasinya.
   return putaran % 2 === 1 ? 'motion-safe:animate-gelombang-a' : 'motion-safe:animate-gelombang-b'
 }
 
-function Kotak({ x, y, kolom, barisPekat, gerak, putaran, kelas = '' }: PropsKotak) {
+function Kotak({ x, y, kolom, barisPekat, putaran, kelas = '' }: PropsKotak) {
   if (kosong(x, y)) return <span className={kelas} />
   // Jeda dihitung dari posisi (diagonal), jadi kotak bergerak berurutan seperti kavling yang terisi.
   const urutan = x + y * 2
   const gelombang = putaran > 0 && y < BARIS_BERGERAK
   return (
     <span
-      className={`rounded-[10px] ${kelasAnimasi(gerak, putaran, y)} ${kelas}`}
+      className={`rounded-[10px] ${kelasAnimasi(putaran, y)} ${kelas}`}
       style={{
         background: warnaKotak(x, y, kolom, barisPekat),
-        animationDelay: gerak === 'diam' ? undefined : `${urutan * (gelombang ? 45 : 22)}ms`,
+        animationDelay: `${urutan * (gelombang ? 45 : 22)}ms`,
       }}
     />
   )
@@ -144,9 +130,7 @@ function Kotak({ x, y, kolom, barisPekat, gerak, putaran, kelas = '' }: PropsKot
  */
 const Mozaik = memo(function Mozaik({ pendek = false }: { pendek?: boolean }) {
   const baris = pendek ? BARIS_PENDEK : BARIS
-  const animasiNyala = useAnimasiLatar()
-  const gerak: Gerak = pendek ? 'sebentar' : animasiNyala ? 'terus' : 'diam'
-  const putaran = useGelombang(gerak)
+  const putaran = useGelombang()
   return (
     <div
       aria-hidden="true"
@@ -162,13 +146,13 @@ const Mozaik = memo(function Mozaik({ pendek = false }: { pendek?: boolean }) {
       {/* HP: 8 kolom. Tiga baris pekat: baris ketiga berada di sela navigasi dan judul, tanpa teks di depannya. */}
       <div className="grid grid-cols-8 gap-1.5 md:hidden">
         {Array.from({ length: KOLOM_HP * baris }, (_, i) => (
-          <Kotak key={i} x={i % KOLOM_HP} y={Math.floor(i / KOLOM_HP)} kolom={KOLOM_HP} barisPekat={pendek ? 2 : 3} gerak={gerak} putaran={putaran} kelas="aspect-square" />
+          <Kotak key={i} x={i % KOLOM_HP} y={Math.floor(i / KOLOM_HP)} kolom={KOLOM_HP} barisPekat={pendek ? 2 : 3} putaran={putaran} kelas="aspect-square" />
         ))}
       </div>
       {/* Desktop: 20 kolom. Tiga baris pekat: di atas layar, di belakang navigasi, dan di bawah navigasi. */}
       <div className="hidden grid-cols-20 gap-1.5 md:grid">
         {Array.from({ length: KOLOM_DESKTOP * baris }, (_, i) => (
-          <Kotak key={i} x={i % KOLOM_DESKTOP} y={Math.floor(i / KOLOM_DESKTOP)} kolom={KOLOM_DESKTOP} barisPekat={pendek ? 2 : 3} gerak={gerak} putaran={putaran} kelas="aspect-square" />
+          <Kotak key={i} x={i % KOLOM_DESKTOP} y={Math.floor(i / KOLOM_DESKTOP)} kolom={KOLOM_DESKTOP} barisPekat={pendek ? 2 : 3} putaran={putaran} kelas="aspect-square" />
         ))}
       </div>
     </div>

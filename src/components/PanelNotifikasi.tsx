@@ -102,13 +102,15 @@ function PanelNotifikasi() {
               })}
             </ul>
           )}
-          {/* Pengingat juga dikirim ke email (permintaan atasan, 20 Nov 2026). Diatur di menu akun. */}
+          {/* Pengingat juga dikirim ke email (permintaan atasan, 20 Nov 2026). Diatur di halaman Profil. */}
           <p className="m-0 flex items-start gap-2 border-t border-garis-lembut px-4 py-3 text-[12px] text-teks-lembut">
             <Ikon nama="email" ukuran={14} className="mt-px flex-none" />
             <span className="flex min-w-0 flex-col">
               <span>Pengingat juga dikirim ke email:</span>
-              <span className="font-semibold break-all text-teks">{alamatPengingat(pengguna)}</span>
-              <span>Ubah lewat menu akun.</span>
+              <span className="font-semibold break-words text-teks">{alamatPengingat(pengguna)}</span>
+              <Link to="/profil" onClick={() => setTerbuka(false)} className="font-semibold text-aksi hover:text-aksi-tua">
+                Ubah di halaman Profil
+              </Link>
             </span>
           </p>
         </div>

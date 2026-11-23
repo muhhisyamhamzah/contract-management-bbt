@@ -93,4 +93,4 @@ Pengganti rekap Excel yang bukan sekadar tabel: status dihitung otomatis dari ta
 
 - Kontras teks minimal 4,5:1; tepi kotak isian dan ikon minimal 3:1.
 - Area sentuh minimal 44 px, fokus keyboard selalu terlihat, setiap isian punya label yang terlihat.
-- Gerak otomatis menghormati mode kurangi gerak dan bisa dihentikan (sakelar "Animasi latar").
+- Gerak otomatis menghormati mode kurangi gerak. Mozaik bergelombang terus tanpa sakelar (keputusan Hisyam 23 Nov 2026).

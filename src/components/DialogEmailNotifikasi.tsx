@@ -1,5 +1,5 @@
 // Dialog "Email pengingat": mengatur email pribadi (misalnya Gmail) yang menerima pengingat kontrak
-// (permintaan atasan, 20 Nov 2026). Dibuka dari menu akun (akun sendiri) atau dari halaman Admin (akun siapa pun).
+// (permintaan atasan, 20 Nov 2026). Dibuka dari halaman Profil (akun sendiri) atau dari halaman Admin (akun siapa pun).
 // Kosong berarti pengingat dikirim ke email kantor. Tidak perlu izin: langsung aktif setelah disimpan.
 
 import { useState } from 'react'
