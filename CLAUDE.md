@@ -51,7 +51,13 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
   Versi dicatat saat Catat adendum, unggah PKS/adendum di Detail, dan ganti PKS di form ubah.
 - Unduh Excel (.xlsx) tanpa library: tombol "Unduh Excel" di halaman Kontrak dan menu ⋮ Detail. Pilihan: kontrak ini
   (dari Detail), semua kontrak, atau pilih sendiri (centang). Lembar "Kontrak" (dengan total nilai lewat rumus SUM) dan
-  "Dokumen". Kode: `src/lib/excel.ts` (format file), `src/lib/rekapExcel.ts` (isi). [ASUMSI] Susunan kolom sementara,
+  "Dokumen". Kode: `src/lib/excel.ts` (format file), `src/lib/rekapExcel.ts` (isi).
+  (23 Nov 2026) "Pilih kontrak dan dokumen": per kontrak yang dicentang, kotak centang per PKS/adendum (nomor sama dengan
+  daftar dokumen di Detail, `daftarVersi` di `src/lib/versiKontrak.ts`). Boleh satu saja (misalnya dokumen 4 dari 7) atau
+  beberapa; bawaannya dokumen terbaru. "Semua kontrak" bisa terbaru saja atau semua versi. Kolom "Versi data" menandai
+  barisnya. Total: SUM biasa kalau tiap kontrak satu baris; SUMIF baris "Terbaru" kalau ada kontrak yang muncul lebih
+  dari sekali, supaya tidak terhitung ganda.
+  Dari Detail, dokumen lama yang sedang dibuka langsung terpilih sebagai versinya. [ASUMSI] Susunan kolom sementara,
   diganti mengikuti template Excel atasan.
 - Pengingat juga dikirim ke email. Masuk tetap dengan email kantor; tiap akun boleh punya "Email pengingat" pribadi
   (Gmail, `Akun.emailNotifikasi`), kosong = email kantor. Diatur pemilik akun (halaman Profil) atau admin (Tambah akun,
@@ -273,7 +279,9 @@ src/
 - Aksesibilitas: pakai `<button>` dan `<a>` asli. Ikon tanpa teks wajib punya `aria-label`.
   Setiap kotak isian punya label yang terlihat.
 - Format rupiah dan tanggal Indonesia lewat `src/lib/format.ts`.
-- Kerja di branch fitur, bukan langsung di `main`. Commit kecil dengan pesan yang jelas.
+- (Hisyam 23 Nov 2026) Kerja langsung di `main`, seperti Sismon: commit dan push dari VS Code, rekan tim cukup `git pull`.
+  Sebelum push, `git pull` dulu supaya perubahan rekan tidak bertabrakan. Cabang `fitur/website-responsif` sudah
+  digabung ke `main` dan tidak dipakai lagi. Commit kecil dengan pesan yang jelas.
 - JANGAN commit atau push tanpa izin Hisyam.
 - Jangan commit `.env` atau `node_modules`. Jangan menjalankan `npm audit fix --force`.
 - Kerjakan bertahap, satu bagian per permintaan. Laporkan file yang dibuat atau diubah dan alasannya.

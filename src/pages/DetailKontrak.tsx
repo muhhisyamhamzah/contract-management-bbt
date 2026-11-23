@@ -492,7 +492,13 @@ function DetailKontrak() {
         onKonfirmasi={hapus}
         onBatal={() => setKonfirmasiHapus(false)}
       />
-      <DialogUnduhExcel terbuka={unduhExcel} kontrakIni={kontrak} onTutup={() => setUnduhExcel(false)} />
+      {/* Kalau dokumen lama sedang dibuka, versi datanya langsung terpilih di dialog (Hisyam 23 Nov 2026). */}
+      <DialogUnduhExcel
+        terbuka={unduhExcel}
+        kontrakIni={kontrak}
+        versiAwal={banding?.dokumenVersi.id}
+        onTutup={() => setUnduhExcel(false)}
+      />
     </>
   )
 }
