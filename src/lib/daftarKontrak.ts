@@ -28,6 +28,21 @@ export function bacaUrutan(teks: string | null): Urutan {
   return teks && teks in LABEL_URUTAN ? (teks as Urutan) : 'berakhir'
 }
 
+/** Pilihan jumlah baris per halaman di tabel Kontrak. Yang pertama adalah bawaan. */
+export const PILIHAN_PER_HALAMAN = [10, 25, 50, 100]
+
+/** Mengubah teks dari alamat (misalnya ?per=25) menjadi jumlah baris per halaman yang sah. */
+export function bacaPerHalaman(teks: string | null): number {
+  const angka = Number(teks)
+  return PILIHAN_PER_HALAMAN.includes(angka) ? angka : PILIHAN_PER_HALAMAN[0]
+}
+
+/** Mengubah teks dari alamat (misalnya ?hal=2) menjadi nomor halaman 1 sampai jumlahHalaman. */
+export function bacaHalaman(teks: string | null, jumlahHalaman: number): number {
+  const angka = Math.floor(Number(teks))
+  return Number.isFinite(angka) ? Math.min(Math.max(1, angka), jumlahHalaman) : 1
+}
+
 /** Apakah kontrak cocok dengan kata kunci (dicari di nama, penyedia, dan nomor PKS). */
 export function cocokKataKunci(kontrak: Kontrak, kataKunci: string): boolean {
   const kunci = kataKunci.trim().toLowerCase()

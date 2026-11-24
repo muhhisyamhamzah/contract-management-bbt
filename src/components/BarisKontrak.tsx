@@ -1,14 +1,16 @@
-// Satu baris di halaman Kontrak: ringkasan kontrak dalam satu baris (No, kontrak, nomor PKS, masa kontrak,
-// nilai, status sisa waktu, status adendum, jumlah dokumen). Seluruh baris adalah tautan ke halaman Detail kontrak
-// (Hisyam 18 Nov 2026: tidak ada rincian yang terbuka di bawah baris).
-// Status adendum punya kolom sendiri (23 Nov 2026), terpisah dari badge status kontrak: waktu keduanya bertumpuk
-// di satu kolom, pengguna membacanya sebagai satu informasi. Status adendum hanya diisi kalau berarti
-// (lihat tampilkanStatusAdendum); kalau tidak, kolomnya berisi tanda pisah.
+// Satu baris tabel di halaman Kontrak (layar lebar, mulai 1280px). Susunan kolom mengikuti halaman daftar kontrak
+// acuan (repo contract-management, 24 Nov 2026), karena tabel dan penempatannya lebih mudah dipahami:
+// Kontrak (nama + nomor PKS) | Penyedia | Berakhir | Nilai | Sisa kontrak (teks + garis) | Status | Adendum | aksi.
+//
+// - Nama kontrak adalah tautan asli ke Detail (bisa dibuka dengan keyboard). Klik di bagian lain baris juga
+//   membuka Detail, hanya sebagai kemudahan untuk tetikus.
+// - Status kontrak (pil berwarna) dan status adendum (teks + ikon) sengaja di kolom berbeda (23 Nov 2026).
+// - Tombol aksi: Ubah dan Hapus. Hapus selalu lewat dialog konfirmasi di halaman Kontrak.
+// Layar lebih kecil memakai ItemDaftarKontrak.
 
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { formatRupiah, formatRupiahSingkat, formatTanggalSingkat } from '../lib/format'
-import { hitungStatus, STATUS_PERPANJANGAN, tampilkanStatusAdendum, teksSisaHari } from '../lib/status'
-import { KELAS_KOLOM_TABEL_KONTRAK } from '../lib/tataLetak'
+import { hitungProgres, hitungStatus, TAMPILAN_STATUS, tampilkanStatusAdendum, teksSisaHari } from '../lib/status'
 import type { Kontrak } from '../types/kontrak'
 import BadgeStatus from './BadgeStatus'
 import Ikon from './Ikon'
@@ -16,71 +18,98 @@ import StatusAdendum from './StatusAdendum'
 
 type Props = {
   kontrak: Kontrak
-  nomor: number
+  onHapus: (kontrak: Kontrak) => void
 }
 
-function BarisKontrak({ kontrak, nomor }: Props) {
+/** Tombol ikon kecil di kolom aksi. Area klik 40px; tabel ini hanya tampil di layar lebar (tetikus). */
+const KELAS_TOMBOL_IKON =
+  'flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut no-underline transition-[background-color,color] duration-150 motion-reduce:transition-none'
+
+function BarisKontrak({ kontrak, onHapus }: Props) {
+  const navigate = useNavigate()
   const status = hitungStatus(kontrak)
-  const adendum = tampilkanStatusAdendum(kontrak)
-  // Pembaca layar: nama tautan cukup nama, penyedia, dan status (diawali teks yang terlihat, WCAG 2.5.3).
-  // Rincian lain dibacakan sebagai keterangan tambahan, bukan bagian nama tautan (impeccable harden, 19 Nov 2026).
-  const namaTautan = `${kontrak.nama}, ${kontrak.penyedia}. ${teksSisaHari(kontrak)}${
-    adendum ? `, ${STATUS_PERPANJANGAN[kontrak.perpanjangan].label}` : ''
-  }`
-  const idRincian = `rincian-kontrak-${kontrak.id}`
+  const tampilan = TAMPILAN_STATUS[status]
+  const progres = hitungProgres(kontrak)
+  const jumlahAdendum = kontrak.dokumen.filter((d) => d.jenis === 'Adendum').length
+  const alamatDetail = `/kontrak/${kontrak.id}`
 
   return (
-    <li className="border-t border-garis-lembut first:border-t-0">
-      {/* hidden: tidak dibaca sebagai teks lepas, tapi tetap dipakai sebagai keterangan tautan lewat aria-describedby. */}
-      <span id={idRincian} hidden>
-        Nomor PKS {kontrak.nomorPks}. Masa kontrak {formatTanggalSingkat(kontrak.tanggalMulai)} sampai{' '}
-        {formatTanggalSingkat(kontrak.tanggalBerakhir)}. Nilai {formatRupiah(kontrak.nilai)}. {kontrak.dokumen.length} file.
-      </span>
-      {/* Susunan bertumpuk (HP sampai di bawah 1280px), dua kolom (isi | panah):
-          baris 1 nama + penyedia, baris 2 nilai, baris 3 status kontrak, baris 4 status adendum.
-          Mulai xl: satu baris tabel mengikuti KELAS_KOLOM_TABEL_KONTRAK. */}
-      <Link
-        to={`/kontrak/${kontrak.id}`}
-        aria-label={namaTautan}
-        aria-describedby={idRincian}
-        className={`group grid w-full grid-cols-[minmax(0,1fr)_20px] items-center gap-x-3 gap-y-1 px-4 py-3 text-left text-[14px] text-teks no-underline transition-[background-color] duration-150 hover:bg-latar hover:text-teks motion-reduce:transition-none md:px-6 xl:min-h-[68px] xl:gap-x-4 xl:py-2 ${KELAS_KOLOM_TABEL_KONTRAK}`}
-      >
-        <span className="hidden text-teks-lembut xl:block">{nomor}</span>
-        <span className="flex min-w-0 flex-col">
-          <span className="text-[15px] font-semibold text-judul">{kontrak.nama}</span>
-          <span className="text-[13px] text-teks-lembut">{kontrak.penyedia}</span>
+    <tr
+      onClick={() => navigate(alamatDetail)}
+      className="group cursor-pointer border-t border-garis-lembut transition-[background-color] duration-150 hover:bg-latar motion-reduce:transition-none"
+    >
+      <td className="max-w-[300px] py-3.5 pr-4 pl-6 align-middle">
+        <Link
+          to={alamatDetail}
+          onClick={(e) => e.stopPropagation()}
+          className="block text-[14px] font-semibold text-judul no-underline group-hover:text-aksi hover:text-aksi"
+        >
+          {kontrak.nama}
+        </Link>
+        <span className="mt-0.5 flex items-center gap-1.5 text-[12px] text-teks-lembut">
+          {kontrak.nomorPks}
+          <span aria-hidden="true">·</span>
+          <Ikon nama="dokumen" ukuran={13} className="flex-none" />
+          {kontrak.dokumen.length} file
         </span>
-        <span className="hidden text-[13px] text-teks-lembut xl:block">{kontrak.nomorPks}</span>
-        {/* Dua baris yang disengaja (awal di atas, akhir di bawah), supaya tidak terpotong di tengah tanggal. */}
-        <span className="hidden flex-col text-[13px] text-teks-lembut xl:flex">
-          <span>{formatTanggalSingkat(kontrak.tanggalMulai)}</span>
-          <span>sampai {formatTanggalSingkat(kontrak.tanggalBerakhir)}</span>
+      </td>
+      <td className="max-w-[200px] px-4 py-3.5 text-[13px] text-teks">{kontrak.penyedia}</td>
+      <td className="px-4 py-3.5 whitespace-nowrap">
+        <span className="block text-[13px] font-semibold text-judul">{formatTanggalSingkat(kontrak.tanggalBerakhir)}</span>
+        <span className="block text-[12px] text-teks-lembut">mulai {formatTanggalSingkat(kontrak.tanggalMulai)}</span>
+      </td>
+      <td className="px-4 py-3.5 text-right text-[14px] font-bold whitespace-nowrap text-judul" title={formatRupiah(kontrak.nilai)}>
+        {formatRupiahSingkat(kontrak.nilai)}
+      </td>
+      <td className="w-[150px] px-4 py-3.5">
+        <span className={`mb-1.5 block text-[12px] font-semibold whitespace-nowrap ${status === 'berjalan' ? 'text-teks' : tampilan.kelasTeks}`}>
+          {teksSisaHari(kontrak)}
         </span>
-        <span className="col-start-1 row-start-2 text-[14px] font-bold text-judul xl:col-auto xl:row-auto xl:text-center">
-          {formatRupiahSingkat(kontrak.nilai)}
+        {/* Garis masa kontrak: berapa persen masa kontrak sudah dilalui. Selalu bersama teks sisa waktu di atasnya. */}
+        <span
+          role="img"
+          aria-label={`Masa kontrak sudah berjalan ${progres} persen`}
+          className="block h-1.5 overflow-hidden rounded-full bg-garis-lembut"
+        >
+          <span className={`block h-full rounded-full ${tampilan.kelasBar}`} style={{ width: `${progres}%` }} />
         </span>
-        {/* Status kontrak (sisa waktu): pil berwarna. */}
-        <span className="col-start-1 row-start-3 flex items-center pt-0.5 xl:col-auto xl:row-auto xl:justify-center xl:pt-0">
-          <BadgeStatus status={status}>{teksSisaHari(kontrak)}</BadgeStatus>
-        </span>
-        {/* Status adendum: teks dengan ikon, kolom sendiri. Label panjang boleh turun ke baris kedua. */}
-        {adendum ? (
-          <span className="col-start-1 row-start-4 flex xl:col-auto xl:row-auto">
-            <StatusAdendum perpanjangan={kontrak.perpanjangan} />
-          </span>
+      </td>
+      <td className="px-4 py-3.5">
+        <BadgeStatus status={status} />
+      </td>
+      <td className="px-4 py-3.5">
+        {tampilkanStatusAdendum(kontrak) ? (
+          <StatusAdendum perpanjangan={kontrak.perpanjangan} />
         ) : (
-          <span aria-hidden="true" className="hidden text-teks-lembut xl:block">
-            –
+          <span className="text-[13px] text-teks-lembut">
+            <span aria-hidden="true">–</span>
+            <span className="sr-only">Belum perlu diputuskan</span>
           </span>
         )}
-        <span className="hidden text-[13px] text-teks-lembut xl:block">{kontrak.dokumen.length} file</span>
-        <Ikon
-          nama="kanan"
-          ukuran={18}
-          className="col-start-2 row-span-4 row-start-1 text-teks-lembut transition-transform duration-150 group-hover:translate-x-0.5 motion-reduce:transition-none xl:col-auto xl:row-auto"
-        />
-      </Link>
-    </li>
+        {jumlahAdendum > 0 && <span className="mt-0.5 block text-[12px] text-teks-lembut">{jumlahAdendum} adendum</span>}
+      </td>
+      <td className="py-3.5 pr-4 pl-2" onClick={(e) => e.stopPropagation()}>
+        <span className="flex justify-end gap-0.5">
+          <Link
+            to={`/kontrak/${kontrak.id}/ubah`}
+            aria-label={`Ubah ${kontrak.nama}`}
+            title="Ubah"
+            className={`${KELAS_TOMBOL_IKON} hover:bg-lembut hover:text-judul`}
+          >
+            <Ikon nama="pensil" ukuran={17} />
+          </Link>
+          <button
+            type="button"
+            onClick={() => onHapus(kontrak)}
+            aria-label={`Hapus ${kontrak.nama}`}
+            title="Hapus"
+            className={`${KELAS_TOMBOL_IKON} hover:bg-hapus-latar hover:text-hapus-teks`}
+          >
+            <Ikon nama="sampah" ukuran={17} />
+          </button>
+        </span>
+      </td>
+    </tr>
   )
 }
 

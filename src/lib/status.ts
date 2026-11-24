@@ -51,6 +51,20 @@ export function perluPerhatian(kontrak: Kontrak, hariIni: Date = new Date()): bo
   return status === 'lewat' || status === 'segera'
 }
 
+/**
+ * Persen masa kontrak yang sudah dilalui (0 sampai 100), untuk garis di kolom "Sisa kontrak" (tabel Kontrak).
+ * Kontrak yang sudah lewat atau selesai selalu 100. Garis selalu tampil bersama teks sisa waktu, jangan sendirian.
+ */
+export function hitungProgres(kontrak: Kontrak, hariIni: Date = new Date()): number {
+  const status = hitungStatus(kontrak, hariIni)
+  if (status === 'lewat' || status === 'selesai') return 100
+  const mulai = keTanggal(kontrak.tanggalMulai)
+  const totalHari = selisihHari(mulai, keTanggal(kontrak.tanggalBerakhir))
+  if (totalHari <= 0) return 100
+  const persen = Math.round((selisihHari(mulai, awalHari(hariIni)) / totalHari) * 100)
+  return Math.min(100, Math.max(0, persen))
+}
+
 /** Teks sisa waktu, misalnya "18 hari lagi", "Lewat 8 hari", atau "Selesai". */
 export function teksSisaHari(kontrak: Kontrak, hariIni: Date = new Date()): string {
   const status = hitungStatus(kontrak, hariIni)

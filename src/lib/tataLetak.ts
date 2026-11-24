@@ -8,14 +8,6 @@ export const KELAS_WADAH = 'mx-auto w-full max-w-[1280px] px-5 md:px-6'
 /** Panel putih bergaris tipis. Dipakai seperlunya: tabel/agenda, form, panel samping. Jangan bersarang. */
 export const KELAS_KOTAK = 'rounded-[20px] border border-garis bg-white md:rounded-3xl'
 
-/**
- * Kolom tabel di halaman Kontrak (judul kolom di Kontrak.tsx dan tiap BarisKontrak memakai class yang sama):
- * No | Kontrak | Nomor PKS | Masa kontrak | Nilai | Status | Adendum | Dokumen | panah.
- * Tabel baru tampil mulai xl (1280px). Di bawahnya kolom Kontrak terlalu sempit, jadi baris memakai susunan bertumpuk.
- */
-export const KELAS_KOLOM_TABEL_KONTRAK =
-  'xl:grid-cols-[32px_minmax(0,2fr)_130px_150px_100px_150px_180px_56px_24px]'
-
 /** Tombol utama: pil navy datar. Satu per layar. */
 export const KELAS_TOMBOL_UTAMA =
   'inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-full border-none bg-galaxy-900 whitespace-nowrap px-5 font-semibold text-white no-underline transition-[background-color] duration-150 hover:bg-aksi hover:text-white disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none'
