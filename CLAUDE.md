@@ -241,7 +241,12 @@ Alamat lama `/pengingat`, `/rekap`, `/ubah-data`, `/critical-point` diarahkan ke
    dalam kotaknya dan muncul dari bawah saat masuk (`src/components/DaftarAgenda.tsx`, tanpa library).
    Hitungan di `src/lib/beranda.ts`.
 3. **Kontrak** (gabungan Kontrak, Pengingat, Rekap): satu tabel semua kontrak. Cari (nama, penyedia, nomor PKS),
-   filter status, urutkan, filter bulan berakhir (lewat alamat `?q=&status=&urut=&bulan=`). Ada tampilan daftar kosong dan hasil pencarian kosong.
+   filter status, urutkan (lewat alamat `?q=&status=&urut=`).
+   (24 Nov 2026) Tombol "Filter" membuka panel filter tambahan (`src/lib/filterKontrak.ts`,
+   `src/components/PanelFilterKontrak.tsx`): status adendum, tanggal berakhir (30/60/90 hari, tahun ini, pilih tanggal;
+   `?bulan=` dari Beranda), nilai ([ASUMSI] batas `BATAS_NILAI` < Rp 500 jt / sampai Rp 1 M / > Rp 1 M), riwayat
+   adendum (pernah/belum), BAST (ada/belum). Langsung berlaku, disimpan di alamat. Filter aktif tampil sebagai chip
+   yang bisa dihapus satu per satu. Filter penyedia tidak dibuat: cukup lewat kotak cari. Ada tampilan daftar kosong dan hasil pencarian kosong.
 4. **Detail kontrak**: data kontrak (termasuk status dan jumlah adendum, jadwal pengingat), ketentuan kontrak,
    riwayat, dropdown dokumen bernomor + unggah + pratinjau. Tombol Ubah, Catat adendum, Tandai selesai
    (dengan keterangan), menu hapus dengan konfirmasi.
@@ -276,6 +281,7 @@ src/
                 versiKontrak.ts (data per versi dokumen), excel.ts + rekapExcel.ts (unduh Excel),
                 akun.ts (alasan nonaktif, email pengingat)
                 beranda.ts (nilai per status, pengingat bulan ini, adendum diproses, garis waktu, aktivitas)
+                filterKontrak.ts (filter tambahan halaman Kontrak)
   types/        kontrak.ts (semua tipe)
 ```
 

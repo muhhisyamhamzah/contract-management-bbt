@@ -4,8 +4,8 @@
 //
 // Susunan mengikuti halaman daftar kontrak acuan (repo contract-management, 24 Nov 2026), karena tabel dan
 // penempatannya lebih mudah dipahami:
-//   1. Toolbar satu baris: kotak cari, Urutkan, Unduh Excel.
-//   2. Chip status dengan ikon dan jumlah.
+//   1. Toolbar satu baris: kotak cari, Urutkan, Filter (24 Nov 2026), Unduh Excel.
+//   2. Chip status dengan ikon dan jumlah, lalu baris "Filter aktif" (chip filter tambahan yang bisa dihapus).
 //   3. Panel tabel: kepala "N kontrak · total nilai", tabel (mulai 1280px) atau daftar bertumpuk (di bawahnya),
 //      lalu pembagian halaman.
 // Tombol "Tambah kontrak" tetap di navigasi atas (satu tombol utama per layar), tidak diulang di toolbar.
@@ -24,8 +24,8 @@ import ItemDaftarKontrak from '../components/ItemDaftarKontrak'
 import KeadaanKosong from '../components/KeadaanKosong'
 import KepalaHalaman from '../components/KepalaHalaman'
 import MenuDropdown from '../components/MenuDropdown'
+import PanelFilterKontrak from '../components/PanelFilterKontrak'
 import PenomoranHalaman from '../components/PenomoranHalaman'
-import { bacaBulan, formatBulan } from '../lib/beranda'
 import { useData } from '../lib/data'
 import {
   bacaFilter,
@@ -39,10 +39,11 @@ import {
   type FilterStatus,
   type Urutan,
 } from '../lib/daftarKontrak'
+import { bacaFilterKontrak, chipFilterAktif, cocokFilterKontrak, PARAMETER_FILTER } from '../lib/filterKontrak'
 import { formatRupiahSingkat } from '../lib/format'
 import { useJudulHalaman } from '../lib/judulHalaman'
 import { hitungJumlahPerStatus, TAMPILAN_STATUS } from '../lib/status'
-import { KELAS_KOTAK, KELAS_TOMBOL_KEDUA, KELAS_WADAH } from '../lib/tataLetak'
+import { KELAS_KOTAK, KELAS_TAUTAN_AKSI, KELAS_TOMBOL_KEDUA, KELAS_WADAH } from '../lib/tataLetak'
 import { useToast } from '../lib/toast'
 import type { Kontrak as DataKontrak } from '../types/kontrak'
 
@@ -69,13 +70,12 @@ function Kontrak() {
   const kataKunci = parameter.get('q') ?? ''
   const urutan = bacaUrutan(parameter.get('urut'))
   const perHalaman = bacaPerHalaman(parameter.get('per'))
-  // ?bulan=YYYY-MM: kontrak yang berakhir di bulan itu (dibuka dari garis waktu Beranda, 24 Nov 2026).
-  const bulan = bacaBulan(parameter.get('bulan'))
+  // Filter tambahan (24 Nov 2026): adendum, tanggal berakhir (termasuk ?bulan= dari Beranda), nilai, riwayat adendum, BAST.
+  const filterTambahan = bacaFilterKontrak(parameter)
+  const chipAktif = chipFilterAktif(filterTambahan)
 
   const jumlah = hitungJumlahPerStatus(kontrak)
-  const hasil = saringDanUrutkan(kontrak, filter, kataKunci, urutan).filter(
-    (k) => !bulan || k.tanggalBerakhir.startsWith(bulan),
-  )
+  const hasil = saringDanUrutkan(kontrak, filter, kataKunci, urutan).filter((k) => cocokFilterKontrak(k, filterTambahan))
   const totalNilai = hasil.reduce((total, k) => total + k.nilai, 0)
   const jumlahHalaman = Math.max(1, Math.ceil(hasil.length / perHalaman))
   const halaman = bacaHalaman(parameter.get('hal'), jumlahHalaman)
@@ -99,6 +99,23 @@ function Kontrak() {
     )
   }
 
+  /** Mengubah beberapa parameter sekaligus (panel Filter). null atau kosong = dihapus. Selalu kembali ke halaman 1. */
+  function ubahBanyakParameter(perubahan: Record<string, string | null>) {
+    setParameter((lama) => {
+      const baru = new URLSearchParams(lama)
+      for (const [nama, nilai] of Object.entries(perubahan)) {
+        if (nilai) baru.set(nama, nilai)
+        else baru.delete(nama)
+      }
+      baru.delete('hal')
+      return baru
+    })
+  }
+
+  function hapusFilterTambahan() {
+    ubahBanyakParameter(Object.fromEntries(PARAMETER_FILTER.map((nama) => [nama, null])))
+  }
+
   function labelFilter(f: FilterStatus) {
     return f === 'semua' ? 'Semua' : TAMPILAN_STATUS[f].label
   }
@@ -110,7 +127,7 @@ function Kontrak() {
     tampilkanToast('Kontrak dihapus.')
   }
 
-  const adaFilter = filter !== 'semua' || kataKunci !== '' || bulan !== null
+  const adaFilter = filter !== 'semua' || kataKunci !== '' || chipAktif.length > 0
 
   return (
     <>
@@ -165,6 +182,13 @@ function Kontrak() {
             }))}
           />
 
+          <PanelFilterKontrak
+            filter={filterTambahan}
+            jumlahAktif={chipAktif.length}
+            onUbah={ubahBanyakParameter}
+            onHapusSemua={hapusFilterTambahan}
+          />
+
           {kontrak.length > 0 && (
             <button type="button" onClick={() => setUnduhExcel(true)} className={`${KELAS_TOMBOL_KEDUA} h-12`}>
               <Ikon nama="unduh" ukuran={17} /> Unduh Excel
@@ -185,29 +209,39 @@ function Kontrak() {
               kelasIkon={f === 'semua' ? undefined : TAMPILAN_STATUS[f].kelasTeks}
             />
           ))}
-          {/* Filter bulan dari garis waktu Beranda: tampil sebagai chip aktif yang bisa dihapus. */}
-          {bulan && (
-            <button
-              type="button"
-              onClick={() => ubahParameter('bulan', '', '')}
-              aria-label={`Hapus filter berakhir ${formatBulan(bulan)}`}
-              className="group flex min-h-11 flex-none cursor-pointer items-center border-none bg-transparent p-0"
-            >
-              <span className="flex h-[38px] items-center gap-2 rounded-full border border-galaxy-900 bg-lembut px-3.5 text-[13px] font-semibold text-galaxy-900">
-                <Ikon nama="kalender" ukuran={14} tebal={2.5} className="flex-none" />
-                Berakhir {formatBulan(bulan)}
-                <Ikon nama="tutup" ukuran={14} tebal={2.5} className="flex-none" />
-              </span>
-            </button>
-          )}
         </div>
+
+        {/* Filter tambahan yang aktif: satu chip per filter, masing-masing bisa dihapus. */}
+        {chipAktif.length > 0 && (
+          <div className="-mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+            <span className="text-[13px] text-teks-lembut">Filter aktif:</span>
+            {chipAktif.map((chip) => (
+              <button
+                key={chip.label}
+                type="button"
+                onClick={() => ubahBanyakParameter(Object.fromEntries(chip.parameter.map((nama) => [nama, null])))}
+                aria-label={`Hapus filter ${chip.label}`}
+                className="group flex min-h-11 flex-none cursor-pointer items-center border-none bg-transparent p-0"
+              >
+                <span className="flex h-[34px] items-center gap-1.5 rounded-full border border-galaxy-900 bg-lembut pr-2.5 pl-3.5 text-[13px] font-semibold text-galaxy-900 group-hover:bg-white">
+                  {chip.label}
+                  <Ikon nama="tutup" ukuran={14} tebal={2.5} className="flex-none" />
+                </span>
+              </button>
+            ))}
+            {chipAktif.length > 1 && (
+              <button type="button" onClick={hapusFilterTambahan} className={KELAS_TAUTAN_AKSI}>
+                Hapus semua
+              </button>
+            )}
+          </div>
+        )}
 
         {/* 3. Panel tabel */}
         <div className={`${KELAS_KOTAK} overflow-clip`}>
           <p aria-live="polite" className="m-0 border-b border-garis px-5 py-3.5 text-[13px] text-teks-lembut md:px-6">
             <span className="font-semibold text-judul">{hasil.length}</span> kontrak
             {kataKunci && <> untuk “{kataKunci}”</>}
-            {bulan && <> berakhir {formatBulan(bulan)}</>}
             {hasil.length > 0 && (
               <>
                 {' '}

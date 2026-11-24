@@ -46,6 +46,7 @@ const daftarIkon = {
     </>
   ),
   urutkan: <path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4" />,
+  filter: <path d="M3 5h18l-7 8.5V19l-4 2v-7.5z" />,
   info: (
     <>
       <circle cx="12" cy="12" r="9" />
