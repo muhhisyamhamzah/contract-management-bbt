@@ -39,7 +39,7 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
   memilih alasan (`ALASAN_NONAKTIF` di `src/lib/akun.ts`, [ASUMSI] daftar usulan) + keterangan. Akun yang keluar
   dilihat di Admin, filter "Nonaktif", dengan alasan, waktu, dan siapa yang menonaktifkan.
 - (19 Nov 2026) Beranda menampilkan pil "Total kontrak" di depan pil status.
-- Mozaik kavling tampil di semua halaman dan bergerak (gelombang setiap 9 detik, 3 kali, lalu diam).
+- Mozaik kavling tampil di semua halaman. (24 Nov 2026) Bergerak hanya saat dilewati kursor, lihat "Acuan desain".
 - Tanpa placeholder contoh dan tanpa tulisan "(opsional)" di form.
 
 ## Keputusan tambahan (atasan lewat Hisyam, 20 Nov 2026)
@@ -115,11 +115,10 @@ Tanda keputusan: [DIKONFIRMASI] dijawab atasan, [ASUMSI] keputusan sementara tim
   ikon garis dari `src/components/Ikon.tsx`, satu tombol utama per layar.
 - TIDAK ADA sidebar. Navigasi berupa pil putih yang melayang di atas, di semua halaman
   (logo di kiri, menu, lonceng, akun, tombol Tambah kontrak). Header navy bergelombang DIHAPUS.
-- Mozaik kavling (kotak warna BBT yang memudar ke putih) tampil di atas semua halaman (18 Nov 2026), dengan
-  gelombang setiap 9 detik, terus-menerus di SEMUA halaman termasuk Masuk, tanpa sakelar (Hisyam 23 Nov 2026;
-  sakelar "Animasi latar" dihapus). Tetap mati saat mode kurangi gerak.
-  Gelombang dipicu pengatur waktu di `src/components/Mozaik.tsx` (sekali jalan, 5 baris teratas, berhenti saat tab
-  tidak dilihat), BUKAN animasi CSS tanpa henti: yang terakhir membebani browser ±10% terus-menerus (diukur 19 Nov 2026).
+- Mozaik kavling (kotak warna BBT yang memudar ke putih) tampil di atas semua halaman (18 Nov 2026), termasuk Masuk.
+  (24 Nov 2026) Gelombang setiap 9 detik DIHAPUS. Kotak muncul berurutan sekali saat dibuka, lalu diam; hanya kotak
+  di bawah kursor yang bergerak sebentar (`useGerakKursor` di `src/components/Mozaik.tsx`, Web Animations, tanpa
+  pengatur waktu dan tanpa library). Di HP (tanpa kursor) diam. Tetap mati saat mode kurangi gerak.
   Warna kotak di belakang teks dibatasi per warna (`PUTIH_MINIMAL` di `src/components/Mozaik.tsx`) supaya teks
   tetap minimal 4,5:1. Di desktop mozaik turun 20px, jadi judul halaman mulai di `md:pt-21` (Beranda juga, sejak 23 Nov 2026)
   dan tidak pernah berada di atas baris kotak pekat.
@@ -234,8 +233,15 @@ Alamat lama `/pengingat`, `/rekap`, `/ubah-data`, `/critical-point` diarahkan ke
    kata sandi salah, akun dikunci sementara.
 2. **Beranda**: judul rata tengah, kotak cari pil, rekap jumlah per status berupa pil (tautan ke daftar terfilter),
    panel "Agenda kontrak" (sudah lewat + habis dalam 90 hari, dengan kotak kalender), tombol Tambah kontrak.
+   (24 Nov 2026) Pil status ikut menampilkan total nilai. Di bawah pembuka ada dua kolom (bertumpuk di bawah 1024px):
+   kiri = garis waktu "Kontrak berakhir" 12 bulan (klik bulan membuka `/kontrak?bulan=YYYY-MM`) + "Aktivitas terakhir"
+   (5 perubahan kontrak terbaru; [ASUMSI] terlihat semua pengguna, perubahan akun tetap hanya di Admin); kanan =
+   "Pengingat bulan ini" + "Adendum sedang diproses". Kedua kolom sama tinggi (panel terakhir tiap kolom `flex-1`).
+   Agenda kontrak paling bawah, lebar penuh, 3 kolom, tinggi 2 baris kartu (6 kartu di desktop); sisanya di-scroll di
+   dalam kotaknya dan muncul dari bawah saat masuk (`src/components/DaftarAgenda.tsx`, tanpa library).
+   Hitungan di `src/lib/beranda.ts`.
 3. **Kontrak** (gabungan Kontrak, Pengingat, Rekap): satu tabel semua kontrak. Cari (nama, penyedia, nomor PKS),
-   filter status, urutkan (lewat alamat `?q=&status=&urut=`). Ada tampilan daftar kosong dan hasil pencarian kosong.
+   filter status, urutkan, filter bulan berakhir (lewat alamat `?q=&status=&urut=&bulan=`). Ada tampilan daftar kosong dan hasil pencarian kosong.
 4. **Detail kontrak**: data kontrak (termasuk status dan jumlah adendum, jadwal pengingat), ketentuan kontrak,
    riwayat, dropdown dokumen bernomor + unggah + pratinjau. Tombol Ubah, Catat adendum, Tandai selesai
    (dengan keterangan), menu hapus dengan konfirmasi.
@@ -269,6 +275,7 @@ src/
                 daftarKontrak.ts (saring, urut), formKontrak.ts (validasi), navigasi.ts, toast.ts,
                 versiKontrak.ts (data per versi dokumen), excel.ts + rekapExcel.ts (unduh Excel),
                 akun.ts (alasan nonaktif, email pengingat)
+                beranda.ts (nilai per status, pengingat bulan ini, adendum diproses, garis waktu, aktivitas)
   types/        kontrak.ts (semua tipe)
 ```
 

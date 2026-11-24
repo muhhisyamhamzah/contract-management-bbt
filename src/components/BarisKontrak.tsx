@@ -58,7 +58,7 @@ function BarisKontrak({ kontrak, onHapus }: Props) {
         <span className="block text-[13px] font-semibold text-judul">{formatTanggalSingkat(kontrak.tanggalBerakhir)}</span>
         <span className="block text-[12px] text-teks-lembut">mulai {formatTanggalSingkat(kontrak.tanggalMulai)}</span>
       </td>
-      <td className="px-4 py-3.5 text-right text-[14px] font-bold whitespace-nowrap text-judul" title={formatRupiah(kontrak.nilai)}>
+      <td className="px-4 py-3.5 text-center text-[14px] font-bold whitespace-nowrap text-judul" title={formatRupiah(kontrak.nilai)}>
         {formatRupiahSingkat(kontrak.nilai)}
       </td>
       <td className="w-[150px] px-4 py-3.5">

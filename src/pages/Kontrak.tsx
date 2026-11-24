@@ -25,6 +25,7 @@ import KeadaanKosong from '../components/KeadaanKosong'
 import KepalaHalaman from '../components/KepalaHalaman'
 import MenuDropdown from '../components/MenuDropdown'
 import PenomoranHalaman from '../components/PenomoranHalaman'
+import { bacaBulan, formatBulan } from '../lib/beranda'
 import { useData } from '../lib/data'
 import {
   bacaFilter,
@@ -50,7 +51,7 @@ const JUDUL_KOLOM: { label: string; kelas?: string }[] = [
   { label: 'Kontrak', kelas: 'pl-6 pr-4' },
   { label: 'Penyedia' },
   { label: 'Berakhir' },
-  { label: 'Nilai', kelas: 'text-right' },
+  { label: 'Nilai', kelas: 'px-4 text-center' },
   { label: 'Sisa kontrak' },
   { label: 'Status' },
   { label: 'Adendum' },
@@ -68,9 +69,13 @@ function Kontrak() {
   const kataKunci = parameter.get('q') ?? ''
   const urutan = bacaUrutan(parameter.get('urut'))
   const perHalaman = bacaPerHalaman(parameter.get('per'))
+  // ?bulan=YYYY-MM: kontrak yang berakhir di bulan itu (dibuka dari garis waktu Beranda, 24 Nov 2026).
+  const bulan = bacaBulan(parameter.get('bulan'))
 
   const jumlah = hitungJumlahPerStatus(kontrak)
-  const hasil = saringDanUrutkan(kontrak, filter, kataKunci, urutan)
+  const hasil = saringDanUrutkan(kontrak, filter, kataKunci, urutan).filter(
+    (k) => !bulan || k.tanggalBerakhir.startsWith(bulan),
+  )
   const totalNilai = hasil.reduce((total, k) => total + k.nilai, 0)
   const jumlahHalaman = Math.max(1, Math.ceil(hasil.length / perHalaman))
   const halaman = bacaHalaman(parameter.get('hal'), jumlahHalaman)
@@ -105,7 +110,7 @@ function Kontrak() {
     tampilkanToast('Kontrak dihapus.')
   }
 
-  const adaFilter = filter !== 'semua' || kataKunci !== ''
+  const adaFilter = filter !== 'semua' || kataKunci !== '' || bulan !== null
 
   return (
     <>
@@ -180,6 +185,21 @@ function Kontrak() {
               kelasIkon={f === 'semua' ? undefined : TAMPILAN_STATUS[f].kelasTeks}
             />
           ))}
+          {/* Filter bulan dari garis waktu Beranda: tampil sebagai chip aktif yang bisa dihapus. */}
+          {bulan && (
+            <button
+              type="button"
+              onClick={() => ubahParameter('bulan', '', '')}
+              aria-label={`Hapus filter berakhir ${formatBulan(bulan)}`}
+              className="group flex min-h-11 flex-none cursor-pointer items-center border-none bg-transparent p-0"
+            >
+              <span className="flex h-[38px] items-center gap-2 rounded-full border border-galaxy-900 bg-lembut px-3.5 text-[13px] font-semibold text-galaxy-900">
+                <Ikon nama="kalender" ukuran={14} tebal={2.5} className="flex-none" />
+                Berakhir {formatBulan(bulan)}
+                <Ikon nama="tutup" ukuran={14} tebal={2.5} className="flex-none" />
+              </span>
+            </button>
+          )}
         </div>
 
         {/* 3. Panel tabel */}
@@ -187,6 +207,7 @@ function Kontrak() {
           <p aria-live="polite" className="m-0 border-b border-garis px-5 py-3.5 text-[13px] text-teks-lembut md:px-6">
             <span className="font-semibold text-judul">{hasil.length}</span> kontrak
             {kataKunci && <> untuk “{kataKunci}”</>}
+            {bulan && <> berakhir {formatBulan(bulan)}</>}
             {hasil.length > 0 && (
               <>
                 {' '}

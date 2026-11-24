@@ -60,42 +60,10 @@
   --color-logo-emas: #F2B829;
   --color-logo-tanah: #E07B2C;
 
-  /* Mozaik: kotak muncul berurutan saat halaman dibuka (meletup, tanpa memantul), lalu setiap 9 detik ada
-     "gelombang" yang mengulang efek itu dari kiri atas (Hisyam 18 Nov 2026). Hanya transform dan opacity.
-     Optimasi 19 Nov 2026: gelombang tidak lagi berupa animasi 9 detik tanpa henti (yang membuat browser menghitung
-     ulang 160 kotak setiap frame walau kotaknya diam). Sekarang Mozaik.tsx memicu satu gelombang sekali jalan
-     (1,1 detik per kotak) lewat pengatur waktu, dan hanya 5 baris teratas yang ikut. Di antara gelombang tidak ada
-     animasi yang berjalan. Dua nama (a/b) dipakai bergantian supaya browser mengulang animasinya.
-     Sejak 23 Nov 2026 gelombang berjalan terus di semua halaman tanpa sakelar (permintaan Hisyam);
-     tetap mati total saat mode kurangi gerak (motion-safe:). */
+  /* Mozaik: kotak muncul berurutan sekali saat halaman dibuka (meletup, tanpa memantul). Hanya transform dan opacity.
+     Gerak saat dilewati kursor (24 Nov 2026, menggantikan gelombang setiap 9 detik) ada di Mozaik.tsx
+     (Web Animations, hanya kotak di bawah kursor), jadi tidak perlu keyframes di sini. */
   --animate-meletup: meletup 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
-  --animate-gelombang-a: gelombang-a 1.1s ease-in-out both;
-  --animate-gelombang-b: gelombang-b 1.1s ease-in-out both;
-
-  /* Satu gelombang: meredup dan mengecil sebentar, lalu kembali. Isi a dan b sama persis. */
-  @keyframes gelombang-a {
-    0%,
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    42% {
-      opacity: 0.25;
-      transform: translateY(6px) scale(0.9);
-    }
-  }
-
-  @keyframes gelombang-b {
-    0%,
-    100% {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    42% {
-      opacity: 0.25;
-      transform: translateY(6px) scale(0.9);
-    }
-  }
 
   @keyframes meletup {
     0% {
