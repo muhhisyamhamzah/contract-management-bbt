@@ -10,6 +10,8 @@ import logging
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+from app.config import pengaturan
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 log = logging.getLogger("galat")
@@ -72,6 +74,14 @@ def kolom_dari_galat(galat: list[dict]) -> dict[str, str]:
     return kolom
 
 
+def _asal_diizinkan(app: FastAPI) -> list[str]:
+    """Asal CORS yang dipasang di app (CORSMiddleware); bawaan: pengaturan.daftar_asal."""
+    for m in app.user_middleware:
+        if getattr(m.cls, "__name__", "") == "CORSMiddleware":
+            return list(m.kwargs.get("allow_origins", []))
+    return pengaturan.daftar_asal
+
+
 def pasang_penangan(app: FastAPI) -> None:
     @app.exception_handler(GalatApi)
     async def _galat_api(_: Request, exc: GalatApi):
@@ -103,4 +113,12 @@ def pasang_penangan(app: FastAPI) -> None:
     @app.exception_handler(Exception)
     async def _tak_terduga(request: Request, exc: Exception):
         log.exception("Galat tak terduga di %s %s", request.method, request.url.path)
-        return JSONResponse(status_code=500, content={"detail": _PESAN_GALAT_SERVER, "kode": "GALAT_SERVER"})
+        # Penangan Exception berjalan di luar CORSMiddleware, jadi header CORS dipasang di sini.
+        # Tanpa ini browser menyembunyikan jawaban 500 dari frontend (terlihat sebagai galat jaringan).
+        header = {}
+        asal = request.headers.get("origin")
+        if asal and asal in _asal_diizinkan(app):
+            header = {"Access-Control-Allow-Origin": asal, "Access-Control-Allow-Credentials": "true", "Vary": "Origin"}
+        return JSONResponse(
+            status_code=500, content={"detail": _PESAN_GALAT_SERVER, "kode": "GALAT_SERVER"}, headers=header
+        )

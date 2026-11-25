@@ -42,8 +42,10 @@ def sisa_detik_kunci(db: Session, akun: Akun, sekarang: datetime) -> int:
 def catat_gagal(db: Session, akun: Akun, sekarang: datetime) -> int | None:
     """Mencatat satu kegagalan. Mengembalikan sisa percobaan, atau None bila percobaan ini membuat akun terkunci."""
     db.add(PercobaanMasuk(akun_id=akun.id, waktu=sekarang, berhasil=False))
-    db.commit()
+    db.flush()
     n = len(_gagal_berturut(db, akun))
+    # Commit setelah menghitung: kunci baris akun (FOR UPDATE di router) baru dilepas di sini.
+    db.commit()
     if n % MAKS_PERCOBAAN_MASUK == 0:
         return None
     return MAKS_PERCOBAAN_MASUK - n % MAKS_PERCOBAAN_MASUK

@@ -156,3 +156,23 @@ def test_token_rusak_401(klien, db, buat_akun, buat):  # Review Focus 2
     token = buat(db, buat_akun)
     r = saya(klien, token)
     assert (r.status_code, r.json()["kode"]) == (401, "PERLU_MASUK")
+
+
+def test_percobaan_bersamaan_tetap_terkunci_setelah_5(buat_akun):  # temuan tinjauan akhir
+    """10 sandi salah dikirim bersamaan: hanya 4 boleh dijawab SANDI_SALAH, sisanya TERKUNCI."""
+    from concurrent.futures import ThreadPoolExecutor
+
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    buat_akun()
+
+    def coba(_):
+        with TestClient(app) as k:
+            return masuk(k, EMAIL, "salah").json()["kode"]
+
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        kode = list(pool.map(coba, range(10)))
+    assert kode.count("SANDI_SALAH") == 4, kode
+    assert kode.count("TERKUNCI") == 6, kode

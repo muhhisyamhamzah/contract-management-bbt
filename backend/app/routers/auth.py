@@ -36,7 +36,9 @@ def _terkunci(sisa_detik: int) -> GalatApi:
 @router.post("/masuk", response_model=HasilMasukOk, response_model_exclude_none=True)
 def masuk(isi: IsianMasuk, db: Session = Depends(ambil_db)):
     # Urutan pemeriksaan sama dengan masuk() di src/components/PenyediaData.tsx.
-    akun = db.scalar(select(Akun).where(Akun.email == isi.email.strip().lower()))
+    # FOR UPDATE: percobaan masuk untuk akun yang sama diproses satu per satu (dilepas saat commit),
+    # supaya permintaan bersamaan tidak bisa melewati batas 5 percobaan.
+    akun = db.scalar(select(Akun).where(Akun.email == isi.email.strip().lower()).with_for_update())
     sekarang = _sekarang()
     if akun is not None and (sisa := batas_masuk.sisa_detik_kunci(db, akun, sekarang)):
         raise _terkunci(sisa)

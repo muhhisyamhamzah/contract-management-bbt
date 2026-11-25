@@ -7,6 +7,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class _AlamatUji(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
     database_url: str = ""
+    database_url_migrasi: str = ""
     database_url_uji: str = ""
 
 
@@ -16,12 +17,21 @@ def _endpoint(url: str) -> str:
     return m.group(1).split(".")[0].removesuffix("-pooler") if m else ""
 
 
+def cek_alamat_uji(uji: str, *alamat_lain: str) -> None:
+    """Menolak jalan bila alamat uji menunjuk database yang sama dengan alamat lain (uji menghapus isi tabel)."""
+    for lain in alamat_lain:
+        if lain and _endpoint(uji) == _endpoint(lain):
+            raise RuntimeError(
+                "DATABASE_URL_UJI menunjuk database yang sama dengan DATABASE_URL atau DATABASE_URL_MIGRASI. "
+                "Uji menghapus isi tabel! Isi DATABASE_URL_UJI dengan alamat branch Neon 'uji'."
+            )
+
+
 _alamat = _AlamatUji()
 # Semua uji (dan app yang diimpor uji) memakai branch "uji". Dipasang sebelum app diimpor,
 # karena variabel lingkungan menang atas isi .env.
 if _alamat.database_url_uji:
-    if _endpoint(_alamat.database_url_uji) == _endpoint(_alamat.database_url):
-        raise RuntimeError("DATABASE_URL_UJI menunjuk database yang sama dengan DATABASE_URL. Uji menghapus isi tabel!")
+    cek_alamat_uji(_alamat.database_url_uji, _alamat.database_url, _alamat.database_url_migrasi)
     os.environ["DATABASE_URL"] = _alamat.database_url_uji
     os.environ["DATABASE_URL_MIGRASI"] = _alamat.database_url_uji
 # Nilai uji, dipasang sebelum app diimpor supaya validator JWT_SECRET tidak menolak.
@@ -102,8 +112,13 @@ def _app_uji():
         model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
         tanggal_berakhir: date
 
+    from fastapi.middleware.cors import CORSMiddleware
+
     app_uji = FastAPI()
     pasang_penangan(app_uji)
+    app_uji.add_middleware(
+        CORSMiddleware, allow_origins=["http://localhost:5173"], allow_credentials=True, allow_methods=["*"]
+    )
 
     @app_uji.get("/uji/galat")
     def galat():

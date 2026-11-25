@@ -37,3 +37,14 @@ def test_galat_tak_terduga_500_tanpa_rincian(klien_uji_tanpa_raise):
     r = klien_uji_tanpa_raise.get("/uji/rusak")
     assert r.status_code == 500 and r.json()["kode"] == "GALAT_SERVER"
     assert "rahasia" not in r.text
+
+
+def test_galat_500_tetap_membawa_cors_untuk_asal_frontend(klien_uji_tanpa_raise):  # temuan tinjauan akhir
+    r = klien_uji_tanpa_raise.get("/uji/rusak", headers={"Origin": "http://localhost:5173"})
+    assert r.status_code == 500
+    assert r.headers.get("access-control-allow-origin") == "http://localhost:5173"
+
+
+def test_galat_500_tanpa_cors_untuk_asal_lain(klien_uji_tanpa_raise):
+    r = klien_uji_tanpa_raise.get("/uji/rusak", headers={"Origin": "https://situs-lain.example"})
+    assert r.status_code == 500 and "access-control-allow-origin" not in r.headers
