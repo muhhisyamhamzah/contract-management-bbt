@@ -46,3 +46,17 @@ class HasilMasukOk(SkemaDasar):
 
 class TokenBaru(SkemaDasar):
     token: str
+
+
+# --- Akun sendiri ---
+
+
+class IsianProfil(SkemaDasar):
+    nama: str | None = Field(default=None, max_length=200)
+    jabatan: str | None = Field(default=None, max_length=200)
+
+
+class IsianGantiSandi(SkemaDasar):
+    sandi_lama: str = Field(max_length=200)
+    # Minimal 8 karakter, sama dengan MIN_PANJANG_SANDI di frontend. Batas 72 byte dicek di router.
+    sandi_baru: str = Field(min_length=8, max_length=200)

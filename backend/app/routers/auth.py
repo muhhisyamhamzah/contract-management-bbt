@@ -11,8 +11,9 @@ from app.database import ambil_db
 from app.deps import akun_masuk
 from app.galat import GalatApi
 from app.models import Akun
-from app.schemas import AkunKeluar, HasilMasukOk, IsianMasuk
-from app.security import buat_token, cocok_sandi
+from app.riwayat import catat_riwayat
+from app.schemas import AkunKeluar, HasilMasukOk, IsianGantiSandi, IsianMasuk, IsianProfil, TokenBaru
+from app.security import acak_sandi, buat_token, cocok_sandi, sandi_terlalu_panjang
 from app.tampil import ke_akun
 
 router = APIRouter(prefix="/api/auth", tags=["Auth"])
@@ -64,3 +65,41 @@ def masuk(isi: IsianMasuk, db: Session = Depends(ambil_db)):
 def saya(akun: Akun = Depends(akun_masuk)):
     """Dipanggil frontend saat halaman dimuat ulang, untuk memulihkan sesi dari token."""
     return ke_akun(akun)
+
+
+def _isian_salah(kolom: str, pesan: str) -> GalatApi:
+    return GalatApi(422, "ISIAN_TIDAK_SAH", pesan, kolom={kolom: pesan})
+
+
+@router.patch("/saya", response_model=AkunKeluar, response_model_exclude_none=True)
+def ubah_profil(isi: IsianProfil, akun: Akun = Depends(akun_masuk), db: Session = Depends(ambil_db)):
+    """Pemilik akun hanya boleh mengubah nama dan jabatannya sendiri. Kalimat riwayat sama dengan ubahProfil()."""
+    nama = isi.nama.strip() if isi.nama is not None else akun.nama
+    jabatan = isi.jabatan.strip() if isi.jabatan is not None else akun.jabatan
+    if not nama:
+        raise _isian_salah("nama", "Nama tidak boleh kosong.")
+
+    berubah = []
+    if nama != akun.nama:
+        berubah.append(f'nama "{akun.nama}" menjadi "{nama}"')
+    if jabatan != akun.jabatan:
+        berubah.append(f'jabatan "{akun.jabatan}" menjadi "{jabatan}"')
+    if berubah:
+        # Dicatat atas nama lama, sama dengan purwarupa.
+        catat_riwayat(db, akun, "akun", f"Mengubah profil sendiri: {', '.join(berubah)}")
+        akun.nama, akun.jabatan = nama, jabatan
+        db.commit()
+    return ke_akun(akun)
+
+
+@router.post("/ganti-sandi", response_model=TokenBaru)
+def ganti_sandi(isi: IsianGantiSandi, akun: Akun = Depends(akun_masuk), db: Session = Depends(ambil_db)):
+    if sandi_terlalu_panjang(isi.sandi_baru):
+        raise _isian_salah("sandiBaru", "Kata sandi baru terlalu panjang (maksimal 72 byte; huruf khusus atau emoji dihitung lebih).")
+    if not cocok_sandi(isi.sandi_lama, akun.password_hash):
+        raise _isian_salah("sandiLama", "Kata sandi saat ini salah.")
+    akun.password_hash = acak_sandi(isi.sandi_baru)
+    catat_riwayat(db, akun, "akun", f"Mengganti kata sandi akun {akun.nama}")
+    db.commit()
+    # Token lama (termasuk di perangkat lain) tidak berlaku lagi; perangkat ini diberi token baru.
+    return TokenBaru(token=buat_token(akun.id, akun.password_hash))
