@@ -285,7 +285,10 @@ di log untuk dibersihkan, tanpa membatalkan penghapusan.
 
 ```
 DATABASE_URL=postgresql+psycopg://...neon.tech/...   # pakai alamat "pooled" Neon
+DATABASE_URL_MIGRASI=...  # alamat "direct" Neon untuk Alembic (migrasi tidak lewat pooler)
+DATABASE_URL_UJI=...      # alamat direct branch Neon "uji", hanya untuk pytest
 JWT_SECRET=...            JWT_MENIT=720
+LAMA_KUNCI_DETIK=300      # lama akun dikunci setelah 5 kali salah sandi
 R2_ACCOUNT_ID=...  R2_ACCESS_KEY=...  R2_SECRET_KEY=...  R2_BUCKET=...  R2_URL_MENIT=10
 MAKS_UKURAN_BERKAS_MB=25
 SMTP_HOST=...  SMTP_PORT=587  SMTP_USER=...  SMTP_SANDI=...  SMTP_PENGIRIM=...
@@ -293,7 +296,7 @@ VAPID_PUBLIK=...  VAPID_PRIVAT=...  VAPID_KONTAK=mailto:...
 ASAL_FRONTEND=https://...   # CORS
 ```
 
-`.env` tidak pernah di-commit. Contohnya ditulis di `backend/.env.contoh`.
+`.env` tidak pernah di-commit. Contohnya ditulis di `backend/.env.contoh` (dikecualikan di `.gitignore` lewat `!.env.contoh`).
 
 ## 8. Urutan pengerjaan
 

@@ -33,3 +33,9 @@ dist-ssr
 
 # Screenshot mockup (bisa dibuat ulang dari file HTML di mockup/)
 mockup/*.png
+!.env.contoh
+
+# Backend Python
+backend/.venv/
+__pycache__/
+.pytest_cache/
