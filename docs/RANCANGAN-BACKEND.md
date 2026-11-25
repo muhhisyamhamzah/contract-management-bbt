@@ -319,6 +319,7 @@ Setiap langkah bisa dipakai sendiri. Selama langkah 3 belum selesai, data contoh
 | Termin pembayaran perlu dicatat? | atasan | tabel baru `termin` (tambahan, tidak mengubah yang lama) |
 | Layanan email pengingat | tim IT | isi `.env` SMTP |
 | Server untuk backend dan cron | tim IT | sama dengan Sismon atau terpisah |
+| Database produksi di akun siapa dan di negara mana | tim IT / hukum | Database **produksi** harus atas nama akun kantor, bukan akun pribadi pengembang. Neon terdekat ada di Singapura; perlu dicek apakah data kontrak instansi boleh disimpan di luar Indonesia. Selama pengembangan dipakai database terpisah berisi data **fiktif** saja. |
 | Pesan "akun tidak ditemukan" boleh dibedakan? | tim IT | keamanan halaman Masuk |
 | Lama kunci setelah gagal masuk, lama sesi | tim IT | `batas_masuk.py`, `JWT_MENIT` |
 | Template Excel impor data awal | atasan | endpoint impor (belum dirancang) |
