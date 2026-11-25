@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import pengaturan
 from app.galat import pasang_penangan
+from app.routers import auth
 
 app = FastAPI(
     title="API Contract Management BBT",
@@ -24,6 +25,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(auth.router)
 
 
 @app.get("/api/cek", tags=["Lain-lain"])
