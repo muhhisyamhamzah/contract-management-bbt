@@ -7,12 +7,15 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import pengaturan
+from app.galat import pasang_penangan
 
 app = FastAPI(
     title="API Contract Management BBT",
     version="0.1.0",
     description="Backend pengelolaan kontrak PKS Badan Bank Tanah. Rancangan: docs/RANCANGAN-BACKEND.md.",
 )
+
+pasang_penangan(app)
 
 app.add_middleware(
     CORSMiddleware,
