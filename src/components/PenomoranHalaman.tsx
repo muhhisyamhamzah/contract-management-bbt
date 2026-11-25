@@ -13,18 +13,22 @@ type Props = {
   onUbahPerHalaman: (perHalaman: number) => void
 }
 
+// Tombol memakai aria-disabled, bukan disabled: tombol "berikutnya" yang menjadi disabled di halaman terakhir
+// saat masih difokus membuang fokus di Safari dan Firefox (impeccable harden, 24 Nov 2026).
 const KELAS_TOMBOL_HALAMAN =
-  'flex size-11 cursor-pointer items-center justify-center rounded-full border border-garis-input bg-white text-judul transition-[background-color] duration-150 hover:bg-latar disabled:cursor-not-allowed disabled:opacity-60 motion-reduce:transition-none'
+  'flex size-11 cursor-pointer items-center justify-center rounded-full border border-garis-input bg-white text-judul transition-[background-color] duration-150 hover:bg-latar aria-disabled:cursor-not-allowed aria-disabled:opacity-60 aria-disabled:hover:bg-white motion-reduce:transition-none'
 
 function PenomoranHalaman({ halaman, jumlahHalaman, perHalaman, onUbahHalaman, onUbahPerHalaman }: Props) {
   return (
     <div className="flex flex-wrap items-center justify-between gap-3 border-t border-garis px-5 py-3 text-[13px] text-teks-lembut md:px-6">
-      <label className="flex items-center gap-2">
+      <label className="flex items-center gap-2 whitespace-nowrap">
         Tampilkan
         <select
           value={perHalaman}
           onChange={(e) => onUbahPerHalaman(Number(e.target.value))}
-          className={`${KELAS_ISIAN} h-11 w-auto cursor-pointer pr-2`}
+          // KELAS_ISIAN memakai w-full untuk form; di sini lebar mengikuti isi. Dulu w-full dan w-auto dipasang bersamaan,
+          // w-full menang, sehingga "per halaman" terpotong dua baris (impeccable polish, 25 Nov 2026).
+          className={`${KELAS_ISIAN.replace('w-full ', '')} h-11 w-auto cursor-pointer pr-2`}
         >
           {PILIHAN_PER_HALAMAN.map((n) => (
             <option key={n} value={n}>
@@ -41,8 +45,8 @@ function PenomoranHalaman({ halaman, jumlahHalaman, perHalaman, onUbahHalaman, o
         <button
           type="button"
           aria-label="Halaman sebelumnya"
-          disabled={halaman <= 1}
-          onClick={() => onUbahHalaman(halaman - 1)}
+          aria-disabled={halaman <= 1}
+          onClick={() => halaman > 1 && onUbahHalaman(halaman - 1)}
           className={KELAS_TOMBOL_HALAMAN}
         >
           <Ikon nama="kiri" ukuran={16} tebal={2.5} />
@@ -50,8 +54,8 @@ function PenomoranHalaman({ halaman, jumlahHalaman, perHalaman, onUbahHalaman, o
         <button
           type="button"
           aria-label="Halaman berikutnya"
-          disabled={halaman >= jumlahHalaman}
-          onClick={() => onUbahHalaman(halaman + 1)}
+          aria-disabled={halaman >= jumlahHalaman}
+          onClick={() => halaman < jumlahHalaman && onUbahHalaman(halaman + 1)}
           className={KELAS_TOMBOL_HALAMAN}
         >
           <Ikon nama="kanan" ukuran={16} tebal={2.5} />

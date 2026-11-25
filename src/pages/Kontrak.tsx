@@ -6,14 +6,14 @@
 // penempatannya lebih mudah dipahami:
 //   1. Toolbar satu baris: kotak cari, Urutkan, Filter (24 Nov 2026), Unduh Excel.
 //   2. Chip status dengan ikon dan jumlah, lalu baris "Filter aktif" (chip filter tambahan yang bisa dihapus).
-//   3. Panel tabel: kepala "N kontrak · total nilai", tabel (mulai 1280px) atau daftar bertumpuk (di bawahnya),
+//   3. Panel tabel: kepala "N kontrak, total nilai", tabel (mulai 1280px) atau daftar bertumpuk (di bawahnya),
 //      lalu pembagian halaman.
 // Tombol "Tambah kontrak" tetap di navigasi atas (satu tombol utama per layar), tidak diulang di toolbar.
 //
 // Filter, kata kunci, urutan, dan halaman disimpan di alamat, misalnya /kontrak?status=lewat&q=hukum&urut=nilai&hal=2.
 // Jadi pil ringkasan di Beranda bisa langsung membuka daftar terfilter, dan tombol Back mengembalikan filter sebelumnya.
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
 import BarisKontrak from '../components/BarisKontrak'
 import ChipFilter from '../components/ChipFilter'
@@ -68,11 +68,31 @@ function Kontrak() {
 
   const filter = bacaFilter(parameter.get('status'))
   const kataKunci = parameter.get('q') ?? ''
+  // Isi kotak cari disimpan di state sendiri, alamat diperbarui 250 ms setelah berhenti mengetik
+  // (impeccable harden, 24 Nov 2026). Dulu kotak diikat langsung ke alamat yang diperbarui sedikit terlambat,
+  // sehingga huruf yang diketik cepat tertimpa: "contoh" menjadi "ch".
+  const [teksCari, setTeksCari] = useState(kataKunci)
+  const [kataKunciLalu, setKataKunciLalu] = useState(kataKunci)
+  const [cariTerkirim, setCariTerkirim] = useState(kataKunci)
+  const jedaCari = useRef<number | undefined>(undefined)
+  // Alamat berubah dari luar (tombol Back, tautan dari Beranda): kotak cari ikut. Perubahan dari ketikan sendiri diabaikan,
+  // supaya huruf yang diketik saat alamat belum selesai diperbarui tidak hilang.
+  if (kataKunci !== kataKunciLalu) {
+    setKataKunciLalu(kataKunci)
+    if (kataKunci !== cariTerkirim) {
+      setTeksCari(kataKunci)
+      setCariTerkirim(kataKunci)
+    }
+  }
   const urutan = bacaUrutan(parameter.get('urut'))
   const perHalaman = bacaPerHalaman(parameter.get('per'))
   // Filter tambahan (24 Nov 2026): adendum, tanggal berakhir (termasuk ?bulan= dari Beranda), nilai, riwayat adendum, BAST.
   const filterTambahan = bacaFilterKontrak(parameter)
   const chipAktif = chipFilterAktif(filterTambahan)
+  // Fokus setelah chip "Filter aktif" dihapus (impeccable harden, 24 Nov 2026): tanpa ini chip yang difokus
+  // hilang dan fokus jatuh ke awal halaman. Nilainya urutan chip yang dihapus; null = tidak ada yang perlu dipindah.
+  const barisChip = useRef<HTMLDivElement>(null)
+  const fokusSetelahHapus = useRef<number | null>(null)
 
   const jumlah = hitungJumlahPerStatus(kontrak)
   const hasil = saringDanUrutkan(kontrak, filter, kataKunci, urutan).filter((k) => cocokFilterKontrak(k, filterTambahan))
@@ -112,6 +132,40 @@ function Kontrak() {
     })
   }
 
+  // Setelah chip hilang: fokus ke chip yang kini menempati posisinya (atau chip terakhir),
+  // dan ke tombol Filter kalau tidak ada chip tersisa.
+  useEffect(() => {
+    const urutan = fokusSetelahHapus.current
+    if (urutan === null) return
+    fokusSetelahHapus.current = null
+    const chip = barisChip.current?.querySelectorAll<HTMLButtonElement>('[data-chip-filter]')
+    const tujuan = chip && chip.length > 0 ? chip[Math.min(urutan, chip.length - 1)] : document.getElementById('tombol-filter-kontrak')
+    tujuan?.focus()
+  }, [chipAktif.length])
+
+  // Ringkasan jumlah untuk pembaca layar, dibacakan setelah pengguna berhenti mengetik,
+  // bukan setiap huruf (impeccable harden, 24 Nov 2026).
+  const ringkasan = `${hasil.length} kontrak${kataKunci ? ` untuk “${kataKunci}”` : ''}`
+  const [ringkasanDibacakan, setRingkasanDibacakan] = useState(ringkasan)
+  useEffect(() => {
+    const jeda = window.setTimeout(() => setRingkasanDibacakan(ringkasan), 700)
+    return () => window.clearTimeout(jeda)
+  }, [ringkasan])
+
+  function kirimCari(nilai: string) {
+    window.clearTimeout(jedaCari.current)
+    setCariTerkirim(nilai)
+    ubahParameter('q', nilai, '')
+  }
+
+  function ketikCari(nilai: string) {
+    setTeksCari(nilai)
+    window.clearTimeout(jedaCari.current)
+    jedaCari.current = window.setTimeout(() => kirimCari(nilai), 250)
+  }
+
+  useEffect(() => () => window.clearTimeout(jedaCari.current), [])
+
   function hapusFilterTambahan() {
     ubahBanyakParameter(Object.fromEntries(PARAMETER_FILTER.map((nama) => [nama, null])))
   }
@@ -127,7 +181,8 @@ function Kontrak() {
     tampilkanToast('Kontrak dihapus.')
   }
 
-  const adaFilter = filter !== 'semua' || kataKunci !== '' || chipAktif.length > 0
+  const adaFilterLain = filter !== 'semua' || chipAktif.length > 0
+  const adaFilter = adaFilterLain || kataKunci !== ''
 
   return (
     <>
@@ -145,18 +200,24 @@ function Kontrak() {
             <span className="sr-only">Cari kontrak</span>
             <input
               type="search"
-              value={kataKunci}
-              onChange={(event) => ubahParameter('q', event.target.value, '')}
+              value={teksCari}
+              onChange={(event) => ketikCari(event.target.value)}
+              name="q"
+              autoComplete="off"
+              spellCheck={false}
               placeholder="Cari nama, penyedia, atau nomor PKS"
               // Garis fokus digambar oleh label pembungkus (focus-within), supaya seluruh kotak tersorot.
               className="min-w-0 flex-1 border-none bg-transparent text-[15px] text-teks outline-none focus-visible:outline-none [&::-webkit-search-cancel-button]:hidden"
             />
-            {kataKunci && (
+            {teksCari && (
               <button
                 type="button"
                 aria-label="Hapus kata kunci"
-                onClick={() => ubahParameter('q', '', '')}
-                className="flex size-10 flex-none cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut hover:bg-latar hover:text-judul"
+                onClick={() => {
+                  setTeksCari('')
+                  kirimCari('')
+                }}
+                className="flex size-11 flex-none cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut hover:bg-latar hover:text-judul"
               >
                 <Ikon nama="tutup" ukuran={18} />
               </button>
@@ -213,13 +274,17 @@ function Kontrak() {
 
         {/* Filter tambahan yang aktif: satu chip per filter, masing-masing bisa dihapus. */}
         {chipAktif.length > 0 && (
-          <div className="-mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+          <div ref={barisChip} className="-mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
             <span className="text-[13px] text-teks-lembut">Filter aktif:</span>
-            {chipAktif.map((chip) => (
+            {chipAktif.map((chip, urutan) => (
               <button
                 key={chip.label}
                 type="button"
-                onClick={() => ubahBanyakParameter(Object.fromEntries(chip.parameter.map((nama) => [nama, null])))}
+                data-chip-filter
+                onClick={() => {
+                  fokusSetelahHapus.current = urutan
+                  ubahBanyakParameter(Object.fromEntries(chip.parameter.map((nama) => [nama, null])))
+                }}
                 aria-label={`Hapus filter ${chip.label}`}
                 className="group flex min-h-11 flex-none cursor-pointer items-center border-none bg-transparent p-0"
               >
@@ -230,7 +295,14 @@ function Kontrak() {
               </button>
             ))}
             {chipAktif.length > 1 && (
-              <button type="button" onClick={hapusFilterTambahan} className={KELAS_TAUTAN_AKSI}>
+              <button
+                type="button"
+                onClick={() => {
+                  fokusSetelahHapus.current = 0
+                  hapusFilterTambahan()
+                }}
+                className={KELAS_TAUTAN_AKSI}
+              >
                 Hapus semua
               </button>
             )}
@@ -239,13 +311,15 @@ function Kontrak() {
 
         {/* 3. Panel tabel */}
         <div className={`${KELAS_KOTAK} overflow-clip`}>
-          <p aria-live="polite" className="m-0 border-b border-garis px-5 py-3.5 text-[13px] text-teks-lembut md:px-6">
+          <span aria-live="polite" className="sr-only">
+            {ringkasanDibacakan}
+          </span>
+          <p className="m-0 border-b border-garis px-5 py-3.5 text-[13px] text-teks-lembut md:px-6">
             <span className="font-semibold text-judul">{hasil.length}</span> kontrak
             {kataKunci && <> untuk “{kataKunci}”</>}
             {hasil.length > 0 && (
               <>
-                {' '}
-                · total nilai <span className="font-semibold text-judul">{formatRupiahSingkat(totalNilai)}</span>
+                , total nilai <span className="font-semibold text-judul">{formatRupiahSingkat(totalNilai)}</span>
               </>
             )}
           </p>
@@ -305,11 +379,19 @@ function Kontrak() {
             <KeadaanKosong
               ikon="cari"
               judul="Tidak ada kontrak yang cocok"
-              pesan="Coba kata kunci lain, misalnya sebagian nama penyedia atau nomor PKS."
+              // Pesan dan tombol mengikuti penyebab hasil kosong: kata kunci, filter, atau keduanya
+              // (impeccable clarify, 25 Nov 2026). Dulu selalu "Coba kata kunci lain", juga saat tidak ada kata kunci.
+              pesan={
+                kataKunci && !adaFilterLain
+                  ? 'Coba kata kunci lain, misalnya sebagian nama penyedia atau nomor PKS.'
+                  : kataKunci
+                    ? 'Coba kata kunci lain, atau kurangi filter yang dipilih.'
+                    : 'Tidak ada kontrak yang memenuhi semua filter yang dipilih. Coba kurangi filternya.'
+              }
               aksi={
                 adaFilter && (
                   <button type="button" onClick={() => setParameter({}, { replace: true })} className={KELAS_TOMBOL_KEDUA}>
-                    Hapus pencarian dan filter
+                    {kataKunci && !adaFilterLain ? 'Hapus pencarian' : kataKunci ? 'Hapus pencarian dan filter' : 'Hapus semua filter'}
                   </button>
                 )
               }

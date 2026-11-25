@@ -2,7 +2,7 @@
 // Contoh: "Data kontrak", "Ketentuan kontrak", "Dokumen".
 // Judul tanpa kotak ikon (DESIGN.md: tanpa kotak ikon berwarna di depan setiap judul). Isi dipisah garis, bukan kartu kecil.
 
-import type { ReactNode } from 'react'
+import { useId, type ReactNode } from 'react'
 import { KELAS_KOTAK } from '../lib/tataLetak'
 
 type Props = {
@@ -18,7 +18,9 @@ type Props = {
 }
 
 function KartuBagian({ judul, aksi, keterangan, children, id, kelas = '' }: Props) {
-  const idJudul = id ? `${id}-judul` : undefined
+  // Tanpa id dari luar tetap memakai id otomatis, supaya bagian selalu punya nama untuk pembaca layar.
+  const idOtomatis = useId()
+  const idJudul = `${id ?? idOtomatis}-judul`
   return (
     <section id={id} aria-labelledby={idJudul} className={`${KELAS_KOTAK} scroll-mt-40 px-5 pt-2 pb-5 md:px-7 md:pb-6 ${kelas}`}>
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-garis py-3">

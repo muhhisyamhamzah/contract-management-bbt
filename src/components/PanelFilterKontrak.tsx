@@ -56,7 +56,7 @@ function GrupPilihan({ judul, nama, nilai, pilihan, onPilih, children }: PropsGr
               />
               <span
                 className={`flex h-8 items-center rounded-full border px-3 text-[13px] transition-[background-color,border-color] duration-150 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-aksi motion-reduce:transition-none ${
-                  dipilih ? 'border-galaxy-900 bg-lembut font-semibold text-judul' : 'border-garis bg-white text-teks group-hover:border-garis-input'
+                  dipilih ? 'border-galaxy-900 bg-lembut font-semibold text-judul' : 'border-garis-input bg-white text-teks group-hover:bg-latar'
                 }`}
               >
                 {label}
@@ -87,6 +87,7 @@ function PanelFilterKontrak({ filter, jumlahAktif, onUbah, onHapusSemua }: Props
     <div ref={wadah} className="relative">
       <button
         ref={tombol}
+        id="tombol-filter-kontrak"
         type="button"
         aria-expanded={terbuka}
         aria-controls={id}
@@ -195,9 +196,11 @@ function PanelFilterKontrak({ filter, jumlahAktif, onUbah, onHapusSemua }: Props
           <div className="flex items-center justify-between gap-2 border-t border-garis px-5 py-3">
             <button
               type="button"
-              onClick={onHapusSemua}
-              disabled={jumlahAktif === 0}
-              className="min-h-11 cursor-pointer border-none bg-transparent px-1 text-[13px] font-semibold text-aksi hover:text-aksi-tua disabled:cursor-not-allowed disabled:text-teks-lembut"
+              // aria-disabled, bukan disabled: tombol yang menjadi disabled saat difokus membuang fokus
+              // di Safari dan Firefox (impeccable harden, 24 Nov 2026).
+              onClick={() => jumlahAktif > 0 && onHapusSemua()}
+              aria-disabled={jumlahAktif === 0}
+              className="min-h-11 cursor-pointer border-none bg-transparent px-1 text-[13px] font-semibold text-aksi hover:text-aksi-tua aria-disabled:cursor-not-allowed aria-disabled:text-teks-lembut"
             >
               Hapus semua filter
             </button>

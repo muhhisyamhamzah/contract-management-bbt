@@ -23,6 +23,14 @@ type Props = {
   daftar: BulanBerakhir[]
 }
 
+/** Rincian status satu bulan untuk pembaca layar dan tooltip, misalnya "2 sudah lewat, 1 segera habis". */
+function rincianStatus(kontrak: BulanBerakhir['kontrak']): string {
+  return URUTAN_STATUS.map((s) => [s, kontrak.filter((k) => hitungStatus(k) === s).length] as const)
+    .filter(([, n]) => n > 0)
+    .map(([s, n]) => `${n} ${TAMPILAN_STATUS[s].label.toLowerCase()}`)
+    .join(', ')
+}
+
 function GarisWaktuBerakhir({ daftar, kelas }: Props) {
   const statusTampil = new Set(daftar.flatMap((b) => b.kontrak.map((k) => hitungStatus(k))))
   const jumlah = daftar.reduce((total, b) => total + b.kontrak.length, 0)
@@ -39,8 +47,13 @@ function GarisWaktuBerakhir({ daftar, kelas }: Props) {
               </span>
               {/* Kotak kavling, disusun dari bawah ke atas. */}
               <span aria-hidden="true" className="flex h-[92px] flex-col-reverse items-center gap-1">
-                {bulan.kontrak.slice(0, MAKS_KOTAK).map((k) => (
-                  <span key={k.id} className={`size-2.5 flex-none rounded-[3px] ${TAMPILAN_STATUS[hitungStatus(k)].kelasBar}`} />
+                {/* Diurutkan per status (urutan keterangan), jadi warna yang sama berkumpul dan mudah dihitung,
+                    tidak hanya dibedakan dari warna yang berselang-seling (impeccable colorize, 24 Nov 2026). */}
+                {[...bulan.kontrak]
+                  .sort((a, b) => URUTAN_STATUS.indexOf(hitungStatus(a)) - URUTAN_STATUS.indexOf(hitungStatus(b)))
+                  .slice(0, MAKS_KOTAK)
+                  .map((k) => (
+                  <span key={k.id} className={`size-2.5 flex-none rounded-[3px] ${TAMPILAN_STATUS[hitungStatus(k)].kelasKotak}`} />
                 ))}
                 {bulan.kontrak.length > MAKS_KOTAK && (
                   <span className="text-[11px] leading-none font-semibold text-teks-lembut">+{bulan.kontrak.length - MAKS_KOTAK}</span>
@@ -58,8 +71,8 @@ function GarisWaktuBerakhir({ daftar, kelas }: Props) {
               {bulan.kontrak.length > 0 ? (
                 <Link
                   to={`/kontrak?bulan=${bulan.kunci}`}
-                  aria-label={`${formatBulan(bulan.kunci)}: ${bulan.kontrak.length} kontrak berakhir, total ${formatRupiahSingkat(bulan.nilai)}`}
-                  title={`${bulan.kontrak.length} kontrak, ${formatRupiahSingkat(bulan.nilai)}`}
+                  aria-label={`${formatBulan(bulan.kunci)}: ${bulan.kontrak.length} kontrak berakhir (${rincianStatus(bulan.kontrak)}), total ${formatRupiahSingkat(bulan.nilai)}`}
+                  title={`${bulan.kontrak.length} kontrak (${rincianStatus(bulan.kontrak)}), ${formatRupiahSingkat(bulan.nilai)}`}
                   className={`${kelasKolom} no-underline transition-[background-color] duration-150 hover:bg-latar motion-reduce:transition-none`}
                 >
                   {isi}
@@ -80,7 +93,7 @@ function GarisWaktuBerakhir({ daftar, kelas }: Props) {
         <p className="m-0 mt-4 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-teks-lembut">
           {URUTAN_STATUS.filter((s) => statusTampil.has(s)).map((s) => (
             <span key={s} className="inline-flex items-center gap-1.5">
-              <span aria-hidden="true" className={`size-2.5 rounded-[3px] ${TAMPILAN_STATUS[s].kelasBar}`} />
+              <span aria-hidden="true" className={`size-2.5 rounded-[3px] ${TAMPILAN_STATUS[s].kelasKotak}`} />
               {TAMPILAN_STATUS[s].label}
             </span>
           ))}

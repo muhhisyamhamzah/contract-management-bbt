@@ -28,7 +28,7 @@ function ChipFilter({ label, jumlah, aktif, onPilih, ikon, kelasIkon = '' }: Pro
         className={`flex h-[38px] items-center gap-2 rounded-full border px-3.5 text-[13px] font-semibold transition-[background-color,border-color,color] duration-150 motion-reduce:transition-none ${
           aktif
             ? 'border-galaxy-900 bg-lembut text-galaxy-900'
-            : 'border-garis bg-white text-judul group-hover:border-garis-input'
+            : 'border-garis-input bg-white text-judul group-hover:bg-latar'
         }`}
       >
         {ikon && <Ikon nama={ikon} ukuran={14} tebal={2.5} className={`flex-none ${kelasIkon}`} />}

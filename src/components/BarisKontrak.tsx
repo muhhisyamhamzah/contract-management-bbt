@@ -21,9 +21,10 @@ type Props = {
   onHapus: (kontrak: Kontrak) => void
 }
 
-/** Tombol ikon kecil di kolom aksi. Area klik 40px; tabel ini hanya tampil di layar lebar (tetikus). */
+/** Tombol ikon di kolom aksi. Area klik 44px (impeccable polish, 25 Nov 2026; dulu 40px): tabel ini juga tampil
+ * di laptop layar sentuh dan tablet mendatar mulai 1280px, jadi aturan 44px tetap berlaku. */
 const KELAS_TOMBOL_IKON =
-  'flex size-10 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut no-underline transition-[background-color,color] duration-150 motion-reduce:transition-none'
+  'flex size-11 cursor-pointer items-center justify-center rounded-full border-none bg-transparent text-teks-lembut no-underline transition-[background-color,color] duration-150 motion-reduce:transition-none'
 
 function BarisKontrak({ kontrak, onHapus }: Props) {
   const navigate = useNavigate()
@@ -46,11 +47,13 @@ function BarisKontrak({ kontrak, onHapus }: Props) {
         >
           {kontrak.nama}
         </Link>
-        <span className="mt-0.5 flex items-center gap-1.5 text-[12px] text-teks-lembut">
+        {/* Nomor PKS dan jumlah file dipisah jarak, tanpa titik tengah (DESIGN.md). Ikon dokumen sudah menjadi pemisah. */}
+        <span className="mt-0.5 flex flex-wrap items-center gap-x-3 text-[12px] text-teks-lembut">
           {kontrak.nomorPks}
-          <span aria-hidden="true">·</span>
-          <Ikon nama="dokumen" ukuran={13} className="flex-none" />
-          {kontrak.dokumen.length} file
+          <span className="inline-flex items-center gap-1">
+            <Ikon nama="dokumen" ukuran={13} className="flex-none" />
+            {kontrak.dokumen.length} file
+          </span>
         </span>
       </td>
       <td className="max-w-[200px] px-4 py-3.5 text-[13px] text-teks">{kontrak.penyedia}</td>

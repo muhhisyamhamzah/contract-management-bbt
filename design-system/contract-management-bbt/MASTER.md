@@ -86,6 +86,13 @@ Judul besar di tengah HANYA di Beranda dan Masuk. Mozaik di semua halaman dengan
 5. **Pengecualian `segera` `#E0A100` (2,27:1 di putih).** Kuning emas tidak bisa mencapai 3:1 di putih tanpa menjadi cokelat
    dan kehilangan arti "emas". Warna ini dipertahankan HANYA sebagai tanda yang selalu disertai teks
    ("Segera habis", "18 hari lagi" dengan `segera-teks` 6,58:1). Jangan pernah memakainya sendirian sebagai pembawa informasi.
+   Kotak kecil status (garis waktu "Kontrak berakhir" di Beranda, ringkasan status) memakai `kelasKotak`: emas yang sama
+   dengan tepi 1px `segera-teks`, jadi bentuknya terlihat 6,58:1 tanpa mengganti emas. Di garis waktu, kotak diurutkan
+   per status dan nama tautan bulan menyebut rinciannya ("2 sudah lewat, 1 segera habis"), karena di sana kotak tidak
+   didampingi teks (impeccable colorize, 24 Nov 2026).
+6. **Tepi pil filter yang belum dipilih: `garis` → `garis-input`** (chip status di Kontrak dan pil di panel Filter).
+   `garis` hanya 1,24:1, padahal tepi itulah yang menandai pil sebagai tombol pilihan. `garis-input` 3,55:1 di putih.
+   Hover memakai latar `latar`, bukan tepi yang lebih gelap (24 Nov 2026).
 
 ---
 

@@ -104,6 +104,9 @@ function Beranda() {
               type="search"
               value={kataKunci}
               onChange={(e) => setKataKunci(e.target.value)}
+              name="q"
+              autoComplete="off"
+              spellCheck={false}
               placeholder="Cari nama, penyedia, atau nomor PKS"
               className="h-11 min-w-0 flex-1 border-none bg-transparent text-[15px] text-teks outline-none"
             />

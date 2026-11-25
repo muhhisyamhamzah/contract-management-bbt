@@ -1,6 +1,6 @@
 // Rekap jumlah kontrak per status di Beranda, berupa pil yang bisa diklik (arah "Kavling", DESIGN.md).
 // Setiap pil membuka daftar Kontrak yang sudah difilter, misalnya /kontrak?status=lewat.
-// (24 Nov 2026) Setiap pil juga menampilkan total nilai kontraknya, misalnya "3 Segera habis · Rp 4,2 M".
+// (24 Nov 2026) Setiap pil juga menampilkan total nilai kontraknya, misalnya "3 Segera habis | Rp 4,2 M" (dipisah garis tipis, bukan titik tengah).
 
 import { Link } from 'react-router-dom'
 import { formatRupiahSingkat } from '../lib/format'
@@ -38,7 +38,7 @@ function RingkasanStatus({ jumlah, total, nilai }: Props) {
             to={`/kontrak?status=${status}`}
             className="flex min-h-11 items-center gap-2 rounded-full border border-garis bg-white px-4 text-[14px] text-teks no-underline transition-[border-color] duration-150 hover:border-garis-input hover:text-teks motion-reduce:transition-none"
           >
-            <span aria-hidden="true" className={`size-2.5 rounded-[3px] ${TAMPILAN_STATUS[status].kelasBar}`} />
+            <span aria-hidden="true" className={`size-2.5 rounded-[3px] ${TAMPILAN_STATUS[status].kelasKotak}`} />
             <span className="text-[16px] font-bold text-judul">{jumlah[status]}</span>
             {TAMPILAN_STATUS[status].label}
             {jumlah[status] > 0 && <NilaiPil nilai={nilai[status]} />}

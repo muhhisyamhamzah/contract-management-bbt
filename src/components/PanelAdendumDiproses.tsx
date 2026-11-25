@@ -31,7 +31,7 @@ function PanelAdendumDiproses({ daftar, kelas }: Props) {
                   <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                     <span className="nama text-[14px] font-semibold text-judul">{kontrak.nama}</span>
                     <span className="text-[13px] text-teks-lembut">
-                      {kontrak.penyedia} · berakhir {formatTanggalSingkat(kontrak.tanggalBerakhir)}
+                      {kontrak.penyedia}, berakhir <span className="whitespace-nowrap">{formatTanggalSingkat(kontrak.tanggalBerakhir)}</span>
                     </span>
                   </span>
                   <span

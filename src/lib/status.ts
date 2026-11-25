@@ -123,6 +123,12 @@ type TampilanStatus = {
   kelasBar: string
   /** Pita bulan di kotak kalender. */
   kelasPita: string
+  /**
+   * Kotak kecil status (garis waktu Beranda, ringkasan status). Sama dengan kelasBar, kecuali "segera":
+   * emas #E0A100 hanya 2,27:1 di putih (pengecualian MASTER.md), jadi kotaknya diberi tepi segera-teks (6,58:1)
+   * supaya bentuknya tetap terlihat 3:1 tanpa mengganti emas (impeccable colorize, 24 Nov 2026).
+   */
+  kelasKotak: string
 }
 
 /**
@@ -137,6 +143,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasTeks: 'text-berjalan-teks',
     kelasBar: 'bg-berjalan',
     kelasPita: 'bg-lembut text-judul',
+    kelasKotak: 'bg-berjalan',
   },
   segera: {
     label: 'Segera habis',
@@ -145,6 +152,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasTeks: 'text-segera-teks',
     kelasBar: 'bg-segera',
     kelasPita: 'bg-logo-emas text-galaxy-900',
+    kelasKotak: 'border border-segera-teks bg-segera',
   },
   lewat: {
     label: 'Sudah lewat',
@@ -154,6 +162,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasBar: 'bg-lewat',
     // Merah bata + teks putih (5,86:1), 23 Nov 2026. Dulu oranye tanah + teks navy, yang mirip pita emas "segera".
     kelasPita: 'bg-lewat text-white',
+    kelasKotak: 'bg-lewat',
   },
   selesai: {
     label: 'Selesai',
@@ -162,6 +171,7 @@ export const TAMPILAN_STATUS: Record<StatusKontrak, TampilanStatus> = {
     kelasTeks: 'text-selesai-teks',
     kelasBar: 'bg-selesai',
     kelasPita: 'bg-selesai-latar text-selesai-teks',
+    kelasKotak: 'bg-selesai',
   },
 }
 

@@ -33,7 +33,7 @@ function PanelPengingatBulanIni({ daftar, namaBulan, kelas }: Props) {
                 <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                   <span className="nama text-[14px] font-semibold text-judul">{kontrak.nama}</span>
                   <span className="text-[13px] text-teks-lembut">
-                    Pengingat {bulan} bulan · berakhir {formatTanggalSingkat(kontrak.tanggalBerakhir)}
+                    Pengingat {bulan} bulan sebelum berakhir <span className="whitespace-nowrap">{formatTanggalSingkat(kontrak.tanggalBerakhir)}</span>
                   </span>
                 </span>
                 <span className={`flex-none text-[13px] font-semibold ${terkirim ? 'text-teks-lembut' : 'text-aksi'}`}>

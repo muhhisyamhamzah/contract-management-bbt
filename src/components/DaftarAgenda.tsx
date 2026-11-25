@@ -1,5 +1,5 @@
 // Daftar kartu Agenda kontrak di Beranda (24 Nov 2026): tingginya dibatasi 2 baris kartu (6 kartu di desktop,
-// 3 kolom), sisanya di-scroll di dalam kotaknya sendiri, jadi Agenda tidak memanjangkan halaman.
+// 3 kolom) mulai 768px, sisanya di-scroll di dalam kotaknya sendiri. Di HP semua kartu tampil berurutan (25 Nov 2026).
 // Kartu yang belum terlihat muncul dari bawah (memudar + naik) saat di-scroll masuk ke kotak. Tanpa library:
 // IntersectionObserver + transisi CSS. Mode kurangi gerak: kartu langsung tampil tanpa gerak.
 
@@ -38,10 +38,13 @@ function DaftarAgenda({ daftar }: Props) {
     const ukur = () => {
       // Ukur tanpa batas dulu, supaya posisi semua kartu terbaca.
       el.style.maxHeight = ''
-      const baru = hitungTinggi(el)
+      // Di HP (1 kolom) daftar tidak dibatasi: scroll di dalam kotak yang ada di dalam halaman yang juga di-scroll
+      // membuat jari "terjebak" di layar sentuh, dan 2 baris di sana hanya 2 kartu (impeccable adapt, 25 Nov 2026).
+      const baru = window.matchMedia('(min-width: 768px)').matches ? hitungTinggi(el) : null
       setTinggi(baru)
       setSisa(baru === null ? 0 : Array.from(el.children).filter((c) => (c as HTMLElement).offsetTop >= baru).length)
-      if (baru !== null) el.style.maxHeight = `${baru}px`
+      // Ditambah padding bawah daftar (ruang garis fokus), karena offsetTop sudah termasuk padding atas.
+      if (baru !== null) el.style.maxHeight = `${baru + parseFloat(getComputedStyle(el).paddingBottom)}px`
     }
     ukur()
     // Hanya lebar yang dipantau: tinggi daftar berubah karena batas ini sendiri, jangan sampai mengukur berulang.
@@ -83,8 +86,10 @@ function DaftarAgenda({ daftar }: Props) {
         ref={ref}
         id="daftar-agenda"
         aria-label={`${daftar.length} kontrak di agenda`}
-        className={`relative m-0 grid list-none gap-4 p-0 md:grid-cols-2 xl:grid-cols-3 ${
-          tinggi !== null ? 'overflow-y-auto pr-1' : ''
+        // -m-1 p-1: ruang 4px di dalam kotak scroll supaya garis fokus kartu (2px + jarak 2px) tidak terpotong,
+        // tanpa menggeser posisi kartu (impeccable harden, 24 Nov 2026).
+        className={`relative -m-1 grid list-none gap-4 p-1 md:grid-cols-2 xl:grid-cols-3 ${
+          tinggi !== null ? 'overflow-y-auto' : ''
         }`}
       >
         {daftar.map((k) => (
