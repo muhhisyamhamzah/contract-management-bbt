@@ -118,3 +118,17 @@ def test_model_sama_dengan_migrasi(db):
     with db.get_bind().connect() as conn:
         beda = compare_metadata(MigrationContext.configure(conn), Base.metadata)
     assert beda == []
+
+
+def test_perintah_alembic_bisa_dijalankan_dari_folder_backend(_skema_uji):
+    """Langkah README `alembic upgrade head` harus bisa menemukan paket app tanpa bantuan pytest."""
+    import os
+    import subprocess
+    import sys
+    from pathlib import Path
+
+    alembic = Path(sys.executable).with_name("alembic")
+    env = {k: v for k, v in os.environ.items() if k != "PYTHONPATH"}
+    hasil = subprocess.run([str(alembic), "current"], capture_output=True, text=True, env=env, cwd=Path(__file__).parents[1])
+    assert hasil.returncode == 0, hasil.stderr[-500:]
+    assert "0001" in hasil.stdout
